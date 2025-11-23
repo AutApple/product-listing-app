@@ -1,4 +1,4 @@
-import { AbstractEntity } from '../../common/abstract.entity.js';
+import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import defaultValidationConfig from '../../config/validation.config.js';
 import { Column, Entity, } from 'typeorm';
 
