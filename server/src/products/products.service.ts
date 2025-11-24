@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity.js';
 import { Repository } from 'typeorm';
 import { QueryProductDto } from './dto/query-product.dto.js';
-import { QueryHelperService } from '../common/services/QueryHelperService.js';
+import { QueryHelperService } from '../common/services/query-helper.service.js';
 
 @Injectable()
 export class ProductsService {
@@ -25,7 +25,7 @@ export class ProductsService {
       for (const s of queryProductDto.sort)
         Object.assign(orderOptions, this.queryHelperService.sortOptionToKeyValue(s));
     
-    return await this.productRepository.find({ order: orderOptions});
+    return await this.productRepository.find({ order: orderOptions });
   }
 
   async findOne(id: string): Promise<ProductEntity> {
