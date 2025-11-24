@@ -1,10 +1,17 @@
 export interface ProductValidationConfig {
-        maxProductTitleLength: number
-        minProductTitleLength: number
+        maxTitleLength: number
+        minTitleLength: number
 
-        maxProductSlugLength: number
-        minProductSlugLength: number
-}
+        maxSlugLength: number
+        minSlugLength: number
+
+        maxShortDescriptionLength: number
+        minShortDescriptionLength: number
+        
+        maxDescriptionLength: number
+        minDescriptionLength: number
+
+    }
 
 export interface ValidationConfig {
     product: ProductValidationConfig
@@ -13,11 +20,18 @@ export interface ValidationConfig {
 
 const defaultValidationConfig: ValidationConfig = {
     product: {
-        maxProductTitleLength: 128,
-        minProductTitleLength: 10,
+        maxTitleLength: 128,
+        minTitleLength: 10,
 
-        maxProductSlugLength: 20,
-        minProductSlugLength: 5
+        maxSlugLength: 20,
+        minSlugLength: 5,
+        
+        maxShortDescriptionLength: 1500,
+        minShortDescriptionLength: 3,
+
+        maxDescriptionLength: 1500,
+        minDescriptionLength: 3,
+
     }
 }
 
