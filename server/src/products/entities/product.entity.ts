@@ -1,6 +1,7 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import defaultValidationConfig from '../../config/validation.config.js';
-import { Column, Entity, } from 'typeorm';
+import { Column, Entity, OneToMany, } from 'typeorm';
+import { ProductImageEntity } from './product-image.entity.js';
 
 @Entity({
     name: 'products'
@@ -34,5 +35,7 @@ export class ProductEntity extends AbstractEntity {
     })
     description: string
 
+    @OneToMany(() => ProductImageEntity, (productImage: ProductImageEntity) => productImage.product)
+    images: ProductImageEntity[];
 
 }

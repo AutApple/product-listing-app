@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsArray, IsString, IsUrl, Length } from 'class-validator';
 import defaultValidationConfig from '../../config/validation.config.js';
 
 export class CreateProductDto {
@@ -29,5 +29,10 @@ export class CreateProductDto {
         defaultValidationConfig.product.maxDescriptionLength
     )
     description: string;
+
+    @IsArray()
+    // @IsUrl({}, { each: true }) - will be for production, ill use string for now
+    @IsString({ each: true })
+    imageUrls: string[];
 
 }

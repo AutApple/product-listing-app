@@ -6,16 +6,27 @@ import { ProductEntity } from './entities/product.entity.js';
 import { Repository } from 'typeorm';
 import { QueryProductDto } from './dto/query-product.dto.js';
 import { QueryHelperService } from '../common/services/query-helper.service.js';
+import { ProductImageEntity } from './entities/product-image.entity.js';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>,
-    private readonly queryHelperService: QueryHelperService) {}
+    @InjectRepository(ProductImageEntity) private readonly productImageRepository: Repository<ProductImageEntity>,
+    private readonly queryHelperService: QueryHelperService
+  ) {}
 
   
   async create(createProductDto: CreateProductDto) {
-    const product: ProductEntity = await this.productRepository.save(createProductDto);
+    const {imageUrls, ...productData} = createProductDto;
+    const product: ProductEntity = await this.productRepository.save(productData);
+
+    if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
+        const images = imageUrls.map(url => this.productImageRepository.create({url, product}));
+        await this.productImageRepository.save(images);
+        product.images = images;  
+    }
+
     return product;
   }
 
@@ -25,7 +36,7 @@ export class ProductsService {
       for (const s of queryProductDto.sort)
         Object.assign(orderOptions, this.queryHelperService.sortOptionToKeyValue(s));
     
-    return await this.productRepository.find({ order: orderOptions });
+    return await this.productRepository.find({ order: orderOptions, relations: {images: true} });
   }
 
   async findOne(id: string): Promise<ProductEntity> {
