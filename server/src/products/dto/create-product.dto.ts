@@ -35,4 +35,6 @@ export class CreateProductDto {
     @IsString({ each: true })
     imageUrls: string[];
 
+    @IsString()
+    productTypeSlug: string;
 }

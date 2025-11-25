@@ -7,19 +7,26 @@ import { Repository } from 'typeorm';
 import { QueryProductDto } from './dto/query-product.dto.js';
 import { QueryHelperService } from '../common/services/query-helper.service.js';
 import { ProductImageEntity } from './entities/product-image.entity.js';
+import { ProductTypesService } from '../product-types/product-types.service.js';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>,
     @InjectRepository(ProductImageEntity) private readonly productImageRepository: Repository<ProductImageEntity>,
-    private readonly queryHelperService: QueryHelperService
+    private readonly queryHelperService: QueryHelperService,
+    private readonly productTypesService: ProductTypesService
   ) {}
 
   
   async create(createProductDto: CreateProductDto) {
-    const {imageUrls, ...productData} = createProductDto;
-    const product: ProductEntity = await this.productRepository.save(productData);
+    const {imageUrls, productTypeSlug, ...productData} = createProductDto;
+    const productType = await this.productTypesService.findOneBySlug(productTypeSlug);
+
+    const product: ProductEntity = this.productRepository.create(productData);
+    product.productType = productType;
+   
+    await this.productRepository.save(product);
 
     if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
         const images = imageUrls.map(url => this.productImageRepository.create({url, product}));
