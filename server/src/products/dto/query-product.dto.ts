@@ -8,9 +8,9 @@ enum SortEnum { created_at_desc ='-createdAt',
                 updated_at_asc = 'updatedAt' }
 
 
-export class QueryProductDto extends QueryCommonDto{
+export class QueryProductDto extends QueryCommonDto {
     @IsOptional()
     @ToArray()
     @IsEnum(SortEnum, {each: true})
     sort: string[];
-}
+}   

@@ -10,11 +10,16 @@ export interface ProductValidationConfig {
         
         maxDescriptionLength: number
         minDescriptionLength: number
+}
 
-    }
+export interface ProductTypeValidationConfig {
+    minSlugLength: number;
+    maxSlugLength: number;
+}
 
 export interface ValidationConfig {
-    product: ProductValidationConfig
+    product: ProductValidationConfig;
+    productType: ProductTypeValidationConfig;
 }
 
 
@@ -31,7 +36,10 @@ const defaultValidationConfig: ValidationConfig = {
 
         maxDescriptionLength: 1500,
         minDescriptionLength: 3,
-
+    },
+    productType: {
+        minSlugLength: 5,
+        maxSlugLength: 20
     }
 }
 
