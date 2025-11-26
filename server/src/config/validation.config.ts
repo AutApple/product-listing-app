@@ -17,14 +17,16 @@ export interface ProductValidationConfig extends SlugLengthConfig, TitleLengthCo
     minDescriptionLength: number
 }
 
-export interface ProductTypeValidationConfig extends SlugLengthConfig{
+export interface ProductTypeValidationConfig extends SlugLengthConfig {
 }
 
+export interface AttributeValidationConfig extends SlugLengthConfig, TitleLengthConfig {
 }
 
 export interface ValidationConfig {
     product: ProductValidationConfig;
     productType: ProductTypeValidationConfig;
+    attribute: AttributeValidationConfig;
 }
 
 const globalSlugLength = {
@@ -51,6 +53,9 @@ const defaultValidationConfig: ValidationConfig = {
     productType: {
         ...globalSlugLength
     },
+    attribute: {
+        ...globalSlugLength,
+        ...globalTitleLength
     }
 }
 

@@ -25,7 +25,7 @@ export class ProductsService {
 
     const product: ProductEntity = this.productRepository.create(productData);
     product.productType = productType;
-   
+
     await this.productRepository.save(product);
 
     if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
@@ -43,7 +43,7 @@ export class ProductsService {
       for (const s of queryProductDto.sort)
         Object.assign(orderOptions, this.queryHelperService.sortOptionToKeyValue(s));
     
-    return await this.productRepository.find({ order: orderOptions, relations: {images: true} });
+    return await this.productRepository.find({ order: orderOptions, relations: {images: true, productType: true} });
   }
 
   async findOne(id: string): Promise<ProductEntity> {

@@ -16,11 +16,11 @@ export class ProductTypesService {
   }
 
   async findAll(): Promise<ProductTypeEntity[]> {
-    return await this.productTypeRepository.find({relations: {products: true}});
+    return await this.productTypeRepository.find({});
   }
 
   async findOneBySlug(slug: string): Promise<ProductTypeEntity> {
-    const productType = await this.productTypeRepository.findOne({where: {slug}, relations: {products: true}});
+    const productType = await this.productTypeRepository.findOne({where: {slug}, select: {createdAt: false, updatedAt: false}});
     if(!productType)
         throw new NotFoundException('Product type with given slug not found');
     return productType;
