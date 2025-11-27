@@ -10,5 +10,6 @@ import { AttributeEnumValueEntity } from './entities/attribute-enum-value.entity
   imports: [TypeOrmModule.forFeature([AttributeEntity, AttributeEnumValueEntity])],
   controllers: [AttributesController],
   providers: [AttributesService],
+  exports: [AttributesService]
 })
 export class AttributesModule {}

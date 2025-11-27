@@ -4,19 +4,31 @@ import { UpdateProductTypeDto } from './dto/update-product-type.dto';
 import { Repository } from 'typeorm';
 import { ProductTypeEntity } from './entities/product-type.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AttributesService } from '../attributes/attributes.service.js';
 
 @Injectable()
 export class ProductTypesService {
   constructor (
-    @InjectRepository(ProductTypeEntity) private readonly productTypeRepository: Repository<ProductTypeEntity>
+    @InjectRepository(ProductTypeEntity) private readonly productTypeRepository: Repository<ProductTypeEntity>,
+    private readonly attributesService: AttributesService
   ) {}
   
   async create(createProductTypeDto: CreateProductTypeDto): Promise<ProductTypeEntity> {
-    return await this.productTypeRepository.save(createProductTypeDto); 
+    const {attributes, ...productTypeData} = createProductTypeDto;
+    const productType = this.productTypeRepository.create(productTypeData);
+    productType.attributes = [];
+
+    if(attributes.length > 0)
+      for (const attributeSlug of attributes) { 
+          const attribute = await this.attributesService.findOneBySlug(attributeSlug);
+          productType.attributes.push(attribute);  
+      }
+
+    return await this.productTypeRepository.save(productType); 
   }
 
   async findAll(): Promise<ProductTypeEntity[]> {
-    return await this.productTypeRepository.find({});
+    return await this.productTypeRepository.find({relations: {attributes: true}});
   }
 
   async findOneBySlug(slug: string): Promise<ProductTypeEntity> {
@@ -27,8 +39,19 @@ export class ProductTypesService {
   }
 
   async update(slug: string, updateProductTypeDto: UpdateProductTypeDto): Promise<ProductTypeEntity> {
+    const {attributes, ...productTypeData} = updateProductTypeDto;
     const productType = await this.findOneBySlug(slug);
-    Object.assign(productType, updateProductTypeDto);
+
+    Object.assign(productType, productTypeData);
+
+    if(attributes && attributes.length > 0) {
+      productType.attributes = [];
+      for (const attributeSlug of attributes) { 
+          const attribute = await this.attributesService.findOneBySlug(attributeSlug);
+          productType.attributes.push(attribute);  
+      }
+    }
+
     return await this.productTypeRepository.save(productType);
   }
 

@@ -17,18 +17,18 @@ export class AttributesController {
     return this.attributesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.attributesService.findOne(id);
+  @Get(':slug')
+  findOne(@Param('slug') slug: string) {
+    return this.attributesService.findOneBySlug(slug);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAttributeDto: UpdateAttributeDto) {
-    return this.attributesService.update(id, updateAttributeDto);
+  @Patch(':slug')
+  update(@Param('slug') slug: string, @Body() updateAttributeDto: UpdateAttributeDto) {
+    return this.attributesService.update(slug, updateAttributeDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.attributesService.remove(id);
+  @Delete(':slug')
+  remove(@Param('slug') slug: string) {
+    return this.attributesService.remove(slug);
   }
 }

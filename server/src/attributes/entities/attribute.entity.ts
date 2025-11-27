@@ -1,8 +1,10 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import defaultValidationConfig from '../../config/validation.config.js';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
 import AttributeTypes from '../types/attribute.types.enum.js';
 import { AttributeEnumValueEntity } from './attribute-enum-value.entity.js';
+import { ProductTypeEntity } from '../../product-types/entities/product-type.entity.js';
+import { Exclude } from 'class-transformer';
 
 @Entity({
     name: 'attributes'
@@ -30,4 +32,7 @@ export class AttributeEntity extends AbstractEntity{
     @OneToMany(() => AttributeEnumValueEntity, (enumValue: AttributeEnumValueEntity) => enumValue.attribute)
     enumValues: AttributeEnumValueEntity[];
     
+    @ManyToMany(() => ProductTypeEntity, (productType: ProductTypeEntity) => productType.attributes)
+    @Exclude({ toPlainOnly: true }) 
+    productTypes: ProductTypeEntity;
 }

@@ -31,15 +31,15 @@ export class AttributesService {
     return this.attributeEntityRepository.find({});
   }
 
-  async findOne(id: string): Promise<AttributeEntity> {
-    const attribute = await this.attributeEntityRepository.findOneBy({id});
+  async findOneBySlug(slug: string): Promise<AttributeEntity> {
+    const attribute = await this.attributeEntityRepository.findOneBy({slug});
     if(!attribute)
-        throw new NotFoundException('Attribute with specified id not found');      
+        throw new NotFoundException('Attribute with specified slug is not found');      
     return attribute;
   }
 
-  async update(id: string, updateAttributeDto: UpdateAttributeDto): Promise<AttributeEntity> {
-      const attribute = await this.findOne(id);
+  async update(slug: string, updateAttributeDto: UpdateAttributeDto): Promise<AttributeEntity> {
+      const attribute = await this.findOneBySlug(slug);
       const {enumValues, ...attributeData} = updateAttributeDto;
       Object.assign(attribute, attributeData);
       if (enumValues && attribute.type === AttributeTypes.ENUM){
@@ -50,8 +50,8 @@ export class AttributesService {
       return await this.attributeEntityRepository.save(attribute);
   }
 
-  async remove(id: string): Promise<AttributeEntity> {
-    const attribute = await this.findOne(id);
+  async remove(slug: string): Promise<AttributeEntity> {
+    const attribute = await this.findOneBySlug(slug);
     await this.attributeEntityRepository.remove(attribute);
     return attribute;
   }
