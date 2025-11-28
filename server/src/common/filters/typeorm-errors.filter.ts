@@ -13,12 +13,15 @@ export class TypeORMErrorFilter implements ExceptionFilter {
         
         const response: Response = host.switchToHttp().getResponse<Response>();
         
+        
+        const driverError = exception.driverError as DatabaseError | undefined;
+        
         const fallback = () =>
             response.status(500).json({
                 message: 'Database query failed',
+                detail: driverError?.detail
             });
         
-        const driverError = exception.driverError as DatabaseError | undefined;
         
         if(!driverError) // Fallback for driverError undefined or not a PG-style error
             return fallback();

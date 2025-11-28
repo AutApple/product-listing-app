@@ -14,7 +14,14 @@ export class ProductImageEntity {
     })
     url: string;
 
-    @ManyToOne(() => ProductEntity, (product: ProductEntity) => product.images)
+    @ManyToOne(
+        () => ProductEntity, 
+        (product: ProductEntity) => product.images, 
+        {
+            cascade: true,
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE'
+        })
     @Exclude({ toPlainOnly: true })
     product: ProductEntity;
 }

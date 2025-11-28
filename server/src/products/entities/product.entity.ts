@@ -43,7 +43,11 @@ export class ProductEntity extends AbstractEntity {
     @ManyToOne(() => ProductTypeEntity, (productType: ProductTypeEntity) => productType.products)
     productType: ProductTypeEntity;
 
-    @OneToMany(() => ProductAttributeValueEntity, (productAttributeValue: ProductAttributeValueEntity) => productAttributeValue.product)
+    @OneToMany(
+        () => ProductAttributeValueEntity, 
+        (productAttributeValue: ProductAttributeValueEntity) => productAttributeValue.product,
+        { cascade: true }
+    )
     attributeValues: ProductAttributeValueEntity[];
 
 }
