@@ -79,18 +79,13 @@ export class ProductsService {
     return result;
   }
 
-
-
   async create(createProductDto: CreateProductDto) {
     const {attributes, imageUrls, productTypeSlug, ...productData} = createProductDto;
     const productType = await this.productTypesService.findOneBySlug(productTypeSlug);
 
     const product: ProductEntity = this.productRepository.create(productData);
     product.productType = productType;
-    
-    
-
-
+  
     await this.productRepository.save(product);
     // Assign attributes
     product.attributeValues = this.validateAndUpsertAttributeValues(
@@ -120,16 +115,15 @@ export class ProductsService {
     return await this.productRepository.find({ order: orderOptions, relations: {images: true, productType: true} });
   }
 
-  async findOne(id: string): Promise<ProductEntity> {
-    const product = await this.productRepository.findOne({where: {id}, relations: ['productType', 'productType.attributes', 'attributeValues']});
+  async findOneBySlug(slug: string): Promise<ProductEntity> {
+    const product = await this.productRepository.findOne({where: {slug}, relations: ['productType', 'productType.attributes', 'productType.attributes.enumValues', 'attributeValues']});
     if(!product)
       throw new NotFoundException('Can\'t find a product with specified ID');
     return product;
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
-    const product = await this.findOne(id);
-    console.log(product.attributeValues);
+  async update(slug: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
+    const product = await this.findOneBySlug(slug);
     
     const {attributes, imageUrls, productTypeSlug, ...productData} = updateProductDto;
     
@@ -153,8 +147,8 @@ export class ProductsService {
     return await this.productRepository.save(product);
   }
 
-  async remove(id: string) {
-    const product = await this.findOne(id);
+  async remove(slug: string) {
+    const product = await this.findOneBySlug(slug);
     await this.productRepository.remove(product);
     return product;
   }
