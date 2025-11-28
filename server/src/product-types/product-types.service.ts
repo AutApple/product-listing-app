@@ -32,7 +32,7 @@ export class ProductTypesService {
   }
 
   async findOneBySlug(slug: string): Promise<ProductTypeEntity> {
-    const productType = await this.productTypeRepository.findOne({where: {slug}, select: {createdAt: false, updatedAt: false}});
+    const productType = await this.productTypeRepository.findOne({where: {slug}, select: {createdAt: false, updatedAt: false}, relations: ['attributes', 'attributes.enumValues']});
     if(!productType)
         throw new NotFoundException('Product type with given slug not found');
     return productType;

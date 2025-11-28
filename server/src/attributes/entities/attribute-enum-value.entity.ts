@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { AttributeEntity } from './attribute.entity.js';
 import { Exclude } from 'class-transformer';
 
@@ -6,11 +6,11 @@ import { Exclude } from 'class-transformer';
     name: 'attribute_enum_values'
 })
 export class AttributeEnumValueEntity {
-    @PrimaryColumn()
-    attributeId: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @ManyToOne(() => AttributeEntity, (attribute: AttributeEntity) => attribute.enumValues, {onDelete: 'CASCADE'})
-    @JoinColumn({name: 'attributeId'})
+    @JoinColumn()
     @Exclude({ toPlainOnly: true })  
     attribute: AttributeEntity;
 

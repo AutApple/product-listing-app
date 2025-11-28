@@ -1,5 +1,16 @@
-import { IsArray, IsString, IsUrl, Length } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsString, IsUrl, Length, ValidateNested } from 'class-validator';
 import defaultValidationConfig from '../../config/validation.config.js';
+import { Type } from 'class-transformer';
+import { IsStringNumberBoolean } from '../../common/validators/is-string-number-boolean.validator.js';
+
+
+class AttributeItem {
+  @IsString()
+  key: string;
+
+  @IsStringNumberBoolean()
+  value: number | boolean | string
+}
 
 export class CreateProductDto {
     @IsString()
@@ -37,4 +48,11 @@ export class CreateProductDto {
 
     @IsString()
     productTypeSlug: string;
+
+    // Attribute values will be specified in there
+    @IsArray()
+    @ValidateNested({each: true})
+    @Type(() => AttributeItem)
+    attributes: AttributeItem[];
+
 }

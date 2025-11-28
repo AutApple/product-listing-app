@@ -3,6 +3,7 @@ import defaultValidationConfig from '../../config/validation.config.js';
 import { Column, Entity, ManyToOne, OneToMany, } from 'typeorm';
 import { ProductImageEntity } from './product-image.entity.js';
 import { ProductTypeEntity } from '../../product-types/entities/product-type.entity.js';
+import { ProductAttributeValueEntity } from './product-attribute-value.js';
 
 @Entity({
     name: 'products'
@@ -41,5 +42,8 @@ export class ProductEntity extends AbstractEntity {
 
     @ManyToOne(() => ProductTypeEntity, (productType: ProductTypeEntity) => productType.products)
     productType: ProductTypeEntity;
+
+    @OneToMany(() => ProductAttributeValueEntity, (productAttributeValue: ProductAttributeValueEntity) => productAttributeValue.product)
+    attributeValues: ProductAttributeValueEntity[];
 
 }
