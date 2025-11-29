@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ProductTypeEntity } from './entities/product-type.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributesService } from '../attributes/attributes.service.js';
+import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 
 @Injectable()
 export class ProductTypesService {
@@ -34,7 +35,7 @@ export class ProductTypesService {
   async findOneBySlug(slug: string, relations: string[] = []): Promise<ProductTypeEntity> {
     const productType = await this.productTypeRepository.findOne({where: {slug}, select: {createdAt: false, updatedAt: false}, relations});
     if(!productType)
-        throw new NotFoundException('Product type with given slug not found');
+        throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product type', slug));
     return productType;
   }
 

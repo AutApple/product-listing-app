@@ -6,6 +6,7 @@ import { AttributeEntity } from './entities/attribute.entity.js';
 import { Repository } from 'typeorm';
 import { AttributeEnumValueEntity } from './entities/attribute-enum-value.entity.js';
 import AttributeTypes from './types/attribute.types.enum.js';
+import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 
 @Injectable()
 export class AttributesService {
@@ -33,7 +34,7 @@ export class AttributesService {
   async findOneBySlug(slug: string): Promise<AttributeEntity> {
     const attribute = await this.attributeEntityRepository.findOneBy({slug});
     if(!attribute)
-        throw new NotFoundException('Attribute with specified slug is not found');      
+        throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('attribute', slug));      
     return attribute;
   }
 

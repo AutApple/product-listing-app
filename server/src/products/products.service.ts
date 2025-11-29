@@ -11,6 +11,7 @@ import { ProductTypesService } from '../product-types/product-types.service.js';
 import AttributeTypes from '../attributes/types/attribute.types.enum.js';
 import { ProductAttributeValueEntity } from './entities/product-attribute-value.js';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
+import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 
 
 @Injectable()
@@ -39,7 +40,7 @@ export class ProductsService {
 
         // 3. if type is enum - check if it's one of the enum values.
         if(attributeEntity.type === AttributeTypes.ENUM && !attributeEntity.enumValues.find(v => v.value === value))
-          throw new BadRequestException(`Attribute ${key} can only have values of ${attributeEntity.enumValues.map(v => v.value).join(', ')}`);  
+          throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_BAD_REQUEST(key, attributeEntity.enumValues.map(v => v.value)));  
         
         // 4. check type constraints
         const expectedTypes = {
@@ -126,7 +127,7 @@ export class ProductsService {
   async findOneBySlug(slug: string, relations: string[] = []): Promise<ProductEntity> {
     const product = await this.productRepository.findOne({where: {slug}, relations});
     if(!product)
-      throw new NotFoundException('Can\'t find a product with specified ID');
+      throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product', slug));
     return product;
   }
 
