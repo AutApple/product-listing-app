@@ -25,7 +25,6 @@ export class ProductsService {
   private validateAndUpsertAttributeValues(
     rawAttributeValues: [{key: string, value: (number | boolean | string)}],
     allowedAttributes: AttributeEntity[],
-    productId: string,
     mergeAttributeValues?: ProductAttributeValueEntity[] // for update
   ): ProductAttributeValueEntity[]{
     
@@ -66,7 +65,6 @@ export class ProductsService {
         } else {
           const attributeValueEntity = new ProductAttributeValueEntity();
 
-          attributeValueEntity.product = {id: productId} as ProductEntity;
           attributeValueEntity.attribute = {id: attributeEntity.id} as AttributeEntity;
           
           attributeValueEntity.valueString = valueString;
@@ -90,17 +88,18 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto) {
     const {attributes, imageUrls, productTypeSlug, ...productData} = createProductDto;
-    const productType = await this.productTypesService.findOneBySlug(productTypeSlug);
+    const productType = await this.productTypesService.findOneBySlug(
+      productTypeSlug,
+      ['attributes', 'attributes.enumValues']
+    );
 
     const product: ProductEntity = this.productRepository.create(productData);
     product.productType = productType;
   
-    await this.productRepository.save(product);
     // Assign attributes
     product.attributeValues = this.validateAndUpsertAttributeValues(
       attributes as [{key: string, value: (number | boolean | string)}], 
-      productType.attributes, 
-      product.id
+      productType.attributes 
     );
     
     await this.productRepository.save(product);
@@ -124,7 +123,7 @@ export class ProductsService {
     return await this.productRepository.find({ order: orderOptions, relations: {images: true, productType: true} });
   }
 
-  async findOneBySlug(slug: string, relations: string[] = ['']): Promise<ProductEntity> {
+  async findOneBySlug(slug: string, relations: string[] = []): Promise<ProductEntity> {
     const product = await this.productRepository.findOne({where: {slug}, relations});
     if(!product)
       throw new NotFoundException('Can\'t find a product with specified ID');
@@ -148,7 +147,6 @@ export class ProductsService {
         const newValues = this.validateAndUpsertAttributeValues(
           attributes as [{key: string, value: (number | boolean | string)}], 
           product.productType.attributes, 
-          product.id,
           product.attributeValues
         );
         product.attributeValues = newValues;

@@ -6,7 +6,6 @@ import { AttributeEntity } from './entities/attribute.entity.js';
 import { Repository } from 'typeorm';
 import { AttributeEnumValueEntity } from './entities/attribute-enum-value.entity.js';
 import AttributeTypes from './types/attribute.types.enum.js';
-import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class AttributesService {
