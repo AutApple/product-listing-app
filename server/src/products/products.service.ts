@@ -79,6 +79,11 @@ export class ProductsService {
     return result;
   }
 
+
+  private upsertImageUrls(product: ProductEntity, imageUrls: string[]) {
+
+  }
+
   async create(createProductDto: CreateProductDto) {
     const {attributes, imageUrls, productTypeSlug, ...productData} = createProductDto;
     const productType = await this.productTypesService.findOneBySlug(productTypeSlug);
@@ -115,15 +120,18 @@ export class ProductsService {
     return await this.productRepository.find({ order: orderOptions, relations: {images: true, productType: true} });
   }
 
-  async findOneBySlug(slug: string): Promise<ProductEntity> {
-    const product = await this.productRepository.findOne({where: {slug}, relations: ['productType', 'productType.attributes', 'productType.attributes.enumValues', 'attributeValues']});
+  async findOneBySlug(slug: string, relations: string[] = ['']): Promise<ProductEntity> {
+    const product = await this.productRepository.findOne({where: {slug}, relations});
     if(!product)
       throw new NotFoundException('Can\'t find a product with specified ID');
     return product;
   }
 
   async update(slug: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
-    const product = await this.findOneBySlug(slug);
+    const product = await this.findOneBySlug(
+      slug, 
+      ['productType', 'productType.attributes', 'productType.attributes.enumValues', 'attributeValues', 'images']
+    );
     
     const {attributes, imageUrls, productTypeSlug, ...productData} = updateProductDto;
     

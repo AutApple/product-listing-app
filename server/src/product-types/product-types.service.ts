@@ -31,8 +31,8 @@ export class ProductTypesService {
     return await this.productTypeRepository.find({relations: {attributes: true}});
   }
 
-  async findOneBySlug(slug: string): Promise<ProductTypeEntity> {
-    const productType = await this.productTypeRepository.findOne({where: {slug}, select: {createdAt: false, updatedAt: false}, relations: ['attributes', 'attributes.enumValues']});
+  async findOneBySlug(slug: string, relations: string[] = []): Promise<ProductTypeEntity> {
+    const productType = await this.productTypeRepository.findOne({where: {slug}, select: {createdAt: false, updatedAt: false}, relations});
     if(!productType)
         throw new NotFoundException('Product type with given slug not found');
     return productType;
@@ -40,7 +40,7 @@ export class ProductTypesService {
 
   async update(slug: string, updateProductTypeDto: UpdateProductTypeDto): Promise<ProductTypeEntity> {
     const {attributes, ...productTypeData} = updateProductTypeDto;
-    const productType = await this.findOneBySlug(slug);
+    const productType = await this.findOneBySlug(slug, ['attributes', 'attributes.enumValues']);
 
     Object.assign(productType, productTypeData);
 
