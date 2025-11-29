@@ -78,10 +78,14 @@ export class ProductsService {
     }
     return result;
   }
-
-
-  private upsertImageUrls(product: ProductEntity, imageUrls: string[]) {
-
+  private upsertImageUrls(product: ProductEntity, imageUrls: string[], mergeImageUrls?: ProductImageEntity[]): ProductImageEntity[] {
+    const result: ProductImageEntity[] = mergeImageUrls ?? [];
+    for (const url of imageUrls) {
+      if (result.findIndex(v => v.url === url) !== -1) 
+        continue;
+      result.push(this.productImageRepository.create({url, product}));
+    }
+    return result;
   }
 
   async create(createProductDto: CreateProductDto) {
@@ -103,7 +107,7 @@ export class ProductsService {
     
     // Assign images
     if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
-        const images = imageUrls.map(url => this.productImageRepository.create({url, product}));
+        const images = this.upsertImageUrls(product, imageUrls);
         await this.productImageRepository.save(images);
         product.images = images;  
     }
@@ -150,7 +154,11 @@ export class ProductsService {
         product.attributeValues = newValues;
     }
 
-    //TODO: update images
+    if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
+        const images = this.upsertImageUrls(product, imageUrls, product.images);
+        await this.productImageRepository.save(images);
+        product.images = images;  
+    }
 
     return await this.productRepository.save(product);
   }
