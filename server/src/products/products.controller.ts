@@ -20,7 +20,7 @@ export class ProductsController {
 
   @Get(':slug')
   findOne(@Param('slug') slug: string) {
-    return this.productsService.findOneBySlug(slug);
+    return this.productsService.findOneBySlugDTO(slug);
   }
 
   @Patch(':slug')

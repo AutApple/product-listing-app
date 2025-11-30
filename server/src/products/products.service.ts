@@ -14,6 +14,7 @@ import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
+import { OutputProductDTO } from './dto/output/output-product.dto.js';
 
 
 @Injectable()
@@ -26,7 +27,7 @@ export class ProductsService {
   ) {}
 
   private readonly defaultSelectOptions: FindOptionsSelect<ProductEntity> = {
-      id: false, 
+      id: true, 
       slug: true,
       title: true,
       description: true,
@@ -97,7 +98,7 @@ export class ProductsService {
         } else {
           const attributeValueEntity = new ProductAttributeValueEntity();
 
-          attributeValueEntity.attribute = {id: attributeEntity.id} as AttributeEntity;
+          attributeValueEntity.attribute = attributeEntity;
           
           attributeValueEntity.valueString = valueString;
           attributeValueEntity.valueInt = valueInt;
@@ -108,6 +109,7 @@ export class ProductsService {
     }
     return result;
   }
+  
   private upsertImageUrls(product: ProductEntity, imageUrls: string[], mergeImageUrls?: ProductImageEntity[]): ProductImageEntity[] {
     const result: ProductImageEntity[] = mergeImageUrls ?? [];
     for (const url of imageUrls) {
@@ -118,7 +120,7 @@ export class ProductsService {
     return result;
   }
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto): Promise<OutputProductDTO> {
     const {attributes, imageUrls, productTypeSlug, ...productData} = createProductDto;
     const productType = await this.productTypesService.findOneBySlug(
       productTypeSlug,
@@ -126,6 +128,7 @@ export class ProductsService {
         id: true,
         attributes: {
           id: true,
+          title: true,
           enumValues: {
             id: true
           }
@@ -151,29 +154,37 @@ export class ProductsService {
         product.images = images;  
     }
 
-    return product;
+    return new OutputProductDTO(product);
   }
 
-  async findAll(queryProductDto: QueryProductDto): Promise<ProductEntity[]> {
+  async findAll(queryProductDto: QueryProductDto): Promise<OutputProductDTO[]> {
     const orderOptions = {};
     if(queryProductDto.sort)
       for (const s of queryProductDto.sort)
         Object.assign(orderOptions, this.queryHelperService.sortOptionToKeyValue(s));
     const relations = extractRelationsFromSelect(this.defaultSelectOptions);
-    return await this.productRepository.find({ order: orderOptions, select: this.defaultSelectOptions, relations});
+    const entities = await this.productRepository.find({ order: orderOptions, select: this.defaultSelectOptions, relations});
+
+    return entities.map(e => new OutputProductDTO(e));
   }
 
   async findOneBySlug(slug: string, mergeSelectOptions: FindOptionsSelect<ProductEntity> = {}): Promise<ProductEntity> {
     const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
     const relations = extractRelationsFromSelect(selectOptions);
-    
+ 
     const product = await this.productRepository.findOne({where: {slug}, select: selectOptions, relations});
+
+   
     if(!product)
       throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product', slug));
     return product;
   }
 
-  async update(slug: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
+  async findOneBySlugDTO(slug: string,  mergeSelectOptions: FindOptionsSelect<ProductEntity> = {}): Promise<OutputProductDTO> {
+    return new OutputProductDTO(await this.findOneBySlug(slug, mergeSelectOptions));
+  }
+
+  async update(slug: string, updateProductDto: UpdateProductDto): Promise<OutputProductDTO> {
     const product = await this.findOneBySlug(
       slug,
       {
@@ -225,12 +236,12 @@ export class ProductsService {
         product.images = images;  
     }
  
-    return product;
+    return new OutputProductDTO(product);
   }
 
-  async remove(slug: string) {
+  async remove(slug: string): Promise<OutputProductDTO> {
     const product = await this.findOneBySlug(slug);
     await this.productRepository.remove(product);
-    return product;
+    return new OutputProductDTO(product);
   }
 }

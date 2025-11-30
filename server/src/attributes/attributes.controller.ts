@@ -19,7 +19,7 @@ export class AttributesController {
 
   @Get(':slug')
   findOne(@Param('slug') slug: string) {
-    return this.attributesService.findOneBySlug(slug);
+    return this.attributesService.findOneBySlugDTO(slug);
   }
 
   @Patch(':slug')

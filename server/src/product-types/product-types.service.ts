@@ -8,6 +8,7 @@ import { AttributesService } from '../attributes/attributes.service.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
+import { OutputProductTypeDTO } from './dto/output/output-product-type.dto.js';
 
 @Injectable()
 export class ProductTypesService {
@@ -22,7 +23,7 @@ export class ProductTypesService {
       createdAt: false,
       updatedAt: false,
       attributes: {
-        id: false,
+        id: true,
         slug: true,
         type: true,
         enumValues: {
@@ -32,7 +33,7 @@ export class ProductTypesService {
       }  
   }
   
-  async create(createProductTypeDto: CreateProductTypeDto): Promise<ProductTypeEntity> {
+  async create(createProductTypeDto: CreateProductTypeDto): Promise<OutputProductTypeDTO> {
     const {attributes, ...productTypeData} = createProductTypeDto;
     const productType = this.productTypeRepository.create(productTypeData);
     productType.attributes = [];
@@ -43,12 +44,13 @@ export class ProductTypesService {
           productType.attributes.push(attribute);  
       }
 
-    return await this.productTypeRepository.save(productType); 
+    return new OutputProductTypeDTO(await this.productTypeRepository.save(productType)); 
   }
 
 
-  async findAll(): Promise<ProductTypeEntity[]> {
-    return await this.productTypeRepository.find({relations: {attributes: true}});
+  async findAll(): Promise<OutputProductTypeDTO[]> {
+    const relations = extractRelationsFromSelect(this.defaultSelectOptions);
+    return (await this.productTypeRepository.find({select: this.defaultSelectOptions, relations})).map(v => new OutputProductTypeDTO(v));
   }
 
   async findOneBySlug(slug: string, mergeSelectOptions: FindOptionsSelect<ProductTypeEntity> = {}): Promise<ProductTypeEntity> {
@@ -61,7 +63,10 @@ export class ProductTypesService {
     return productType;
   }
 
-  async update(slug: string, updateProductTypeDto: UpdateProductTypeDto): Promise<ProductTypeEntity> {
+    async findOneBySlugDTO(slug: string, mergeSelectOptions: FindOptionsSelect<ProductTypeEntity> = {}): Promise<OutputProductTypeDTO> {
+    return this.findOneBySlug(slug, mergeSelectOptions);
+  }
+  async update(slug: string, updateProductTypeDto: UpdateProductTypeDto): Promise<OutputProductTypeDTO> {
     const {attributes, ...productTypeData} = updateProductTypeDto;
     const productType = await this.findOneBySlug(slug, {
       attributes: {
@@ -86,12 +91,12 @@ export class ProductTypesService {
       }
     }
 
-    return await this.productTypeRepository.save(productType);
+    return new OutputProductTypeDTO(await this.productTypeRepository.save(productType));
   }
 
-  async remove(slug: string): Promise<ProductTypeEntity> {
+  async remove(slug: string): Promise<OutputProductTypeDTO> {
     const productType = await this.findOneBySlug(slug);
     await this.productTypeRepository.remove(productType);
-    return productType;
+    return new OutputProductTypeDTO(productType);
   }
 }
