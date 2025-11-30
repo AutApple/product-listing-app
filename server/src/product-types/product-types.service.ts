@@ -77,7 +77,11 @@ export class ProductTypesService {
     if(attributes && attributes.length > 0) {
       productType.attributes = [];
       for (const attributeSlug of attributes) { 
-          const attribute = await this.attributesService.findOneBySlug(attributeSlug);
+          const attribute = await this.attributesService.findOneBySlug(attributeSlug,
+            {
+              id: true
+            }
+          );
           productType.attributes.push(attribute);  
       }
     }
