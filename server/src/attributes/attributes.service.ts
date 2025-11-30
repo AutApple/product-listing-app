@@ -3,10 +3,12 @@ import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributeEntity } from './entities/attribute.entity.js';
-import { Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsSelect, Repository } from 'typeorm';
 import { AttributeEnumValueEntity } from './entities/attribute-enum-value.entity.js';
 import AttributeTypes from './types/attribute.types.enum.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
+import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
 
 @Injectable()
 export class AttributesService {
@@ -14,6 +16,15 @@ export class AttributesService {
     @InjectRepository(AttributeEntity) private readonly attributeEntityRepository: Repository<AttributeEntity>
   ) {}
 
+  private readonly defaultSelectOptions: FindOptionsSelect<AttributeEntity> = {
+    id: false,
+    slug: true,
+    type: true,
+    enumValues: {
+        id: false,
+        value: true
+    }
+  }
 
   async create(createAttributeDto: CreateAttributeDto): Promise<AttributeEntity> {
     const {enumValues, ...attributeData} = createAttributeDto;
@@ -31,8 +42,12 @@ export class AttributesService {
     return this.attributeEntityRepository.find({});
   }
 
-  async findOneBySlug(slug: string): Promise<AttributeEntity> {
-    const attribute = await this.attributeEntityRepository.findOneBy({slug});
+  async findOneBySlug(slug: string,  mergeSelectOptions: FindOptionsSelect<AttributeEntity> = {}): Promise<AttributeEntity> {
+    const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
+    const relations = extractRelationsFromSelect(selectOptions);
+    
+    
+    const attribute = await this.attributeEntityRepository.findOne({where: {slug}, select: selectOptions, relations: relations});
     if(!attribute)
         throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('attribute', slug));      
     return attribute;

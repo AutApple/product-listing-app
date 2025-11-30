@@ -3,7 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity.js';
-import { Repository } from 'typeorm';
+import { FindOptions, FindOptionsSelect, Repository } from 'typeorm';
 import { QueryProductDto } from './dto/query-product.dto.js';
 import { QueryHelperService } from '../common/services/query-helper.service.js';
 import { ProductImageEntity } from './entities/product-image.entity.js';
@@ -12,6 +12,8 @@ import AttributeTypes from '../attributes/types/attribute.types.enum.js';
 import { ProductAttributeValueEntity } from './entities/product-attribute-value.js';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
+import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 
 
 @Injectable()
@@ -23,6 +25,34 @@ export class ProductsService {
     private readonly productTypesService: ProductTypesService
   ) {}
 
+  private readonly defaultSelectOptions: FindOptionsSelect<ProductEntity> = {
+      id: false, 
+      slug: true,
+      title: true,
+      description: true,
+      shortDescription: true,
+      productType: {slug: true, id: false}, 
+      images: {id: false, url: true},
+      createdAt: false,
+      updatedAt: false,
+      attributeValues: {
+        productId: false,
+        attributeId: false,
+        product: false,
+        attribute: {
+          id: false,
+          updatedAt: false,
+          createdAt: false,
+          slug: true,
+          type: true,
+          title: true
+        },
+        valueString: true,
+        valueBool: true,
+        valueInt: true
+      }
+  };
+
   private validateAndUpsertAttributeValues(
     rawAttributeValues: [{key: string, value: (number | boolean | string)}],
     allowedAttributes: AttributeEntity[],
@@ -33,7 +63,7 @@ export class ProductsService {
     for (const {key, value} of rawAttributeValues) {
         // 2. check if it's an actual attribute that belongs to product type. If not - throw 400
         const attributeEntity = allowedAttributes.find((value) => (value.slug === key));
-        
+
         if(!attributeEntity)
           throw new BadRequestException(`Attribute with key ${key} was not found 
                                           in attributes of a given product type.`); 
@@ -59,6 +89,7 @@ export class ProductsService {
         const valueBool = typeof(value) === 'boolean' ? value : null;
 
         const findIndex = result.findIndex(v => v.attributeId === attributeEntity.id)
+
         if (mergeAttributeValues && findIndex !== -1){
           result[findIndex].valueBool = valueBool;
           result[findIndex].valueInt = valueInt;
@@ -91,7 +122,15 @@ export class ProductsService {
     const {attributes, imageUrls, productTypeSlug, ...productData} = createProductDto;
     const productType = await this.productTypesService.findOneBySlug(
       productTypeSlug,
-      ['attributes', 'attributes.enumValues']
+      {
+        id: true,
+        attributes: {
+          id: true,
+          enumValues: {
+            id: true
+          }
+        }
+      }
     );
 
     const product: ProductEntity = this.productRepository.create(productData);
@@ -116,16 +155,19 @@ export class ProductsService {
   }
 
   async findAll(queryProductDto: QueryProductDto): Promise<ProductEntity[]> {
-    let orderOptions = {};
+    const orderOptions = {};
     if(queryProductDto.sort)
       for (const s of queryProductDto.sort)
         Object.assign(orderOptions, this.queryHelperService.sortOptionToKeyValue(s));
-    
-    return await this.productRepository.find({ order: orderOptions, relations: {images: true, productType: true} });
+    const relations = extractRelationsFromSelect(this.defaultSelectOptions);
+    return await this.productRepository.find({ order: orderOptions, select: this.defaultSelectOptions, relations});
   }
 
-  async findOneBySlug(slug: string, relations: string[] = []): Promise<ProductEntity> {
-    const product = await this.productRepository.findOne({where: {slug}, relations});
+  async findOneBySlug(slug: string, mergeSelectOptions: FindOptionsSelect<ProductEntity> = {}): Promise<ProductEntity> {
+    const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
+    const relations = extractRelationsFromSelect(selectOptions);
+    
+    const product = await this.productRepository.findOne({where: {slug}, select: selectOptions, relations});
     if(!product)
       throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product', slug));
     return product;
@@ -133,14 +175,37 @@ export class ProductsService {
 
   async update(slug: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
     const product = await this.findOneBySlug(
-      slug, 
-      ['productType', 'productType.attributes', 'productType.attributes.enumValues', 'attributeValues', 'images']
+      slug,
+      {
+        id: true,
+        productType: {
+            attributes: {
+                id: true,
+                slug: true,
+                type: true,
+                enumValues: {
+                    id: true,
+                    attribute: true,
+                    value: true
+                }
+            }
+        },
+        attributeValues: {
+          attributeId: true,
+          productId: true,
+          attribute: {
+            id: true
+          },
+          product: {
+            id: true
+          }
+        }
+      }
     );
-    
     const {attributes, imageUrls, productTypeSlug, ...productData} = updateProductDto;
     
     Object.assign(product, productData);
-
+    
     if (productTypeSlug)
         product.productType = await this.productTypesService.findOneBySlug(productTypeSlug);   
     
@@ -152,14 +217,15 @@ export class ProductsService {
         );
         product.attributeValues = newValues;
     }
+    await this.productRepository.save(product);
 
     if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
         const images = this.upsertImageUrls(product, imageUrls, product.images);
         await this.productImageRepository.save(images);
         product.images = images;  
     }
-
-    return await this.productRepository.save(product);
+ 
+    return product;
   }
 
   async remove(slug: string) {

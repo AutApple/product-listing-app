@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductTypeDto } from './dto/create-product-type.dto';
 import { UpdateProductTypeDto } from './dto/update-product-type.dto';
-import { Repository } from 'typeorm';
+import { FindOptionsSelect, Repository } from 'typeorm';
 import { ProductTypeEntity } from './entities/product-type.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributesService } from '../attributes/attributes.service.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
+import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 
 @Injectable()
 export class ProductTypesService {
@@ -13,6 +15,22 @@ export class ProductTypesService {
     @InjectRepository(ProductTypeEntity) private readonly productTypeRepository: Repository<ProductTypeEntity>,
     private readonly attributesService: AttributesService
   ) {}
+  
+  private readonly defaultSelectOptions: FindOptionsSelect<ProductTypeEntity> = {
+      id: true,
+      slug: true,
+      createdAt: false,
+      updatedAt: false,
+      attributes: {
+        id: false,
+        slug: true,
+        type: true,
+        enumValues: {
+          id: false,
+          value: true
+        }
+      }  
+  }
   
   async create(createProductTypeDto: CreateProductTypeDto): Promise<ProductTypeEntity> {
     const {attributes, ...productTypeData} = createProductTypeDto;
@@ -28,12 +46,16 @@ export class ProductTypesService {
     return await this.productTypeRepository.save(productType); 
   }
 
+
   async findAll(): Promise<ProductTypeEntity[]> {
     return await this.productTypeRepository.find({relations: {attributes: true}});
   }
 
-  async findOneBySlug(slug: string, relations: string[] = []): Promise<ProductTypeEntity> {
-    const productType = await this.productTypeRepository.findOne({where: {slug}, select: {createdAt: false, updatedAt: false}, relations});
+  async findOneBySlug(slug: string, mergeSelectOptions: FindOptionsSelect<ProductTypeEntity> = {}): Promise<ProductTypeEntity> {
+    const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
+    const relations = extractRelationsFromSelect(selectOptions);
+          
+    const productType = await this.productTypeRepository.findOne({where: {slug}, select: selectOptions, relations});
     if(!productType)
         throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product type', slug));
     return productType;
@@ -41,7 +63,14 @@ export class ProductTypesService {
 
   async update(slug: string, updateProductTypeDto: UpdateProductTypeDto): Promise<ProductTypeEntity> {
     const {attributes, ...productTypeData} = updateProductTypeDto;
-    const productType = await this.findOneBySlug(slug, ['attributes', 'attributes.enumValues']);
+    const productType = await this.findOneBySlug(slug, {
+      attributes: {
+        id: true,
+        enumValues: {
+          id: true
+        }
+      }
+    });
 
     Object.assign(productType, productTypeData);
 
