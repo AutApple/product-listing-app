@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UsePipes, SetMetadata } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { QueryProductDto } from './dto/query-product.dto.js';
+import { QueryCommonDto } from '../common/dto/query.common.dto.js';
+import { ParsedQuery } from '../common/transformers/parsed-query.transformer.js';
+import { productsQueryParserConfig } from './query-parser-config/products.query-parser-config.js';
 
 @Controller('products')
 export class ProductsController {
@@ -13,8 +15,9 @@ export class ProductsController {
     return this.productsService.create(createProductDto);
   }
 
+  
   @Get()
-  findAll(@Query() query: QueryProductDto) {
+  findAll(@ParsedQuery({config: productsQueryParserConfig, dto: QueryCommonDto}) query: QueryCommonDto) {
     return this.productsService.findAll(query);
   }
 

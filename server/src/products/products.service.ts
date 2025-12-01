@@ -4,7 +4,6 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity.js';
 import { FindOptions, FindOptionsSelect, Repository } from 'typeorm';
-import { QueryProductDto } from './dto/query-product.dto.js';
 import { QueryHelperService } from '../common/services/query-helper.service.js';
 import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypesService } from '../product-types/product-types.service.js';
@@ -15,6 +14,7 @@ import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 import { OutputProductDTO } from './dto/output/output-product.dto.js';
+import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 
 
 @Injectable()
@@ -155,7 +155,7 @@ export class ProductsService {
     return new OutputProductDTO(product);
   }
 
-  async findAll(queryProductDto: QueryProductDto): Promise<OutputProductDTO[]> {
+  async findAll(queryProductDto: QueryCommonDto): Promise<OutputProductDTO[]> {
     const orderOptions = {};
     if(queryProductDto.sort)
       for (const s of queryProductDto.sort)
