@@ -3,7 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity.js';
-import { FindOptions, FindOptionsSelect, Repository } from 'typeorm';
+import { FindOptions, FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
 import { QueryHelperService } from '../common/services/query-helper.service.js';
 import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypesService } from '../product-types/product-types.service.js';
@@ -32,26 +32,9 @@ export class ProductsService {
       title: true,
       description: true,
       shortDescription: true,
-      productType: {slug: true, id: false}, 
-      images: {id: false, url: true},
-      createdAt: false,
-      updatedAt: false,
-      attributeValues: {
-        productId: true,
-        attributeId: true,
-        product: false,
-        attribute: {
-          id: true,
-          updatedAt: false,
-          createdAt: false,
-          slug: true,
-          type: true,
-          title: true
-        },
-        valueString: true,
-        valueBool: true,
-        valueInt: true
-      }
+      productType: {slug: true, id: true},
+      createdAt: true,
+      updatedAt: true,
   };
 
   private validateAndUpsertAttributeValues(
@@ -155,22 +138,38 @@ export class ProductsService {
     return new OutputProductDTO(product);
   }
 
-  async findAll(queryProductDto: QueryCommonDto): Promise<OutputProductDTO[]> {
-    const orderOptions = {};
-    if(queryProductDto.sort)
-      for (const s of queryProductDto.sort)
-        Object.assign(orderOptions, this.queryHelperService.sortOptionToKeyValue(s));
-    const relations = extractRelationsFromSelect(this.defaultSelectOptions);
-    const entities = await this.productRepository.find({ order: orderOptions, select: this.defaultSelectOptions, relations});
-
+  async findAll(
+    mergeSelectOptions: FindOptionsSelect<ProductEntity> = {},
+    orderOptions: FindOptionsOrder<ProductEntity> = {},
+    skip: number = 0,
+    take: number = 10
+  ): Promise<OutputProductDTO[]> {
+    console.log(skip);
+    console.log(take);
+    const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
+    const relations = extractRelationsFromSelect(selectOptions);
+    const entities = await this.productRepository.find({ 
+      order: orderOptions, 
+      select: selectOptions, 
+      relations,
+      skip,
+      take
+    });
     return entities.map(e => new OutputProductDTO(e));
   }
 
-  async findOneBySlug(slug: string, mergeSelectOptions: FindOptionsSelect<ProductEntity> = {}): Promise<ProductEntity> {
+  async findOneBySlug(
+    slug: string, 
+    mergeSelectOptions: FindOptionsSelect<ProductEntity> = {}
+  ): Promise<ProductEntity> {
     const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
     const relations = extractRelationsFromSelect(selectOptions);
  
-    const product = await this.productRepository.findOne({where: {slug}, select: selectOptions, relations});
+    const product = await this.productRepository.findOne({
+      where: {slug}, 
+      select: selectOptions, 
+      relations
+    });
 
    
     if(!product)
@@ -186,7 +185,6 @@ export class ProductsService {
     const product = await this.findOneBySlug(
       slug,
       {
-        id: true,
         productType: {
             attributes: {
                 id: true,
@@ -208,6 +206,10 @@ export class ProductsService {
           product: {
             id: true
           }
+        },
+        images: {
+          id: true,
+          url: true
         }
       }
     );

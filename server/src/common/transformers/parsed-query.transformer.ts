@@ -22,8 +22,7 @@ export const ParsedQuery = createParamDecorator((data: {config: QueryParserConfi
                                                                  .parsePagination()
                                                                  .parseSort()
                                                                  .build();
-    console.log(parsedQuery);
 
-    return transformedQuery;
+    return parsedQuery;
 
 });

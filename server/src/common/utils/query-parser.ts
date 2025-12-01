@@ -5,7 +5,7 @@ import { deepMergeObjects } from './deep-merge-objects.js';
 export interface QueryParserResult {
     selectOptions?: object;
     orderOptions?: object;
-    paginationOptions?: object;
+    paginationOptions?: {skip: number, take: number};
 }
 
 export class QueryParser {

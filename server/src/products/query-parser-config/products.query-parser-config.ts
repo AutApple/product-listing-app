@@ -1,6 +1,6 @@
 import { QueryParserConfiguration } from '../../common/interfaces/query-parser-config.type.js';
 
-const attributeDataSelect = {
+export const productSelectAttributes = {
     attributeValues: {
     productId: true,
     attributeId: true,
@@ -19,15 +19,18 @@ const attributeDataSelect = {
     }
 }
 
-const imageDataSelect = {
-    images: true
+const productSelectImages = {
+    images: {
+        id: true,
+        url: true
+    }
 }
 
 
 export const productsQueryParserConfig: QueryParserConfiguration = {
     includeMap: {
-        'attributes': attributeDataSelect,
-        'images': imageDataSelect 
+        'attributes': productSelectAttributes,
+        'images': productSelectImages 
     },
     orderOptions: ['createdAt', 'updatedAt']
 };
