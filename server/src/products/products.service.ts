@@ -144,8 +144,6 @@ export class ProductsService {
     skip: number = 0,
     take: number = 10
   ): Promise<OutputProductDTO[]> {
-    console.log(skip);
-    console.log(take);
     const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
     const relations = extractRelationsFromSelect(selectOptions);
     const entities = await this.productRepository.find({ 
