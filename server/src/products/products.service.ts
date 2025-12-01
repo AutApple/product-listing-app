@@ -37,11 +37,11 @@ export class ProductsService {
       createdAt: false,
       updatedAt: false,
       attributeValues: {
-        productId: false,
-        attributeId: false,
+        productId: true,
+        attributeId: true,
         product: false,
         attribute: {
-          id: false,
+          id: true,
           updatedAt: false,
           createdAt: false,
           slug: true,
@@ -58,16 +58,14 @@ export class ProductsService {
     rawAttributeValues: [{key: string, value: (number | boolean | string)}],
     allowedAttributes: AttributeEntity[],
     mergeAttributeValues?: ProductAttributeValueEntity[] // for update
-  ): ProductAttributeValueEntity[]{
-    
+  ): ProductAttributeValueEntity[] {
     let result: ProductAttributeValueEntity[] = mergeAttributeValues ?? [];
     for (const {key, value} of rawAttributeValues) {
         // 2. check if it's an actual attribute that belongs to product type. If not - throw 400
         const attributeEntity = allowedAttributes.find((value) => (value.slug === key));
 
         if(!attributeEntity)
-          throw new BadRequestException(`Attribute with key ${key} was not found 
-                                          in attributes of a given product type.`); 
+          throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_NOT_FOUND(key)); 
 
         // 3. if type is enum - check if it's one of the enum values.
         if(attributeEntity.type === AttributeTypes.ENUM && !attributeEntity.enumValues.find(v => v.value === value))
@@ -82,7 +80,7 @@ export class ProductsService {
         };
 
         if(typeof(value) !== expectedTypes[attributeEntity.type])
-          throw new BadRequestException(`Value of attribute ${key} should be type of ${attributeEntity.type}`);
+          throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_WRONG_TYPE(key, attributeEntity.type));
 
         // 5. create ProductAttributeValue with given key and value OR merge if there is mering array
         const valueString = typeof(value) === 'string' ? value : null;

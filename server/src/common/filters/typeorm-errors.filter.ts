@@ -5,6 +5,7 @@ import { QueryFailedError, TypeORMError } from 'typeorm';
 import { PostgresErrorCodes } from '../enums/pg-error-codes.enum.js';
 import type { Response } from 'express';
 import { DatabaseError } from 'pg-protocol';
+import { ERROR_MESSAGES } from '../../config/error-messages.config.js';
 
 @Catch(QueryFailedError)
 export class TypeORMErrorFilter implements ExceptionFilter {
@@ -18,7 +19,7 @@ export class TypeORMErrorFilter implements ExceptionFilter {
         
         const fallback = () =>
             response.status(500).json({
-                message: 'Database query failed',
+                message: ERROR_MESSAGES.DB_ERROR_GENERAL,
                 detail: driverError?.detail
             });
         
@@ -28,10 +29,16 @@ export class TypeORMErrorFilter implements ExceptionFilter {
 
         switch(driverError.code) {
             case PostgresErrorCodes.UniqueViolation:
+                console.log(driverError);
                 return response.status(409).json({
-                    message: 'Unique constraint violation',
+                    message: ERROR_MESSAGES.DB_UNIQUE_CONSTRAINT_VIOLATION(driverError.where),
                     detail: driverError.detail
                 });
+            case PostgresErrorCodes.ForeignKeyViolation: 
+                console.log(driverError);
+                return response.status(409).json({
+                    message: ERROR_MESSAGES.DB_FOREIGN_KEY_VIOLATION(driverError.table),
+                })
         }
         
         return fallback();
