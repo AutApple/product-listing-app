@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductTypeDto } from './dto/create-product-type.dto';
 import { UpdateProductTypeDto } from './dto/update-product-type.dto';
-import { FindOptionsSelect, Repository } from 'typeorm';
+import { FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
 import { ProductTypeEntity } from './entities/product-type.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributesService } from '../attributes/attributes.service.js';
@@ -9,15 +9,18 @@ import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 import { OutputProductTypeDTO } from './dto/output/output-product-type.dto.js';
+import { BaseService } from '../common/base.service.js';
 
 @Injectable()
-export class ProductTypesService {
+export class ProductTypesService extends BaseService<ProductTypeEntity, OutputProductTypeDTO> {
   constructor (
     @InjectRepository(ProductTypeEntity) private readonly productTypeRepository: Repository<ProductTypeEntity>,
     private readonly attributesService: AttributesService
-  ) {}
+  ) {
+    super(productTypeRepository, OutputProductTypeDTO, 'product type')
+  }
   
-  private readonly defaultSelectOptions: FindOptionsSelect<ProductTypeEntity> = {
+  protected readonly defaultSelectOptions: FindOptionsSelect<ProductTypeEntity> = {
       id: true,
       slug: true,
       createdAt: false,
@@ -27,7 +30,7 @@ export class ProductTypesService {
         slug: true,
         type: true,
         enumValues: {
-          id: false,
+          id: true,
           value: true
         }
       }  
@@ -47,25 +50,6 @@ export class ProductTypesService {
     return new OutputProductTypeDTO(await this.productTypeRepository.save(productType)); 
   }
 
-
-  async findAll(): Promise<OutputProductTypeDTO[]> {
-    const relations = extractRelationsFromSelect(this.defaultSelectOptions);
-    return (await this.productTypeRepository.find({select: this.defaultSelectOptions, relations})).map(v => new OutputProductTypeDTO(v));
-  }
-
-  async findOneBySlug(slug: string, mergeSelectOptions: FindOptionsSelect<ProductTypeEntity> = {}): Promise<ProductTypeEntity> {
-    const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
-    const relations = extractRelationsFromSelect(selectOptions);
-          
-    const productType = await this.productTypeRepository.findOne({where: {slug}, select: selectOptions, relations});
-    if(!productType)
-        throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product type', slug));
-    return productType;
-  }
-
-    async findOneBySlugDTO(slug: string, mergeSelectOptions: FindOptionsSelect<ProductTypeEntity> = {}): Promise<OutputProductTypeDTO> {
-    return this.findOneBySlug(slug, mergeSelectOptions);
-  }
   async update(slug: string, updateProductTypeDto: UpdateProductTypeDto): Promise<OutputProductTypeDTO> {
     const {attributes, ...productTypeData} = updateProductTypeDto;
     const productType = await this.findOneBySlug(slug, {
@@ -94,9 +78,31 @@ export class ProductTypesService {
     return new OutputProductTypeDTO(await this.productTypeRepository.save(productType));
   }
 
-  async remove(slug: string): Promise<OutputProductTypeDTO> {
-    const productType = await this.findOneBySlug(slug);
-    await this.productTypeRepository.remove(productType);
-    return new OutputProductTypeDTO(productType);
+  async findAll(
+    mergeSelectOptions: FindOptionsSelect<ProductTypeEntity> = {},
+    orderOptions: FindOptionsOrder<ProductTypeEntity> = {},
+    skip: number = 0,
+    take: number = 10
+  ): Promise<OutputProductTypeDTO[]> {
+    return super.findAll(mergeSelectOptions, orderOptions, skip, take);
   }
+
+  async findOneBySlug(
+    slug: string, 
+    mergeSelectOptions: FindOptionsSelect<ProductTypeEntity> = {}
+  ): Promise<ProductTypeEntity> {
+    return super.findOneBySlug(slug, mergeSelectOptions);
+  }
+
+  async findOneBySlugDTO(
+    slug: string,  
+    mergeSelectOptions: FindOptionsSelect<ProductTypeEntity> = {}
+  ): Promise<OutputProductTypeDTO> {
+    return super.findOneBySlugDTO(slug, mergeSelectOptions)
+  }
+
+  async remove(slug: string): Promise<OutputProductTypeDTO> {
+    return super.remove(slug);
+  }
+
 }
