@@ -3,8 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity.js';
-import { FindOptions, FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
-import { QueryHelperService } from '../common/services/query-helper.service.js';
+import { FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
 import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypesService } from '../product-types/product-types.service.js';
 import AttributeTypes from '../attributes/types/attribute.types.enum.js';
@@ -22,7 +21,6 @@ export class ProductsService {
   constructor(
     @InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>,
     @InjectRepository(ProductImageEntity) private readonly productImageRepository: Repository<ProductImageEntity>,
-    private readonly queryHelperService: QueryHelperService,
     private readonly productTypesService: ProductTypesService
   ) {}
 
