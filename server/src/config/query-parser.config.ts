@@ -44,9 +44,6 @@ const productSelects = {
 }
 
 
-
-
-
 const products: QueryParserConfiguration = {
     includeMap: {
         'attributes': productSelects.attributes,
@@ -55,6 +52,17 @@ const products: QueryParserConfiguration = {
     },
     orderOptions: ['createdAt', 'updatedAt']
 };
+const productTypes: QueryParserConfiguration = {
+    includeMap: {},
+    orderOptions: []
+}
+
+const attributes: QueryParserConfiguration = {
+    includeMap: {},
+    orderOptions: []
+}
+
+
 
 export const globalQueryParserConfig: Record<string, QueryParserConfiguration> = {
     products

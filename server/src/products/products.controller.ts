@@ -19,7 +19,6 @@ export class ProductsController {
   
   @Get()
   findAll(@ParsedQuery({config: globalQueryParserConfig.products, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
-    // console.log(parsedQuery);
     return this.productsService.findAll(
       parsedQuery.selectOptions ?? {}, 
       parsedQuery.orderOptions ?? {}, 

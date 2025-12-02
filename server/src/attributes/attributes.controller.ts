@@ -2,6 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AttributesService } from './attributes.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
+import { ParsedQuery } from '../common/transformers/parsed-query.transformer.js';
+import { globalQueryParserConfig } from '../config/query-parser.config.js';
+import { QueryCommonDto } from '../common/dto/query.common.dto.js';
+import type { QueryParserResult } from '../common/utils/query-parser.js';
 
 @Controller('admin/attributes')
 export class AttributesController {
@@ -13,13 +17,21 @@ export class AttributesController {
   }
 
   @Get()
-  findAll() {
-    return this.attributesService.findAll();
+  findAll(@ParsedQuery({config: globalQueryParserConfig.attributes, dto: QueryCommonDto}) queryResult: QueryParserResult) {
+    return this.attributesService.findAll(
+      queryResult.selectOptions ?? {},
+      queryResult.orderOptions ?? {},
+      queryResult.paginationOptions?.skip ?? 0,
+      queryResult.paginationOptions?.take ?? 10
+    );
   }
 
   @Get(':slug')
-  findOne(@Param('slug') slug: string) {
-    return this.attributesService.findOneBySlugDTO(slug);
+  findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.attributes, dto: QueryCommonDto}) queryResult: QueryParserResult) {
+    return this.attributesService.findOneBySlugDTO(
+      slug,
+      queryResult.selectOptions ?? {}
+    );
   }
 
   @Patch(':slug')

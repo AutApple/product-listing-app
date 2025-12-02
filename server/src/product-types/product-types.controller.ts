@@ -2,6 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ProductTypesService } from './product-types.service';
 import { CreateProductTypeDto } from './dto/create-product-type.dto';
 import { UpdateProductTypeDto } from './dto/update-product-type.dto';
+import { ParsedQuery } from '../common/transformers/parsed-query.transformer.js';
+import { globalQueryParserConfig } from '../config/query-parser.config.js';
+import { QueryCommonDto } from '../common/dto/query.common.dto.js';
+import type { QueryParserResult } from '../common/utils/query-parser.js';
 
 @Controller('admin/product-types')
 export class ProductTypesController {
@@ -13,13 +17,21 @@ export class ProductTypesController {
   }
 
   @Get()
-  findAll() {
-    return this.productTypesService.findAll();
+  findAll(@ParsedQuery({config: globalQueryParserConfig.productTypes, dto: QueryCommonDto}) queryResult: QueryParserResult) {
+    return this.productTypesService.findAll(
+        queryResult.selectOptions ?? {},
+        queryResult.orderOptions ?? {},
+        queryResult.paginationOptions?.skip ?? 0,
+        queryResult.paginationOptions?.take ?? 10 
+    );
   }
 
   @Get(':slug')
-  findOne(@Param('slug') slug: string) {
-    return this.productTypesService.findOneBySlug(slug);
+  findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.productTypes, dto: QueryCommonDto}) queryResult: QueryParserResult) {
+    return this.productTypesService.findOneBySlug(
+      slug,
+      queryResult.selectOptions ?? {}
+    );
   }
 
   @Patch(':slug')
