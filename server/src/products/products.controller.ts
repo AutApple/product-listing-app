@@ -4,8 +4,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import { ParsedQuery } from '../common/transformers/parsed-query.transformer.js';
-import { productsQueryParserConfig } from './query-parser-config/products.query-parser-config.js';
 import type { QueryParserResult } from '../common/utils/query-parser.js';
+import { globalQueryParserConfig } from '../config/query-parser.config.js';
 
 @Controller('products')
 export class ProductsController {
@@ -18,7 +18,7 @@ export class ProductsController {
 
   
   @Get()
-  findAll(@ParsedQuery({config: productsQueryParserConfig, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
+  findAll(@ParsedQuery({config: globalQueryParserConfig.products, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
     // console.log(parsedQuery);
     return this.productsService.findAll(
       parsedQuery.selectOptions ?? {}, 
@@ -29,7 +29,7 @@ export class ProductsController {
   }
 
   @Get(':slug')
-  findOne(@Param('slug') slug: string, @ParsedQuery({config: productsQueryParserConfig, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
+  findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.products, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
     return this.productsService.findOneBySlugDTO(slug, parsedQuery.selectOptions ?? {});
   }
 
