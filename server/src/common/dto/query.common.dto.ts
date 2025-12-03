@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsNumber, IsObject, IsOptional, Min } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
 import { ToArray } from '../transformers/to-array.transformer.js';
 import { Expose, Transform, Type } from 'class-transformer';
 enum SortEnum { created_at_desc ='-createdAt', 
@@ -6,7 +6,7 @@ enum SortEnum { created_at_desc ='-createdAt',
                 updated_at_desc = '-updatedAt',
                 updated_at_asc = 'updatedAt' }
 
-interface FilterEntry {
+export interface FilterEntry {
     values: string[]; 
     operation: string;
 }
@@ -17,7 +17,6 @@ function transformFlattenedFilters({ obj }: { obj: any }): any {
     for (const key in sourceObject) {
         const regex = key.match(/filter((?:_(?:lte|gte|gt|lt)))?\[([^\]]+)\]/);
         if(!regex) continue;
-        
         
         const vals: string[] = sourceObject[key].split(',');
         
@@ -58,5 +57,5 @@ export class QueryCommonDto {
     @Expose()
     @IsOptional()
     @Transform(transformFlattenedFilters)
-    filters?: any;
+    filters?: Record<string, Array<FilterEntry>>;
 }

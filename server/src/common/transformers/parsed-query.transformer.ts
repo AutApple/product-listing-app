@@ -17,13 +17,14 @@ export const ParsedQuery = createParamDecorator((data: {config: QueryParserConfi
         exposeUnsetFields: false
     });
     //2. validate - TODO
-    console.log(transformedQuery);
+    
     //3. parsing logic
     const parsedQuery = new QueryParser(transformedQuery, config).parseInclude()
                                                                  .parsePagination()
                                                                  .parseSort()
+                                                                 .parseFilters()
                                                                  .build();
-
+    console.log(parsedQuery);
     return parsedQuery;
 
 });

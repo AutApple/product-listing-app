@@ -50,7 +50,15 @@ const products: QueryParserConfiguration = {
         'images': productSelects.images,
         'productType': productSelects.type
     },
-    orderOptions: ['createdAt', 'updatedAt']
+    orderOptions: ['createdAt', 'updatedAt'],
+    filterOptions: {
+        filterQueryMap: {
+            'type': {
+                path: 'productType.slug',
+                type: 'string'
+            }
+        }
+    }
 };
 const productTypes: QueryParserConfiguration = {
     includeMap: {},
@@ -65,5 +73,5 @@ const attributes: QueryParserConfiguration = {
 
 
 export const globalQueryParserConfig: Record<string, QueryParserConfiguration> = {
-    products
+    products, productTypes, attributes
 }

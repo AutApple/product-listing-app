@@ -36,13 +36,15 @@ export class BaseService <Entity extends MinimalEntity, OutputDTO> {
         mergeSelectOptions: FindOptionsSelect<Entity> = {},
         orderOptions: FindOptionsOrder<Entity> = {},
         skip: number = 0,
-        take: number = 10
+        take: number = 10,
+        filterOptions: FindOptionsWhere<Entity> = {}
     ) : Promise <OutputDTO[]> {
         const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
         const relations = extractRelationsFromSelect(selectOptions);
         const entities = await this.repository.find({ 
             order: orderOptions, 
             select: selectOptions, 
+            where: filterOptions,
             relations,
             skip,
             take

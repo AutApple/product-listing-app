@@ -23,7 +23,8 @@ export class ProductsController {
       parsedQuery.selectOptions ?? {}, 
       parsedQuery.orderOptions ?? {}, 
       parsedQuery.paginationOptions?.skip ?? 0, //TODO: default pagination options config.
-      parsedQuery.paginationOptions?.take ?? 10
+      parsedQuery.paginationOptions?.take ?? 10,
+      parsedQuery.filterOptions ?? {}
     );
   }
 

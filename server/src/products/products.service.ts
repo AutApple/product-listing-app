@@ -3,7 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity.js';
-import { FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
+import { FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
 import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypesService } from '../product-types/product-types.service.js';
 import AttributeTypes from '../attributes/types/attribute.types.enum.js';
@@ -198,9 +198,10 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     mergeSelectOptions: FindOptionsSelect<ProductEntity> = {},
     orderOptions: FindOptionsOrder<ProductEntity> = {},
     skip: number = 0,
-    take: number = 10
+    take: number = 10,
+    filterOptions: FindOptionsWhere<ProductEntity> = {}
   ): Promise<OutputProductDTO[]> {
-    return super.findAll(mergeSelectOptions, orderOptions, skip, take);
+    return super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions);
   }
 
   async findOneBySlug(
