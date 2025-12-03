@@ -13,10 +13,11 @@ export const ParsedQuery = createParamDecorator((data: {config: QueryParserConfi
 
     // 1. dto transformation - get the raw query and try to convert it into actual dto
     const transformedQuery: QueryCommonDto = plainToInstance(dto, rawQuery, {
-        enableImplicitConversion: true
+        enableImplicitConversion: true,
+        exposeUnsetFields: false
     });
     //2. validate - TODO
-    
+    console.log(transformedQuery);
     //3. parsing logic
     const parsedQuery = new QueryParser(transformedQuery, config).parseInclude()
                                                                  .parsePagination()

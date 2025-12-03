@@ -8,7 +8,8 @@ async function bootstrap() {
   
   // Validation pipe
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true
+    whitelist: true,
+    
   }));
 
   // TypeORM errors filter

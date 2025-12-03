@@ -50,12 +50,11 @@ export class QueryParser {
 
     build(): QueryParserResult {
         const result: QueryParserResult = {};
+        
         if (Object.keys(this.findSelectOptionsAccum).length > 0) Object.assign(result, {selectOptions: this.findSelectOptionsAccum})
         if (Object.keys(this.orderOptionsAccum).length > 0) Object.assign(result, {orderOptions: this.orderOptionsAccum})
         if (Object.keys(this.paginationOptions).length > 0) Object.assign(result, {paginationOptions: this.paginationOptions})
-        
-
-
+    
         return result;
     }
 
