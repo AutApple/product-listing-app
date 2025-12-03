@@ -24,27 +24,9 @@ function transformFlattenedFilters({ obj }: { obj: any }): any {
         const resultingObj: FilterEntry = {values: vals, operation: regex[1]?.slice(1) ?? 'eq'}
         if(!filters[regex[2]]) filters[regex[2]] = [];
         filters[regex[2]].push(resultingObj);
-        
-        
-        // 
-        // console.log(key, ' ', vals);
     }
     
     return filters;
-  //console.log(`Source obj ${obj}`);
-  
-//   const filters: Record<string, string> = {};
-
-//   for (const key in sourceObject) {
-//     if (key.startsWith('filters[')) {
-//     const filterNameMatch = key.match(/filters\[(.+?)\]/);
-      
-//       if (filterNameMatch && filterNameMatch[1]) {
-//         const filterName = filterNameMatch[1];
-//         filters[filterName] = String(sourceObject[key]); 
-//       }
-//     }
-//   }
 }
 
 export class QueryCommonDto {
