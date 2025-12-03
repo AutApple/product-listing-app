@@ -33,6 +33,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
       productType: {slug: true, id: true},
       createdAt: true,
       updatedAt: true,
+      price: true
   };
 
   private validateAndUpsertAttributeValues(

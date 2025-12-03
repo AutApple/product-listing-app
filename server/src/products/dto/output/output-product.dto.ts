@@ -19,6 +19,8 @@ export class OutputProductDTO {
     description: string; 
     productType: string;
 
+    price: number;
+
     attributeData: AttributeValueDTO[];
     images: string[];
 
@@ -28,7 +30,7 @@ export class OutputProductDTO {
         this.title = product.title;
         this.shortDescription = product.shortDescription;
         this.description = product.description;
-
+        this.price = product.price;
         this.productType = product.productType.slug; 
         
         if(product.attributeValues) {

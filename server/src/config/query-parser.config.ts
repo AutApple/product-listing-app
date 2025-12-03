@@ -1,4 +1,4 @@
-import { QueryParserConfiguration } from '../common/interfaces/query-parser-config.type.js';
+import { QueryParserConfiguration } from '../query-parser/types/query-parser-config.type.js';
 
 // which stuff corresponds to which selections 
 const productSelects = {
@@ -56,6 +56,10 @@ const products: QueryParserConfiguration = {
             'type': {
                 path: 'productType.slug',
                 type: 'string'
+            },
+            'price': {
+                path: 'price',
+                type: 'number'
             }
         }
     }

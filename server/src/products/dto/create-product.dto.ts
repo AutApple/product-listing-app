@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsInt, IsString, IsUrl, Length, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsNumber, IsString, IsUrl, Length, ValidateNested } from 'class-validator';
 import defaultValidationConfig from '../../config/validation.config.js';
 import { Type } from 'class-transformer';
 import { IsStringNumberBoolean } from '../../common/validators/is-string-number-boolean.validator.js';
@@ -41,6 +41,9 @@ export class CreateProductDto {
     )
     description: string;
 
+    @IsNumber()
+    price: number;
+    
     @IsArray()
     // @IsUrl({}, { each: true }) - will be for production, ill use string for now
     @IsString({ each: true })

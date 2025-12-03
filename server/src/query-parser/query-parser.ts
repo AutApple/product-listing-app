@@ -1,7 +1,7 @@
 import { And, Equal, FindOperator, In, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual } from 'typeorm';
-import { FilterEntry, QueryCommonDto } from '../dto/query.common.dto.js';
-import { QueryParserConfiguration } from '../interfaces/query-parser-config.type.js';
-import { deepMergeObjects } from './deep-merge-objects.js';
+import { FilterEntry, QueryCommonDto } from '../common/dto/query.common.dto.js';
+import { QueryParserConfiguration } from './types/query-parser-config.type.js';
+import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 import { BadRequestException, Type } from '@nestjs/common';
 import { ERROR_MESSAGES } from 'src/config/error-messages.config.js';
 

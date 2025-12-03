@@ -37,6 +37,13 @@ export class ProductEntity extends AbstractEntity {
     })
     description: string
 
+    //TEST COLUMN
+    @Column({
+        default: 0,
+        type: 'numeric'
+    })
+    price: number;
+    
     @OneToMany(() => ProductImageEntity, (productImage: ProductImageEntity) => productImage.product)
     images: ProductImageEntity[];
 
@@ -50,4 +57,5 @@ export class ProductEntity extends AbstractEntity {
     )
     attributeValues: ProductAttributeValueEntity[];
 
+    
 }

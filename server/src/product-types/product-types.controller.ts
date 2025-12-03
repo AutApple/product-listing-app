@@ -5,7 +5,7 @@ import { UpdateProductTypeDto } from './dto/update-product-type.dto';
 import { ParsedQuery } from '../common/transformers/parsed-query.transformer.js';
 import { globalQueryParserConfig } from '../config/query-parser.config.js';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
-import type { QueryParserResult } from '../common/utils/query-parser.js';
+import type { QueryParserResult } from '../query-parser/query-parser.js';
 
 @Controller('admin/product-types')
 export class ProductTypesController {
