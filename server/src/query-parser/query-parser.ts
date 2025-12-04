@@ -79,15 +79,17 @@ export class QueryParser {
             'gte': MoreThanOrEqual,
             'lte': LessThanOrEqual
         }
-        if(obj.values.length > 1 && obj.operation !== 'eq')
-            throw new BadRequestException('Multiple values are not appliable for that operation') //todo: get proper error messages
-
+        if(obj.values.length > 1 && obj.operation !== 'eq') // Multiple values for non-eq operations are forbidden
+            throw new BadRequestException(ERROR_MESSAGES.FILTER_WRONG_SIGNATURE(obj.key)) 
+        if (obj.operation !== 'eq' && type !== FilterType.NUMBER) // Numeric comparasion on non-numeric values is forbidden
+            throw new BadRequestException(ERROR_MESSAGES.FILTER_WRONG_SIGNATURE(obj.key))
         // 1. validate and convert
         const values: Array<string | boolean | number | undefined> = obj.values.map(v => this._validateAndConvertToType(v, type));
         const failed = values.some(v => v === undefined);
 
         if(failed)
-            throw new BadRequestException('Wrong type');
+            throw new BadRequestException(ERROR_MESSAGES.FILTER_WRONG_TYPE(obj.key, type));
+        
         // 2. multiple eq logic
         if(obj.values.length > 1 && obj.operation === 'eq')  
             return In(values);    

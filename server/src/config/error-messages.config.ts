@@ -14,6 +14,6 @@ export const ERROR_MESSAGES = {
    ATTRIBUTE_WRONG_TYPE: (key: string, type: string) => `Value of attribute ${key} should be type of ${type}`,
 
    // filter validation messages
-   FILTER_WRONG_TYPE: (key: string, type: string, value: string) => `Key ${key} expects value to be ${type}. Got ${typeof(value)} instead`
-
+   FILTER_WRONG_TYPE: (key: string, type: string) => `Wrong value type provided to the filter of ${key}. Expected ${type}`,
+   FILTER_WRONG_SIGNATURE: (key: string) => `Wrong signature of a filter of ${key}`
 }
