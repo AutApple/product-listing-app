@@ -1,9 +1,8 @@
 import { And, Equal, FindOperator, In, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual } from 'typeorm';
 import { FilterEntry, QueryCommonDto } from '../common/dto/query.common.dto.js';
-import { QueryParserConfiguration } from './types/query-parser-config.type.js';
+import { FilterType, QueryParserConfiguration } from './types/query-parser-config.type.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
-import { BadRequestException, Type } from '@nestjs/common';
-import { ERROR_MESSAGES } from 'src/config/error-messages.config.js';
+import { BadRequestException, InternalServerErrorException, Type } from '@nestjs/common';
 
 export interface QueryParserResult {
     selectOptions?: object;
@@ -11,8 +10,6 @@ export interface QueryParserResult {
     paginationOptions?: {skip: number, take: number};
     filterOptions?: object;
 }
-
-
 
 export class QueryParser {
     private findSelectOptionsAccum = {};
@@ -51,7 +48,7 @@ export class QueryParser {
         // console.log(root);
         return root; 
     }
-    private _validateAndConvertToType(value: string, type: 'string' | 'number' | 'boolean') : string | number | boolean | undefined{
+    private _validateAndConvertToType(value: string, type: FilterType) : string | number | boolean | undefined{
         function convertToNumber (v: string): number | undefined {
             const num = Number(v);
             if(isNaN(num)) return undefined;
@@ -73,7 +70,7 @@ export class QueryParser {
         return result;
     }
 
-    private _parseFilterObject(obj: FilterEntry, type: 'string' | 'number' | 'boolean'): FindOperator<unknown>{
+    private _parseFilterObject(obj: FilterEntry, type: FilterType): FindOperator<unknown>{
         type OperatorFunction = (value: any) => FindOperator<unknown>;
         const ops: Record<string, OperatorFunction>  = {
             'eq': Equal,
@@ -86,7 +83,7 @@ export class QueryParser {
             throw new BadRequestException('Multiple values are not appliable for that operation') //todo: get proper error messages
 
         // 1. validate and convert
-        const values: Array<string | boolean  | number  | undefined> = obj.values.map(v => this._validateAndConvertToType(v, type));
+        const values: Array<string | boolean | number | undefined> = obj.values.map(v => this._validateAndConvertToType(v, type));
         const failed = values.some(v => v === undefined);
 
         if(failed)
@@ -97,7 +94,7 @@ export class QueryParser {
         // 3. everything else
         const op = ops[obj.operation];
         if (!op)
-            throw new BadRequestException('Unexpected');
+            throw new InternalServerErrorException('Unexpected filtering operation. Report this error to the devs');
 
         return op(values[0]);
     }
@@ -105,10 +102,11 @@ export class QueryParser {
     parseFilters() {
         if(!this.query.filters)
             return this;
+
         for (const key of Object.keys(this.query.filters)) {
             const pathToField: string | undefined = this.config?.filterOptions?.filterQueryMap[key].path;
-            const type: 'string' | 'number' | 'boolean' | undefined = this.config?.filterOptions?.filterQueryMap[key].type;
-            if(!pathToField || !type) continue; // TODO: non-explicit filtering. for now ill just do an explicit filtering
+            const type: FilterType | undefined = this.config?.filterOptions?.filterQueryMap[key].type;
+            if(!pathToField || !type) continue; // TODO: non-explicit filtering. for now i'll just do an explicit filtering
             //1. Check if there is multiple values assigned to that key. If yes - start constructing AND.    
             let value: FindOperator<unknown>;
             if(this.query.filters[key].length > 1) 
@@ -118,7 +116,6 @@ export class QueryParser {
             this.filterOptions = deepMergeObjects(this.filterOptions, this._makeFieldObject(pathToField, value));
         }
      
-
         return this;
     }
 
@@ -157,5 +154,4 @@ export class QueryParser {
 
         return result;
     }
-
 }

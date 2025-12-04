@@ -1,4 +1,4 @@
-import { QueryParserConfiguration } from '../query-parser/types/query-parser-config.type.js';
+import { FilterType, QueryParserConfiguration } from '../query-parser/types/query-parser-config.type.js';
 
 // which stuff corresponds to which selections 
 const productSelects = {
@@ -55,11 +55,11 @@ const products: QueryParserConfiguration = {
         filterQueryMap: {
             'type': {
                 path: 'productType.slug',
-                type: 'string'
+                type: FilterType.STRING
             },
             'price': {
                 path: 'price',
-                type: 'number'
+                type: FilterType.NUMBER
             }
         }
     }

@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ProductTypesService } from './product-types.service';
 import { CreateProductTypeDto } from './dto/create-product-type.dto';
 import { UpdateProductTypeDto } from './dto/update-product-type.dto';
-import { ParsedQuery } from '../common/transformers/parsed-query.transformer.js';
+import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
 import { globalQueryParserConfig } from '../config/query-parser.config.js';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';

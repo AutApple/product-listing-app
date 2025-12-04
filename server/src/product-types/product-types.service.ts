@@ -6,7 +6,7 @@ import { ProductTypeEntity } from './entities/product-type.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributesService } from '../attributes/attributes.service.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { extractRelationsFromSelect } from '../query-parser/decorators/extract-relations.js';
+import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 import { OutputProductTypeDTO } from './dto/output/output-product-type.dto.js';
 import { BaseService } from '../common/base.service.js';

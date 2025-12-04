@@ -1,12 +1,16 @@
-import { Type } from '@nestjs/common';
+export enum FilterType {
+     STRING = 'string', 
+     BOOLEAN = 'boolean',
+     NUMBER = 'number'
+}
 
-interface FilterQueryMapEntry {
+interface FilterMapEntry {
     path: string; // dot-separated path
-    type: 'string' | 'boolean' | 'number'; // type of that field
+    type: FilterType; // type of that field
 }
 
 interface QueryFilterOptions {
-    filterQueryMap: Record<string, FilterQueryMapEntry> // explicitly defined filtering fields
+    filterQueryMap: Record<string, FilterMapEntry> // explicitly defined filtering fields
 }
 
 export interface QueryParserConfiguration {

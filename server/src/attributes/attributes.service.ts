@@ -8,7 +8,7 @@ import { AttributeEnumValueEntity } from './entities/attribute-enum-value.entity
 import AttributeTypes from './types/attribute.types.enum.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
-import { extractRelationsFromSelect } from '../query-parser/decorators/extract-relations.js';
+import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
 import { OutputAttributeDTO } from './dto/output/output-attribute.dto.js';
 import { BaseService } from '../common/base.service.js';
 

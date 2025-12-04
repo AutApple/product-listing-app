@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { AttributesService } from './attributes.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { ParsedQuery } from '../common/transformers/parsed-query.transformer.js';
+import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
 import { globalQueryParserConfig } from '../config/query-parser.config.js';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';

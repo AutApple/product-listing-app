@@ -1,5 +1,5 @@
 import { FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
-import { extractRelationsFromSelect } from '../query-parser/decorators/extract-relations.js';
+import { extractRelationsFromSelect } from './utils/extract-relations.js';
 import { deepMergeObjects } from './utils/deep-merge-objects.js';
 import { NotFoundException } from '@nestjs/common';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';

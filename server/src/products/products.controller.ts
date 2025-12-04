@@ -3,7 +3,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
-import { ParsedQuery } from '../common/transformers/parsed-query.transformer.js';
+import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';
 import { globalQueryParserConfig } from '../config/query-parser.config.js';
 
