@@ -7,6 +7,7 @@ enum SortEnum { created_at_desc ='-createdAt',
                 updated_at_asc = 'updatedAt' }
 
 export interface FilterEntry {
+    key: string;
     values: string[]; 
     operation: string;
 }
@@ -18,9 +19,14 @@ function transformFlattenedFilters({ obj }: { obj: any }): any {
         const regex = key.match(/filter((?:_(?:lte|gte|gt|lt)))?\[([^\]]+)\]/);
         if(!regex) continue;
         
-        const vals: string[] = sourceObject[key].split(',');
+        let vals: string[]; 
         
-        const resultingObj: FilterEntry = {values: vals, operation: regex[1]?.slice(1) ?? 'eq'}
+        if (Array.isArray(sourceObject[key]))
+            vals = sourceObject[key].map((v: string) => v.trim().split(',')).flat();
+        else
+            vals = sourceObject[key].split(',');
+
+        const resultingObj: FilterEntry = {key: regex[2], values: vals, operation: regex[1]?.slice(1) ?? 'eq'}
         if(!filters[regex[2]]) filters[regex[2]] = [];
         filters[regex[2]].push(resultingObj);
     }
