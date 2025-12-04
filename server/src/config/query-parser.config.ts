@@ -61,9 +61,11 @@ const products: QueryParserConfiguration = {
                 path: 'price',
                 type: FilterType.NUMBER
             }
-        }
+        },
+        enableFallbackCollection: true
     }
 };
+
 const productTypes: QueryParserConfiguration = {
     includeMap: {},
     orderOptions: []

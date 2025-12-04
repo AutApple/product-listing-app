@@ -19,12 +19,13 @@ export class ProductsController {
   
   @Get()
   findAll(@ParsedQuery({config: globalQueryParserConfig.products, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
-    return this.productsService.findAll(
+    return this.productsService.findWithDynamicFilters(
       parsedQuery.selectOptions ?? {}, 
       parsedQuery.orderOptions ?? {}, 
       parsedQuery.paginationOptions?.skip ?? 0, //TODO: default pagination options config.
       parsedQuery.paginationOptions?.take ?? 10,
-      parsedQuery.filterOptions ?? {}
+      parsedQuery.filterOptions ?? {},
+      parsedQuery.filterFallbackCollection ?? []
     );
   }
 

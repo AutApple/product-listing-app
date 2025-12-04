@@ -9,8 +9,10 @@ interface FilterMapEntry {
     type: FilterType; // type of that field
 }
 
+
 interface QueryFilterOptions {
     filterQueryMap: Record<string, FilterMapEntry> // explicitly defined filtering fields
+    enableFallbackCollection: boolean;
 }
 
 export interface QueryParserConfiguration {

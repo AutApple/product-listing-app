@@ -7,6 +7,7 @@ import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypeEntity } from '../product-types/entities/product-type.entity.js';
 import { ProductTypesModule } from '../product-types/product-types.module.js';
 import { ProductAttributeValueEntity } from './entities/product-attribute-value.js';
+import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { ProductAttributeValueEntity } from './entities/product-attribute-value.
               ProductEntity, 
               ProductImageEntity, 
               ProductTypeEntity,
-              ProductAttributeValueEntity
+              ProductAttributeValueEntity,
+              AttributeEntity
             ]), 
             ProductTypesModule
           ],

@@ -3,7 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity.js';
-import { FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
+import { And, FindOperator, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, In, Repository } from 'typeorm';
 import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypesService } from '../product-types/product-types.service.js';
 import AttributeTypes from '../attributes/types/attribute.types.enum.js';
@@ -12,6 +12,11 @@ import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 import { OutputProductDTO } from './dto/output/output-product.dto.js';
 import { BaseService } from '../common/base.service.js';
+import { FilterEntry } from '../common/dto/query.common.dto.js';
+import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
+import { attributeTypeToFilterType } from '../common/utils/attribute-to-filter-type.js';
+import { FilterConditionBuilder } from '../common/utils/filter-condition-builder.js';
+import { FilterType } from '../query-parser/types/query-parser-config.type.js';
 
 
 @Injectable()
@@ -19,6 +24,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
   constructor(
     @InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>,
     @InjectRepository(ProductImageEntity) private readonly productImageRepository: Repository<ProductImageEntity>,
+    @InjectRepository(AttributeEntity) private readonly attributeRepository: Repository<AttributeEntity>,
     private readonly productTypesService: ProductTypesService
   ) { 
     super(productRepository, OutputProductDTO, 'product')
@@ -138,7 +144,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
   }
 
   async update(slug: string, updateProductDto: UpdateProductDto): Promise<OutputProductDTO> {
-      const product = await this.findOneBySlug(
+    const product = await this.findOneBySlug(
         slug,
         {
           productType: {
@@ -168,7 +174,8 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
             url: true
           }
         }
-      );
+    );
+    
     const {attributes, imageUrls, productTypeSlug, ...productData} = updateProductDto;
     
     Object.assign(product, productData);
@@ -195,12 +202,64 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     return new OutputProductDTO(product);
   }
 
+
+  async findWithDynamicFilters(
+    mergeSelectOptions: FindOptionsSelect<ProductEntity> = {},
+    orderOptions: FindOptionsOrder<ProductEntity> = {},
+    skip: number = 0,
+    take: number = 10,
+    filterOptions: FindOptionsWhere<ProductEntity> = {},
+    fallbackFilterCollection: Array<{[key: string]: FilterEntry[]}>
+  ): Promise<OutputProductDTO[]> {
+    // build with object that should be merged with filterOptions
+    const fallbackFilterOptions: FindOptionsWhere<ProductEntity> = {};
+
+    const attrValueConditions: Array<object> = [];
+    const filterConditionBuilder = new FilterConditionBuilder();
+
+    for (const fallbackFilter  of fallbackFilterCollection) {      
+        const slug = Object.keys(fallbackFilter)[0];
+        const attribute = await this.attributeRepository.findOne({where: {slug}});
+        if (!attribute) throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_NOT_FOUND(slug));
+        
+        const type = attributeTypeToFilterType(attribute.type);
+        let value: FindOperator<unknown>;
+        
+        if(fallbackFilter[slug].length === 1)
+          value = filterConditionBuilder.buildFindOperator(fallbackFilter[slug][0], type);
+        else 
+          value = And(... fallbackFilter[slug].map(v => filterConditionBuilder.buildFindOperator(v, type)));
+        
+        const dict = {
+          [FilterType.NUMBER]: 'valueNumber',
+          [FilterType.STRING]: 'valueString',
+          [FilterType.BOOLEAN]: 'valueBoolean' 
+        };
+        
+        //attributeValues: [{attribute: {slug: key}, value(Type) = value}, ...]
+        attrValueConditions.push({attribute: {slug: slug}, [dict[type]]: value});
+    }
+
+    // to prevent cutting attributes on applying where, i do this trick
+    // where i just pull out set of product ids that would match the attribute filters and then pass them to the actual find. 
+    // perfect fix would be using sql builder instead, but watever.
+    const ids = await this.productRepository.find({where: { attributeValues: attrValueConditions }, select: {id: true}});
+
+    filterOptions = deepMergeObjects(filterOptions, {id: In(ids.map(v => v.id))});
+    return await this.findAll(
+      mergeSelectOptions,
+      orderOptions,
+      skip,
+      take,
+      filterOptions
+    )
+  }
   async findAll(
     mergeSelectOptions: FindOptionsSelect<ProductEntity> = {},
     orderOptions: FindOptionsOrder<ProductEntity> = {},
     skip: number = 0,
     take: number = 10,
-    filterOptions: FindOptionsWhere<ProductEntity> = {}
+    filterOptions: FindOptionsWhere<ProductEntity> = {},
   ): Promise<OutputProductDTO[]> {
     return super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions);
   }

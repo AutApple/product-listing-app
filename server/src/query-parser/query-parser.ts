@@ -2,13 +2,14 @@ import { And, Equal, FindOperator, In, LessThan, LessThanOrEqual, MoreThan, More
 import { FilterEntry, QueryCommonDto } from '../common/dto/query.common.dto.js';
 import { FilterType, QueryParserConfiguration } from './types/query-parser-config.type.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
-import { BadRequestException, InternalServerErrorException, Type } from '@nestjs/common';
+import { FilterConditionBuilder } from '../common/utils/filter-condition-builder.js';
 
 export interface QueryParserResult {
     selectOptions?: object;
     orderOptions?: object;
     paginationOptions?: {skip: number, take: number};
     filterOptions?: object;
+    filterFallbackCollection?: Array<{[key: string]: FilterEntry[]}>;
 }
 
 export class QueryParser {
@@ -16,6 +17,7 @@ export class QueryParser {
     private orderOptionsAccum = {};
     private paginationOptions = {};
     private filterOptions = {};
+    private filterFallbackCollection: Array<{[key: string]: FilterEntry[]}> = []; // all unrecognized filter keys are stored in this collection
 
     constructor (private query: QueryCommonDto, private config?: QueryParserConfiguration) {}
     
@@ -48,73 +50,28 @@ export class QueryParser {
         // console.log(root);
         return root; 
     }
-    private _validateAndConvertToType(value: string, type: FilterType) : string | number | boolean | undefined{
-        function convertToNumber (v: string): number | undefined {
-            const num = Number(v);
-            if(isNaN(num)) return undefined;
-            return num;
-        }
-        function convertToBool (v: string): boolean | undefined {
-            const vL = v.toLowerCase();
-            const res = {'false': false, 'true': true};
-            if(vL in res)
-                return res[vL];
-            return undefined;
-        }
-        const validationConditions = {
-            string: (v: string) => v,
-            number: (v: string) => convertToNumber(v),
-            boolean: (v: string) => convertToBool(v)
-        }
-        const result = validationConditions[type](value);
-        return result;
-    }
-
-    private _parseFilterObject(obj: FilterEntry, type: FilterType): FindOperator<unknown>{
-        type OperatorFunction = (value: any) => FindOperator<unknown>;
-        const ops: Record<string, OperatorFunction>  = {
-            'eq': Equal,
-            'lt': LessThan,
-            'gt': MoreThan,
-            'gte': MoreThanOrEqual,
-            'lte': LessThanOrEqual
-        }
-        if(obj.values.length > 1 && obj.operation !== 'eq') // Multiple values for non-eq operations are forbidden
-            throw new BadRequestException(ERROR_MESSAGES.FILTER_WRONG_SIGNATURE(obj.key)) 
-        if (obj.operation !== 'eq' && type !== FilterType.NUMBER) // Numeric comparasion on non-numeric values is forbidden
-            throw new BadRequestException(ERROR_MESSAGES.FILTER_WRONG_SIGNATURE(obj.key))
-        // 1. validate and convert
-        const values: Array<string | boolean | number | undefined> = obj.values.map(v => this._validateAndConvertToType(v, type));
-        const failed = values.some(v => v === undefined);
-
-        if(failed)
-            throw new BadRequestException(ERROR_MESSAGES.FILTER_WRONG_TYPE(obj.key, type));
-        
-        // 2. multiple eq logic
-        if(obj.values.length > 1 && obj.operation === 'eq')  
-            return In(values);    
-        // 3. everything else
-        const op = ops[obj.operation];
-        if (!op)
-            throw new InternalServerErrorException('Unexpected filtering operation. Report this error to the devs');
-
-        return op(values[0]);
-    }
-
+    
     parseFilters() {
         if(!this.query.filters)
             return this;
 
         for (const key of Object.keys(this.query.filters)) {
-            const pathToField: string | undefined = this.config?.filterOptions?.filterQueryMap[key].path;
-            const type: FilterType | undefined = this.config?.filterOptions?.filterQueryMap[key].type;
-            if(!pathToField || !type) continue; // TODO: non-explicit filtering. for now i'll just do an explicit filtering
+            const pathToField: string | undefined = this.config?.filterOptions?.filterQueryMap[key]?.path;
+            const type: FilterType | undefined = this.config?.filterOptions?.filterQueryMap[key]?.type;
+            if(!pathToField || !type) { 
+                if(this.config?.filterOptions?.enableFallbackCollection)
+                         this.filterFallbackCollection.push({[key]: this.query.filters[key]});// fallback filtering logic
+                continue; // TODO: non-explicit filtering. for now i'll just do an explicit filtering
+            }
+            
+            let filterConditionBuilder = new FilterConditionBuilder();
+
             //1. Check if there is multiple values assigned to that key. If yes - start constructing AND.    
             let value: FindOperator<unknown>;
             if(this.query.filters[key].length > 1) 
-                value = And(...this.query.filters[key].map((v: FilterEntry) => this._parseFilterObject(v, type)));
+                value = And(...this.query.filters[key].map((v: FilterEntry) => filterConditionBuilder.buildFindOperator(v, type)));
             else
-                value = this._parseFilterObject(this.query.filters[key][0], type); //otherwise just convert this single value to findOperator
+                value = filterConditionBuilder.buildFindOperator(this.query.filters[key][0], type); //otherwise just convert this single value to findOperator
             this.filterOptions = deepMergeObjects(this.filterOptions, this._makeFieldObject(pathToField, value));
         }
      
@@ -153,7 +110,7 @@ export class QueryParser {
         if (Object.keys(this.orderOptionsAccum).length > 0) Object.assign(result, {orderOptions: this.orderOptionsAccum})
         if (Object.keys(this.paginationOptions).length > 0) Object.assign(result, {paginationOptions: this.paginationOptions})
         if (Object.keys(this.filterOptions).length > 0) Object.assign(result, {filterOptions: this.filterOptions});
-
+        if (this.filterFallbackCollection.length > 0) Object.assign(result, {filterFallbackCollection: this.filterFallbackCollection})
         return result;
     }
 }
