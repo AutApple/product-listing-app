@@ -47,7 +47,6 @@ export class QueryParser {
                 currentLevel = currentLevel[key];
             }
         });
-        // console.log(root);
         return root; 
     }
     

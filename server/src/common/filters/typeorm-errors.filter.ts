@@ -29,13 +29,11 @@ export class TypeORMErrorFilter implements ExceptionFilter {
 
         switch(driverError.code) {
             case PostgresErrorCodes.UniqueViolation:
-                console.log(driverError);
                 return response.status(409).json({
                     message: ERROR_MESSAGES.DB_UNIQUE_CONSTRAINT_VIOLATION(driverError.where),
                     detail: driverError.detail
                 });
             case PostgresErrorCodes.ForeignKeyViolation: 
-                console.log(driverError);
                 return response.status(409).json({
                     message: ERROR_MESSAGES.DB_FOREIGN_KEY_VIOLATION(driverError.table),
                 })

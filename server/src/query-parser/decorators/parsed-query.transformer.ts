@@ -24,7 +24,6 @@ export const ParsedQuery = createParamDecorator((data: {config: QueryParserConfi
                                                                  .parseSort()
                                                                  .parseFilters()
                                                                  .build();
-    console.log(parsedQuery);
     return parsedQuery;
 
 });
