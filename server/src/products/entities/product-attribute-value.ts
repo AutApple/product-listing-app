@@ -30,7 +30,7 @@ export class ProductAttributeValueEntity {
     @Column({ type: 'varchar', nullable: true })
     valueString: string | null;
 
-    @Column({ type: 'int', nullable: true })
+    @Column({ type: 'numeric', nullable: true })
     valueInt: number | null;
 
     @Column({ type: 'boolean', nullable: true })
