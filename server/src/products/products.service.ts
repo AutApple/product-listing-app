@@ -163,11 +163,15 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
             attributeId: true,
             productId: true,
             attribute: {
-              id: true
+              id: true,
+              slug: true
             },
             product: {
               id: true
-            }
+            },
+            valueBool: true,
+            valueString: true,
+            valueInt: true
           },
           images: {
             id: true,
