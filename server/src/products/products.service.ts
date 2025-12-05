@@ -235,9 +235,9 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
           value = And(... fallbackFilter[slug].map(v => filterConditionBuilder.buildFindOperator(v, type)));
         
         const dict = {
-          [FilterType.NUMBER]: 'valueNumber',
+          [FilterType.NUMBER]: 'valueInt',
           [FilterType.STRING]: 'valueString',
-          [FilterType.BOOLEAN]: 'valueBoolean' 
+          [FilterType.BOOLEAN]: 'valueBool' 
         };
         
         //attributeValues: [{attribute: {slug: key}, value(Type) = value}, ...]
