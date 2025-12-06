@@ -106,41 +106,53 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     return result;
   }
 
-  async create(createProductDto: CreateProductDto): Promise<OutputProductDTO> {
-    const {attributes, imageUrls, productTypeSlug, ...productData} = createProductDto;
-    const productType = await this.productTypesService.findOneBySlug(
-      productTypeSlug,
-      {
-        id: true,
-        attributes: {
-          id: true,
-          title: true,
-          enumValues: {
-            id: true
+  async create(dto: CreateProductDto | CreateProductDto[]): Promise<OutputProductDTO | OutputProductDTO[]> {
+    const dtos: CreateProductDto[] = [];
+    const products: ProductEntity[] = [];
+
+    if (Array.isArray(dto))
+      dtos.push(... dto);
+    else
+      dtos.push(dto);
+    
+
+    for (const createProductDto of dtos) {
+        const {attributes, imageUrls, productTypeSlug, ...productData} = createProductDto;
+        const productType = await this.productTypesService.findOneBySlug(
+          productTypeSlug,
+          {
+            id: true,
+            attributes: {
+              id: true,
+              title: true,
+              enumValues: {
+                id: true
+              }
+            }
           }
+        );
+
+        const product: ProductEntity = this.productRepository.create(productData);
+        product.productType = productType;
+      
+        // Assign attributes
+        product.attributeValues = this.validateAndUpsertAttributeValues(
+          attributes as [{key: string, value: (number | boolean | string)}], 
+          productType.attributes 
+        );
+        
+        await this.productRepository.save(product);
+        
+        // Assign images
+        if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
+            const images = this.upsertImageUrls(product, imageUrls);
+            await this.productImageRepository.save(images);
+            product.images = images;  
         }
-      }
-    );
 
-    const product: ProductEntity = this.productRepository.create(productData);
-    product.productType = productType;
-  
-    // Assign attributes
-    product.attributeValues = this.validateAndUpsertAttributeValues(
-      attributes as [{key: string, value: (number | boolean | string)}], 
-      productType.attributes 
-    );
-    
-    await this.productRepository.save(product);
-    
-    // Assign images
-    if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
-        const images = this.upsertImageUrls(product, imageUrls);
-        await this.productImageRepository.save(images);
-        product.images = images;  
+        products.push(product);
     }
-
-    return new OutputProductDTO(product);
+    return (products.length === 1) ? new OutputProductDTO(products[0]) : products.map(p => new OutputProductDTO(p));
   }
 
   async update(slug: string, updateProductDto: UpdateProductDto): Promise<OutputProductDTO> {

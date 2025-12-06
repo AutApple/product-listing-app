@@ -6,13 +6,14 @@ import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';
 import { globalQueryParserConfig } from '../config/query-parser.config.js';
+import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
+  create(@Body(new BulkOrSingleValidationPipe(CreateProductDto)) createProductDto: CreateProductDto | CreateProductDto[]) {
     return this.productsService.create(createProductDto);
   }
 

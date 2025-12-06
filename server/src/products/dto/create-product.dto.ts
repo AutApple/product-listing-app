@@ -2,6 +2,7 @@ import { IsArray, IsBoolean, IsInt, IsNumber, IsString, IsUrl, Length, ValidateN
 import defaultValidationConfig from '../../config/validation.config.js';
 import { Type } from 'class-transformer';
 import { IsStringNumberBoolean } from '../../common/validators/is-string-number-boolean.validator.js';
+import { isTypedArray } from 'util/types';
 
 
 class AttributeItem {
