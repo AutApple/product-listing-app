@@ -17,6 +17,7 @@ import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 import { attributeTypeToFilterType } from '../common/utils/attribute-to-filter-type.js';
 import { FilterConditionBuilder } from '../common/utils/filter-condition-builder.js';
 import { FilterType } from '../query-parser/types/query-parser-config.type.js';
+import { ProductTypeEntity } from '../product-types/entities/product-type.entity.js';
 
 
 @Injectable()
@@ -118,19 +119,13 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     }
     return result;
   }
-
-  async create(dto: CreateProductDto | CreateProductDto[]): Promise<OutputProductDTO | OutputProductDTO[]> {
-    const dtos: CreateProductDto[] = [];
-    const products: ProductEntity[] = [];
-
-    if (Array.isArray(dto))
-      dtos.push(... dto);
-    else
-      dtos.push(dto);
-    
-    // 1. validate all AttributeValues data.
-    for (const createProductDto of dtos) {
-        const {attributes, productTypeSlug} = createProductDto;
+  
+  private async validateAndPreloadProductTypes (
+    dtos: CreateProductDto[]
+  ) {
+    const productTypeMap: Map<string, ProductTypeEntity> = new Map<string, ProductTypeEntity>(); 
+    for (const dto of dtos) {
+        const {attributes, productTypeSlug} = dto;
         const productType = await this.productTypesService.findOneBySlug(
           productTypeSlug,
           {
@@ -144,30 +139,30 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
             }
           }
         );
+        if(!productType)
+            throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product type', productTypeSlug));
         this.validateAttributeValues(
           attributes as [{key: string, value: (number | boolean | string)}], 
           productType.attributes 
         );
+        productTypeMap.set(productTypeSlug, productType);
     }
+    return productTypeMap;
+  }
 
-    //2. create product
-    for (const createProductDto of dtos) {
-        const {attributes, imageUrls, productTypeSlug, ...productData} = createProductDto;
-        const productType = await this.productTypesService.findOneBySlug(
-          productTypeSlug,
-          {
-            id: true,
-            attributes: {
-              id: true,
-              title: true,
-              enumValues: {
-                id: true
-              }
-            }
-          }
-        );
-
+  private async createProductsWithAttributesAndImages(
+    dtos: CreateProductDto[],
+    productTypeMap: Map<string, ProductTypeEntity>
+  ) {
+    const products: ProductEntity[] = [];
+    for (const dto of dtos) {
+        const {attributes, imageUrls, productTypeSlug, ...productData} = dto;
+        const productType: ProductTypeEntity | undefined = productTypeMap.get(productTypeSlug);
+        if (!productType)
+          throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product type', productTypeSlug));
+        
         const product: ProductEntity = this.productRepository.create(productData);
+        
         product.productType = productType;
       
         // Assign attributes
@@ -175,19 +170,25 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
           attributes as [{key: string, value: (number | boolean | string)}], 
           productType.attributes 
         );
-        
         await this.productRepository.save(product);
-        
         // Assign images
         if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
             const images = this.upsertImageUrls(product, imageUrls);
             await this.productImageRepository.save(images);
             product.images = images;  
         }
-
+        
         products.push(product);
     }
+    
+    return products;
+  }
 
+  async create(dto: CreateProductDto | CreateProductDto[]): Promise<OutputProductDTO | OutputProductDTO[]> {
+    const dtos: CreateProductDto[] = Array.isArray(dto) ? dto : [dto];
+    
+    const productTypeMap = await this.validateAndPreloadProductTypes(dtos);
+    let products: ProductEntity[] = await this.createProductsWithAttributesAndImages(dtos, productTypeMap);
 
     return (products.length === 1) ? new OutputProductDTO(products[0]) : products.map(p => new OutputProductDTO(p));
   }
