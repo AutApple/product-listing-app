@@ -41,36 +41,49 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
       updatedAt: true,
       price: true
   };
+  private validateAttributeValues(
+    rawAttributeValues: [{key: string, value: (number | boolean | string)}],
+    allowedAttributes: AttributeEntity[]
+  ): void { 
+      for (const {key, value} of rawAttributeValues) {
+        // check if it's an actual attribute that belongs to product type. If not - throw 400
+        const attributeEntity = allowedAttributes.find((value) => (value.slug === key));
 
-  private validateAndUpsertAttributeValues(
+        if(!attributeEntity)
+          throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_NOT_FOUND(key)); 
+
+        // if type is enum - check if it's one of the enum values.
+        if(attributeEntity.type === AttributeTypes.ENUM && !attributeEntity.enumValues.find(v => v.value === value))
+          throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_BAD_REQUEST(key, attributeEntity.enumValues.map(v => v.value)));  
+        
+        // check type constraints
+        const expectedTypes = {
+            [AttributeTypes.NUMBER]:  'number',
+            [AttributeTypes.STRING]:  'string',
+            [AttributeTypes.ENUM]:    'string',
+            [AttributeTypes.BOOLEAN]: 'boolean',
+        };
+
+        if(typeof(value) !== expectedTypes[attributeEntity.type])
+          throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_WRONG_TYPE(key, attributeEntity.type));
+      }
+  }
+
+  // should be called after validation
+  private upsertAttributeValues(
     rawAttributeValues: [{key: string, value: (number | boolean | string)}],
     allowedAttributes: AttributeEntity[],
     mergeAttributeValues?: ProductAttributeValueEntity[] // for update
   ): ProductAttributeValueEntity[] {
     let result: ProductAttributeValueEntity[] = mergeAttributeValues ?? [];
     for (const {key, value} of rawAttributeValues) {
-        // 2. check if it's an actual attribute that belongs to product type. If not - throw 400
+        // get attribute entity
         const attributeEntity = allowedAttributes.find((value) => (value.slug === key));
 
         if(!attributeEntity)
           throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_NOT_FOUND(key)); 
 
-        // 3. if type is enum - check if it's one of the enum values.
-        if(attributeEntity.type === AttributeTypes.ENUM && !attributeEntity.enumValues.find(v => v.value === value))
-          throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_BAD_REQUEST(key, attributeEntity.enumValues.map(v => v.value)));  
-        
-        // 4. check type constraints
-        const expectedTypes = {
-            [AttributeTypes.NUMBER]: 'number',
-            [AttributeTypes.STRING]: 'string',
-            [AttributeTypes.ENUM]:   'string',
-            [AttributeTypes.BOOLEAN]:'boolean',
-        };
-
-        if(typeof(value) !== expectedTypes[attributeEntity.type])
-          throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_WRONG_TYPE(key, attributeEntity.type));
-
-        // 5. create ProductAttributeValue with given key and value OR merge if there is mering array
+        // create ProductAttributeValue with given key and value OR merge if there is mering array
         const valueString = typeof(value) === 'string' ? value : null;
         const valueInt = typeof(value) === 'number' ? value : null;
         const valueBool = typeof(value) === 'boolean' ? value : null;
@@ -115,7 +128,29 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     else
       dtos.push(dto);
     
+    // 1. validate all AttributeValues data.
+    for (const createProductDto of dtos) {
+        const {attributes, productTypeSlug} = createProductDto;
+        const productType = await this.productTypesService.findOneBySlug(
+          productTypeSlug,
+          {
+            id: true,
+            attributes: {
+              id: true,
+              title: true,
+              enumValues: {
+                id: true
+              }
+            }
+          }
+        );
+        this.validateAttributeValues(
+          attributes as [{key: string, value: (number | boolean | string)}], 
+          productType.attributes 
+        );
+    }
 
+    //2. create product
     for (const createProductDto of dtos) {
         const {attributes, imageUrls, productTypeSlug, ...productData} = createProductDto;
         const productType = await this.productTypesService.findOneBySlug(
@@ -136,7 +171,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
         product.productType = productType;
       
         // Assign attributes
-        product.attributeValues = this.validateAndUpsertAttributeValues(
+        product.attributeValues = this.upsertAttributeValues(
           attributes as [{key: string, value: (number | boolean | string)}], 
           productType.attributes 
         );
@@ -152,6 +187,8 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
 
         products.push(product);
     }
+
+
     return (products.length === 1) ? new OutputProductDTO(products[0]) : products.map(p => new OutputProductDTO(p));
   }
 
@@ -200,7 +237,11 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
         product.productType = await this.productTypesService.findOneBySlug(productTypeSlug);   
     
     if (attributes) {
-        const newValues = this.validateAndUpsertAttributeValues(
+        this.validateAttributeValues(
+            attributes as [{key: string, value: (number | boolean | string)}], 
+            product.productType.attributes
+        );
+        const newValues = this.upsertAttributeValues(
           attributes as [{key: string, value: (number | boolean | string)}], 
           product.productType.attributes, 
           product.attributeValues
