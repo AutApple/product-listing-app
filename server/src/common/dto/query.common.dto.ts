@@ -56,9 +56,15 @@ export class QueryCommonDto {
     @IsOptional()
     @ToArray()
     include?: string[];
-    
+
+    @IsOptional()
+    @IsString()
+    search?:string
+
     @Expose()
     @IsOptional()
     @Transform(transformFlattenedFilters)
     filters?: Record<string, Array<FilterEntry>>;
+
+
 }

@@ -63,7 +63,8 @@ const products: QueryParserConfiguration = {
             }
         },
         enableFallbackCollection: true
-    }
+    },
+    searchFieldPath: 'title'
 };
 
 const productTypes: QueryParserConfiguration = {

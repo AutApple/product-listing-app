@@ -19,4 +19,5 @@ export interface QueryParserConfiguration {
     includeMap?: Record<string, object>;
     orderOptions?: string[];
     filterOptions?: QueryFilterOptions;
+    searchFieldPath?: string; // dot-separated path to the field that would be used for ?search=
 }
