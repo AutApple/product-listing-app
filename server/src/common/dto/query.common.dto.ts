@@ -1,10 +1,7 @@
-import { IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { ToArray } from '../transformers/to-array.transformer.js';
 import { Expose, Transform, Type } from 'class-transformer';
-enum SortEnum { created_at_desc ='-createdAt', 
-                created_at_asc = 'createdAt',
-                updated_at_desc = '-updatedAt',
-                updated_at_asc = 'updatedAt' }
+
 
 export interface FilterEntry {
     key: string;
@@ -53,7 +50,7 @@ export class QueryCommonDto {
 
     @IsOptional()
     @ToArray()
-    @IsEnum(SortEnum, {each: true})
+    @IsString()
     sort?: string[];
 
     @IsOptional()
