@@ -6,13 +6,14 @@ import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer
 import { globalQueryParserConfig } from '../config/query-parser.config.js';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';
+import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
 
 @Controller('admin/attributes')
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
 
   @Post()
-  create(@Body() createAttributeDto: CreateAttributeDto) {
+  create(@Body(new BulkOrSingleValidationPipe(CreateAttributeDto)) createAttributeDto: CreateAttributeDto | CreateAttributeDto[]) {
     return this.attributesService.create(createAttributeDto);
   }
 

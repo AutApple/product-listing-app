@@ -30,13 +30,13 @@ export interface ValidationConfig {
 }
 
 const globalSlugLength = {
-    minSlugLength: 5,
-    maxSlugLength: 20
+    minSlugLength: 4,
+    maxSlugLength: 100
 }
 
 const globalTitleLength = {
     minTitleLength: 10,
-    maxTitleLength: 128
+    maxTitleLength: 1000
 }
 
 const defaultValidationConfig: ValidationConfig = {
