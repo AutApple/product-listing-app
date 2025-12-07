@@ -3,7 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity.js';
-import { And, FindOperator, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, In, Repository } from 'typeorm';
+import { And, EntityManager, FindOperator, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, In, Repository } from 'typeorm';
 import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypesService } from '../product-types/product-types.service.js';
 import AttributeTypes from '../attributes/types/attribute.types.enum.js';
@@ -155,31 +155,33 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     productTypeMap: Map<string, ProductTypeEntity>
   ) {
     const products: ProductEntity[] = [];
-    for (const dto of dtos) {
-        const {attributes, imageUrls, productTypeSlug, ...productData} = dto;
-        const productType: ProductTypeEntity | undefined = productTypeMap.get(productTypeSlug);
-        if (!productType)
-          throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product type', productTypeSlug));
-        
-        const product: ProductEntity = this.productRepository.create(productData);
-        
-        product.productType = productType;
-      
-        // Assign attributes
-        product.attributeValues = this.upsertAttributeValues(
-          attributes as [{key: string, value: (number | boolean | string)}], 
-          productType.attributes 
-        );
-        await this.productRepository.save(product);
-        // Assign images
-        if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
-            const images = this.upsertImageUrls(product, imageUrls);
-            await this.productImageRepository.save(images);
-            product.images = images;  
-        }
-        
-        products.push(product);
-    }
+
+    await this.productRepository.manager.transaction(async (entityManager: EntityManager) => {
+        for (const dto of dtos) {
+                const {attributes, imageUrls, productTypeSlug, ...productData} = dto;
+                const productType: ProductTypeEntity | undefined = productTypeMap.get(productTypeSlug);
+                if (!productType)
+                  throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product type', productTypeSlug));
+                
+                const product: ProductEntity = this.productRepository.create(productData);
+                
+                product.productType = productType;
+              
+                // Assign attributes
+                product.attributeValues = this.upsertAttributeValues(
+                  attributes as [{key: string, value: (number | boolean | string)}], 
+                  productType.attributes 
+                );
+                await entityManager.save(product);
+                // Assign images
+                if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
+                    const images = this.upsertImageUrls(product, imageUrls);
+                    await entityManager.save(images);
+                    product.images = images;  
+                }
+                products.push(product);
+            }
+    });
     
     return products;
   }
@@ -189,6 +191,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     
     const productTypeMap = await this.validateAndPreloadProductTypes(dtos);
     let products: ProductEntity[] = await this.createProductsWithAttributesAndImages(dtos, productTypeMap);
+      
 
     return (products.length === 1) ? new OutputProductDTO(products[0]) : products.map(p => new OutputProductDTO(p));
   }
