@@ -6,7 +6,7 @@ import { ProductEntity } from './entities/product.entity.js';
 import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypeEntity } from '../product-types/entities/product-type.entity.js';
 import { ProductTypesModule } from '../product-types/product-types.module.js';
-import { ProductAttributeValueEntity } from './entities/product-attribute-value.js';
+import { ProductAttributeValueEntity } from './entities/product-attribute-value.entity.js';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 
 @Module({

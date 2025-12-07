@@ -7,7 +7,7 @@ import { And, EntityManager, FindOperator, FindOptionsOrder, FindOptionsSelect, 
 import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypesService } from '../product-types/product-types.service.js';
 import AttributeTypes from '../attributes/types/attribute.types.enum.js';
-import { ProductAttributeValueEntity } from './entities/product-attribute-value.js';
+import { ProductAttributeValueEntity } from './entities/product-attribute-value.entity.js';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 import { OutputProductDTO } from './dto/output/output-product.dto.js';

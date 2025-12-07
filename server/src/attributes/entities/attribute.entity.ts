@@ -5,7 +5,7 @@ import AttributeTypes from '../types/attribute.types.enum.js';
 import { AttributeEnumValueEntity } from './attribute-enum-value.entity.js';
 import { ProductTypeEntity } from '../../product-types/entities/product-type.entity.js';
 import { Exclude } from 'class-transformer';
-import { ProductAttributeValueEntity } from '../../products/entities/product-attribute-value.js';
+import { ProductAttributeValueEntity } from '../../products/entities/product-attribute-value.entity.js';
 
 @Entity({
     name: 'attributes'

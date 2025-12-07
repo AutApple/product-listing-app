@@ -57,7 +57,7 @@ export class QueryParser {
             (alias) => `similarity(${alias}, :searchTerm) >= :threshold`,
             {
                 searchTerm: this.query.search,
-                threshold: 0.15 
+                threshold: 0.01 
             }
         );
 
