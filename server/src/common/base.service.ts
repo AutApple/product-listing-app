@@ -37,10 +37,11 @@ export class BaseService <Entity extends MinimalEntity, OutputDTO> {
         orderOptions: FindOptionsOrder<Entity> = {},
         skip: number = 0,
         take: number = 10,
-        filterOptions: FindOptionsWhere<Entity> = {}
+        filterOptions: FindOptionsWhere<Entity> = {},
+        customRelations: string[] = []
     ) : Promise <OutputDTO[]> {
         const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
-        const relations = extractRelationsFromSelect(selectOptions);
+        const relations = [...customRelations, ...extractRelationsFromSelect(selectOptions)];
         const entities = await this.repository.find({ 
             order: orderOptions, 
             select: selectOptions, 
@@ -62,10 +63,11 @@ export class BaseService <Entity extends MinimalEntity, OutputDTO> {
      */
     async findOneBySlug(
         slug: string, 
-        mergeSelectOptions: FindOptionsSelect<Entity> = {}
+        mergeSelectOptions: FindOptionsSelect<Entity> = {},
+        customRelations: string[] = []
     ): Promise<Entity> {
         const selectOptions = deepMergeObjects(this.defaultSelectOptions, mergeSelectOptions);
-        const relations = extractRelationsFromSelect(selectOptions);
+        const relations = [...customRelations, ...extractRelationsFromSelect(selectOptions)];
      
         const entity = await this.repository.findOne({
           where: {slug} as FindOptionsWhere<Entity>, 

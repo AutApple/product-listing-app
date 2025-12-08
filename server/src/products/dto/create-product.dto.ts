@@ -45,6 +45,7 @@ export class CreateProductDto {
     @IsNumber()
     price: number;
     
+
     @IsArray()
     // @IsUrl({}, { each: true }) - will be for production, ill use string for now
     @IsString({ each: true })

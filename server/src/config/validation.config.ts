@@ -15,6 +15,12 @@ export interface ProductValidationConfig extends SlugLengthConfig, TitleLengthCo
         
     maxDescriptionLength: number
     minDescriptionLength: number
+
+    maxCategoryTitleLength: number
+    minCategoryTitleLength: number 
+
+    maxCategorySlugLength: number
+    minCategorySlugLength: number
 }
 
 export interface ProductTypeValidationConfig extends SlugLengthConfig {
@@ -49,6 +55,12 @@ const defaultValidationConfig: ValidationConfig = {
 
         maxDescriptionLength: 1500,
         minDescriptionLength: 3,
+
+        maxCategoryTitleLength: 100,
+        minCategoryTitleLength: 50,
+
+        maxCategorySlugLength: 100,
+        minCategorySlugLength: 50
     },
     productType: {
         ...globalSlugLength

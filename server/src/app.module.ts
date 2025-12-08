@@ -7,6 +7,7 @@ import { getTypeOrmConfig } from './config/typeorm.config.js';
 import { ProductsModule } from './products/products.module';
 import { ProductTypesModule } from './product-types/product-types.module';
 import { AttributesModule } from './attributes/attributes.module';
+import { CategoriesModule } from './categories/categories.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -17,7 +18,8 @@ import { AttributesModule } from './attributes/attributes.module';
     }),
     ProductsModule,
     ProductTypesModule,
-    AttributesModule],
+    AttributesModule,
+    CategoriesModule],
   controllers: [AppController],
   providers: [AppService],
 })

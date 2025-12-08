@@ -77,8 +77,12 @@ const attributes: QueryParserConfiguration = {
     orderOptions: []
 }
 
+const categories: QueryParserConfiguration = {
+    includeMap: {},
+    orderOptions: []
+}
 
 
 export const globalQueryParserConfig: Record<string, QueryParserConfiguration> = {
-    products, productTypes, attributes
+    products, productTypes, attributes, categories
 }

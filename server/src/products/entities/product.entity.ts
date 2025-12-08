@@ -4,6 +4,7 @@ import { Column, Entity, ManyToOne, OneToMany, } from 'typeorm';
 import { ProductImageEntity } from './product-image.entity.js';
 import { ProductTypeEntity } from '../../product-types/entities/product-type.entity.js';
 import { ProductAttributeValueEntity } from './product-attribute-value.entity.js';
+import { CategoryEntity } from '../../categories/entities/category.entity.js';
 
 @Entity({
     name: 'products'
@@ -37,13 +38,15 @@ export class ProductEntity extends AbstractEntity {
     })
     description: string
 
-    //TEST COLUMN
     @Column({
         default: 0,
         type: 'numeric'
     })
     price: number;
-    
+
+    @ManyToOne(() => CategoryEntity)
+    category: CategoryEntity;
+
     @OneToMany(() => ProductImageEntity, (productImage: ProductImageEntity) => productImage.product)
     images: ProductImageEntity[];
 
