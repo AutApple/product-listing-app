@@ -18,6 +18,8 @@ import { attributeTypeToFilterType } from '../common/utils/attribute-to-filter-t
 import { FilterConditionBuilder } from '../common/utils/filter-condition-builder.js';
 import { FilterType } from '../query-parser/types/query-parser-config.type.js';
 import { ProductTypeEntity } from '../product-types/entities/product-type.entity.js';
+import { CategoryEntity } from '../categories/entities/category.entity.js';
+import { CategoriesService } from '../categories/categories.service.js';
 
 
 @Injectable()
@@ -26,7 +28,8 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     @InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>,
     @InjectRepository(ProductImageEntity) private readonly productImageRepository: Repository<ProductImageEntity>,
     @InjectRepository(AttributeEntity) private readonly attributeRepository: Repository<AttributeEntity>,
-    private readonly productTypesService: ProductTypesService
+    private readonly productTypesService: ProductTypesService,
+    private readonly categoriesService: CategoriesService
   ) { 
     super(productRepository, OutputProductDTO, 'product')
   }
@@ -158,15 +161,19 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
 
     await this.productRepository.manager.transaction(async (entityManager: EntityManager) => {
         for (const dto of dtos) {
-                const {attributes, imageUrls, productTypeSlug, ...productData} = dto;
+                const {attributes, imageUrls, productTypeSlug, categorySlug, ...productData} = dto;
                 const productType: ProductTypeEntity | undefined = productTypeMap.get(productTypeSlug);
                 if (!productType)
                   throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product type', productTypeSlug));
                 
+                const category: CategoryEntity = await this.categoriesService.findOneBySlug(categorySlug)
+
                 const product: ProductEntity = this.productRepository.create(productData);
                 
                 product.productType = productType;
-              
+                product.category = category;
+
+
                 // Assign attributes
                 product.attributeValues = this.upsertAttributeValues(
                   attributes as [{key: string, value: (number | boolean | string)}], 
@@ -233,13 +240,16 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
         }
     );
     
-    const {attributes, imageUrls, productTypeSlug, ...productData} = updateProductDto;
+    const {attributes, imageUrls, productTypeSlug, categorySlug, ...productData} = updateProductDto;
     
     Object.assign(product, productData);
     
     if (productTypeSlug)
         product.productType = await this.productTypesService.findOneBySlug(productTypeSlug);   
-    
+    if (categorySlug)
+        product.category = await this.categoriesService.findOneBySlug(categorySlug);
+
+
     if (attributes) {
         this.validateAttributeValues(
             attributes as [{key: string, value: (number | boolean | string)}], 

@@ -54,6 +54,9 @@ export class CreateProductDto {
     @IsString()
     productTypeSlug: string;
 
+    @IsString()
+    categorySlug: string;
+
     // Attribute values will be specified in there
     @IsArray()
     @ValidateNested({each: true})

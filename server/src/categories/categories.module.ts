@@ -10,5 +10,6 @@ import { CategoryEntity } from './entities/category.entity.js';
   ])],
   controllers: [CategoriesController],
   providers: [CategoriesService],
+  exports: [CategoriesService]
 })
 export class CategoriesModule {}

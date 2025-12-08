@@ -14,6 +14,7 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
   ) {
     super(categoryRepository, OutputCategoryDTO, 'category');
   }
+  
   private readonly categoryMaxDepth: number = 10; // TODO: move to some separate config. Hard coded rn for prototyping purposes.
   
   protected defaultSelectOptions = {
