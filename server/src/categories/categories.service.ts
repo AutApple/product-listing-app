@@ -3,7 +3,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entities/category.entity.js';
-import { FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
+import { EntityManager, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
 import { BaseService } from '../common/base.service.js';
 import { OutputCategoryDTO } from './dto/output/output-category.dto.js';
 
@@ -36,14 +36,21 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
       return relations;
   };
 
-  async create(createCategoryDto: CreateCategoryDto): Promise<OutputCategoryDTO> {
-    const { parentCategorySlug, ...categoryData } = createCategoryDto;
-    const category = this.categoryRepository.create(categoryData);
-    if (parentCategorySlug)
-       category.parentCategory = await this.findOneBySlug(parentCategorySlug);
-    await this.categoryRepository.save(category);
-
-    return new OutputCategoryDTO(category);
+  async create(createCategoryDto: CreateCategoryDto | CreateCategoryDto[]): Promise<OutputCategoryDTO[] | OutputCategoryDTO> {
+    const dtos: CreateCategoryDto[] = Array.isArray(createCategoryDto) ? createCategoryDto : [createCategoryDto];
+    const categories: CategoryEntity[] = [];
+    await this.categoryRepository.manager.transaction(async (entityManager: EntityManager) => {
+        for (const dto of dtos) {
+          const { parentCategorySlug, ...categoryData } = dto;
+          const category = this.categoryRepository.create(categoryData);
+          if (parentCategorySlug)
+              category.parentCategory = await this.findOneBySlug(parentCategorySlug);
+          await entityManager.save(category);
+          categories.push(category);
+        }
+    });
+    
+    return categories.length === 1 ? new OutputCategoryDTO(categories[0]) : categories.map(c => new OutputCategoryDTO(c));
   }
   async update(slug: string, updateCategoryDto: UpdateCategoryDto): Promise<OutputCategoryDTO> {
     const category = await this.findOneBySlug(slug);

@@ -17,9 +17,7 @@ export const ERROR_MESSAGES = {
    // filter validation messages
    FILTER_WRONG_TYPE: (key: string, type: string) => `Wrong value type provided to the filter of ${key}. Expected ${type}`,
    FILTER_WRONG_SIGNATURE: (key: string) => `Wrong signature of a filter of ${key}`,
-
-
-
+ 
 
    UNEXPECTED: (action: string) => `Unexpected error occured while ${action}. Report this to the devs.`
 }
