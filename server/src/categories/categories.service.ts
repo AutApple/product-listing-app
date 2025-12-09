@@ -21,12 +21,11 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
       id: true, 
       slug: true,
       title: true,
-      parentCategory: {id: true, slug: true, title: true}, 
-      childrenCategories: {id: true, slug: true, title: true}
+      parentCategory: {id: true, slug: true, title: true},
   }; 
 
 
-    private buildDeepRelations (relationName: string, depth: number): string[] {
+  private buildDeepRelations (relationName: string, depth: number): string[] {
       let relations: string[] = [];
       let currentPath = relationName;
 
@@ -36,6 +35,22 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
       }
       return relations;
   };
+
+  async getFlattenedCategoryTree(slug: string) {
+      const category = await this.findOneBySlug(slug, {}, this.buildDeepRelations('childrenCategories', this.categoryMaxDepth));
+      
+      const collectDescendantSlugs = (category: CategoryEntity, slugArray: string[] = []): string[] => {    
+          slugArray.push(category.slug); 
+          if (category.childrenCategories && category.childrenCategories.length > 0)
+              for (const child of category.childrenCategories){
+                  collectDescendantSlugs(child, slugArray);
+              }
+          
+          return slugArray;
+      }
+      return collectDescendantSlugs(category);
+  }
+
 
   async create(createCategoryDto: CreateCategoryDto | CreateCategoryDto[]): Promise<OutputCategoryDTO[] | OutputCategoryDTO> {
     const dtos: CreateCategoryDto[] = Array.isArray(createCategoryDto) ? createCategoryDto : [createCategoryDto];
@@ -76,9 +91,10 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
 
   async findOneBySlug(
       slug: string, 
-      mergeSelectOptions: FindOptionsSelect<CategoryEntity> = {}
+      mergeSelectOptions: FindOptionsSelect<CategoryEntity> = {},
+      customRelations: string[] = []
   ): Promise<CategoryEntity> {
-      const relations: string[] = this.buildDeepRelations('parentCategory', this.categoryMaxDepth);
+      const relations: string[] = [...customRelations, ...this.buildDeepRelations('parentCategory', this.categoryMaxDepth)];
       return super.findOneBySlug(slug, mergeSelectOptions, relations);
   }
   

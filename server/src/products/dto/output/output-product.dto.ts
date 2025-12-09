@@ -18,10 +18,11 @@ export class OutputProductDTO {
     shortDescription: string;
     description: string; 
     productType: string;
+    category: string;
 
     price: number;
 
-    attributeData: AttributeValueDTO[];
+    attributes: AttributeValueDTO[];
     images: string[];
 
 
@@ -32,11 +33,12 @@ export class OutputProductDTO {
         this.description = product.description;
         this.price = product.price;
         this.productType = product.productType.slug; 
-        
+        this.category = product.category.slug; 
+
         if(product.attributeValues) {
-            this.attributeData = [];
+            this.attributes = [];
             for (const attrVal of product.attributeValues)
-                this.attributeData.push(
+                this.attributes.push(
                     new AttributeValueDTO(
                         attrVal.attribute.slug, 
                         attrVal.attribute.title, 

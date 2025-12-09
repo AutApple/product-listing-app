@@ -30,7 +30,7 @@ export class CategoriesController {
 
   @Get(':slug')
   findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.categories, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
-    return this.categoriesService.findOneBySlug(slug, parsedQuery.selectOptions ?? {});
+    return this.categoriesService.findOneBySlugDTO(slug, parsedQuery.selectOptions ?? {});
   }
 
   @Patch(':slug')

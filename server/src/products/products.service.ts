@@ -43,7 +43,8 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
       productType: {slug: true, id: true},
       createdAt: true,
       updatedAt: true,
-      price: true
+      price: true,
+      category: {slug: true}
   };
   private validateAttributeValues(
     rawAttributeValues: [{key: string, value: (number | boolean | string)}],
@@ -273,33 +274,47 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     return new OutputProductDTO(product);
   }
 
-
   async findWithDynamicFilters(
     mergeSelectOptions: FindOptionsSelect<ProductEntity> = {},
     orderOptions: FindOptionsOrder<ProductEntity> = {},
     skip: number = 0,
     take: number = 10,
     filterOptions: FindOptionsWhere<ProductEntity> = {},
-    fallbackFilterCollection: Array<{[key: string]: FilterEntry[]}>
+    fallbackFilterCollection: Record<string, FilterEntry[]> = {}
   ): Promise<OutputProductDTO[]> {
-    // build with object that should be merged with filterOptions
-    const fallbackFilterOptions: FindOptionsWhere<ProductEntity> = {};
+    //1. apply category filters 
+    const containsCategoryFilter = Object.keys(fallbackFilterCollection).find(key => key === 'category');
+    if (containsCategoryFilter) {
+        
+        const entries = fallbackFilterCollection['category'];
+        const categorySlugs: string[] = [];
 
+        for (const entry of entries) {
+          if (entry.operation !== 'eq')
+            throw new BadRequestException(ERROR_MESSAGES.FILTER_WRONG_SIGNATURE('category'));
+          for (const value of entry.values)
+            categorySlugs.push(... await this.categoriesService.getFlattenedCategoryTree(value)); // search within specified categories and their children
+        }
+        console.log(categorySlugs);
+        filterOptions = deepMergeObjects(filterOptions, {category: {slug: In(categorySlugs)}});
+
+        delete fallbackFilterCollection.category; 
+    }
+
+    //2. treat other fallback filters as an attribute filters
     const attrValueConditions: Array<object> = [];
     const filterConditionBuilder = new FilterConditionBuilder();
-
-    for (const fallbackFilter  of fallbackFilterCollection) {      
-        const slug = Object.keys(fallbackFilter)[0];
+    for (const slug  of Object.keys(fallbackFilterCollection)) {      
         const attribute = await this.attributeRepository.findOne({where: {slug}});
         if (!attribute) throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_NOT_FOUND(slug));
         
         const type = attributeTypeToFilterType(attribute.type);
         let value: FindOperator<unknown>;
         
-        if(fallbackFilter[slug].length === 1)
-          value = filterConditionBuilder.buildFindOperator(fallbackFilter[slug][0], type);
+        if(fallbackFilterCollection[slug].length === 1)
+          value = filterConditionBuilder.buildFindOperator(fallbackFilterCollection[slug][0], type);
         else 
-          value = And(... fallbackFilter[slug].map(v => filterConditionBuilder.buildFindOperator(v, type)));
+          value = And(... fallbackFilterCollection[slug].map(v => filterConditionBuilder.buildFindOperator(v, type)));
         
         const dict = {
           [FilterType.NUMBER]: 'valueInt',
@@ -315,6 +330,8 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     // where i just pull out set of product ids that would match the attribute filters and then pass them to the actual find. 
     // perfect fix would be using sql builder instead, but watever.
     const ids = await this.productRepository.find({where: { attributeValues: attrValueConditions }, select: {id: true}});
+    
+    
 
     filterOptions = deepMergeObjects(filterOptions, {id: In(ids.map(v => v.id))});
     return await this.findAll(

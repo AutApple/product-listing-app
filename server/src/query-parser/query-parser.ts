@@ -9,7 +9,7 @@ export interface QueryParserResult {
     orderOptions?: object;
     paginationOptions?: { skip: number, take: number; };
     filterOptions?: object;
-    filterFallbackCollection?: Array<{ [key: string]: FilterEntry[]; }>;
+    filterFallbackCollection?: Record<string, FilterEntry[]>;
 }
 
 export class QueryParser {
@@ -17,7 +17,7 @@ export class QueryParser {
     private orderOptionsAccum = {};
     private paginationOptions = {};
     private filterOptions = {};
-    private filterFallbackCollection: Array<{ [key: string]: FilterEntry[]; }> = []; // all unrecognized filter keys are stored in this collection
+    private filterFallbackCollection: Record<string, FilterEntry[]> = {}; // all unrecognized filter keys are stored in this collection
 
     constructor(private query: QueryCommonDto, private config?: QueryParserConfiguration) { }
 
@@ -83,7 +83,7 @@ export class QueryParser {
             const type: FilterType | undefined = this.config?.filterOptions?.filterQueryMap[key]?.type;
             if (!pathToField || !type) {
                 if (this.config?.filterOptions?.enableFallbackCollection)
-                    this.filterFallbackCollection.push({ [key]: this.query.filters[key] });// fallback filtering logic
+                    this.filterFallbackCollection = deepMergeObjects(this.filterFallbackCollection, { [key]: this.query.filters[key] }) as Record<string, FilterEntry[]>;// fallback filtering logic
                 continue; // TODO: non-explicit filtering. for now i'll just do an explicit filtering
             }
 
@@ -133,7 +133,7 @@ export class QueryParser {
         if (Object.keys(this.orderOptionsAccum).length > 0) Object.assign(result, { orderOptions: this.orderOptionsAccum });
         if (Object.keys(this.paginationOptions).length > 0) Object.assign(result, { paginationOptions: this.paginationOptions });
         if (Object.keys(this.filterOptions).length > 0) Object.assign(result, { filterOptions: this.filterOptions });
-        if (this.filterFallbackCollection.length > 0) Object.assign(result, { filterFallbackCollection: this.filterFallbackCollection });
+        if (Object.keys(this.filterFallbackCollection).length > 0) Object.assign(result, { filterFallbackCollection: this.filterFallbackCollection });
         return result;
     }
 }

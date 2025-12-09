@@ -26,7 +26,7 @@ export class ProductsController {
       parsedQuery.paginationOptions?.skip ?? 0, //TODO: default pagination options config.
       parsedQuery.paginationOptions?.take ?? 10,
       parsedQuery.filterOptions ?? {},
-      parsedQuery.filterFallbackCollection ?? []
+      parsedQuery.filterFallbackCollection ?? {}
     );
   }
 
