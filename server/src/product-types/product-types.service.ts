@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AttributesService } from '../attributes/attributes.service.js';
 import { OutputProductTypeDTO } from './dto/output/output-product-type.dto.js';
 import { BaseService } from '../common/base.service.js';
+import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 
 @Injectable()
 export class ProductTypesService extends BaseService<ProductTypeEntity, OutputProductTypeDTO> {
@@ -33,6 +34,17 @@ export class ProductTypesService extends BaseService<ProductTypeEntity, OutputPr
     }
   };
 
+  private async makeAttributes(attributes: string[]): Promise<AttributeEntity[]> {
+    const entities: AttributeEntity[] = [];
+    if (!attributes || attributes.length === 0)
+      return entities;
+    for (const attributeSlug of attributes) {
+      const attribute = await this.attributesService.findOneBySlug(attributeSlug, {id: true});
+      entities.push(attribute);
+    }
+    return entities;
+  }
+  
   async create(createProductTypeDto: CreateProductTypeDto | CreateProductTypeDto[]): Promise<OutputProductTypeDTO | OutputProductTypeDTO[]> {
     const dtos: CreateProductTypeDto[] = Array.isArray(createProductTypeDto) ? createProductTypeDto : [createProductTypeDto];
     const productTypes: ProductTypeEntity[] = [];
@@ -40,13 +52,7 @@ export class ProductTypesService extends BaseService<ProductTypeEntity, OutputPr
       for (const dto of dtos) {
         const { attributes, ...productTypeData } = dto;
         const productType = this.productTypeRepository.create(productTypeData);
-        productType.attributes = [];
-
-        if (attributes.length > 0)
-          for (const attributeSlug of attributes) {
-            const attribute = await this.attributesService.findOneBySlug(attributeSlug);
-            productType.attributes.push(attribute);
-          }
+        productType.attributes = await this.makeAttributes(attributes);
         productTypes.push(await entityManager.save(productType));
       }
     });
@@ -67,17 +73,9 @@ export class ProductTypesService extends BaseService<ProductTypeEntity, OutputPr
 
     Object.assign(productType, productTypeData);
 
-    if (attributes && attributes.length > 0) {
-      productType.attributes = [];
-      for (const attributeSlug of attributes) {
-        const attribute = await this.attributesService.findOneBySlug(attributeSlug,
-          {
-            id: true
-          }
-        );
-        productType.attributes.push(attribute);
-      }
-    }
+    if (attributes && attributes.length > 0)
+      productType.attributes = await this.makeAttributes(attributes);
+
 
     return new OutputProductTypeDTO(await this.productTypeRepository.save(productType));
   }
