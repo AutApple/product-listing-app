@@ -10,6 +10,7 @@ import { ProductAttributeValueEntity } from './entities/product-attribute-value.
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { CategoryEntity } from '../categories/entities/category.entity.js';
 import { CategoriesModule } from '../categories/categories.module.js';
+import { ProductsFilterService } from './products-filter.service.js';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { CategoriesModule } from '../categories/categories.module.js';
             CategoriesModule
           ],
   controllers: [ProductsController],
-  providers: [ProductsService],
+  providers: [ProductsService, ProductsFilterService],
 })
 export class ProductsModule {}
