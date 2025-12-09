@@ -54,14 +54,14 @@ export class QueryParser {
         if (!this.query.search || !this.config?.searchFieldPath)
             return this;
         const whereValue = Raw(
-            (alias) => `similarity(${alias}, :searchTerm) >= :threshold`,
+            (alias) => `word_similarity(${alias}, :searchTerm) >= :threshold`,
             {
                 searchTerm: this.query.search,
-                threshold: 0.01 
+                threshold: 0.3 
             }
         );
 
-        const orderValue = Raw((alias) => `similarity(${alias}, :searchTerm) DESC`, {
+        const orderValue = Raw((alias) => `word_similarity(${alias}, :searchTerm) DESC`, {
             searchTerm: this.query.search,
         }) as any;
         
