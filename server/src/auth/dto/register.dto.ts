@@ -10,4 +10,5 @@ export class RegisterDto {
     password: string; 
     @IsString()
     coniformPassword: string; 
+    confirmPassword: string; 
 }

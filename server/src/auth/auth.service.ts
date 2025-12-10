@@ -26,7 +26,7 @@ export class AuthService {
     }
 
     async register(registerDto: RegisterDto): Promise<OutputUserDto> {
-      if(registerDto.password !== registerDto.coniformPassword)
+      if(registerDto.password !== registerDto.confirmPassword)
         throw new BadRequestException(ERROR_MESSAGES.AUTH_PASSWORDS_DONT_MATCH());
 
       const hashedPassword = await bcrypt.hash(registerDto.password, globalAuthConfiguration.saltLevel);
