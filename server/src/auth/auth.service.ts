@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { LoginDto } from './dto/login.dto.js';
+import { RegisterDto } from './dto/register.dto.js';
+import bcrypt from 'bcrypt';
+import { globalAuthConfiguration } from '../config/auth.config.js';
+import { UsersService } from '../users/users.service.js';
+import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+    constructor (
+      private readonly userService: UsersService
+    ) {}
+    async login(loginDto: LoginDto) {
+      const {email, password} = loginDto;
+      try { 
+        const user = await this.userService.findOneByEmail(email, true);
+        if (!await bcrypt.compare(password, user.hashedPassword))
+          throw new UnauthorizedException(ERROR_MESSAGES.AUTH_WRONG_PASSWORD);
+        return user;
+      } catch (e: unknown) {
+        if (e instanceof Error) 
+           throw new UnauthorizedException(e.message);
+        throw new UnauthorizedException(ERROR_MESSAGES.UNEXPECTED('login'));
+      }
+    }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+    async register(registerDto: RegisterDto) {
+      if(registerDto.password !== registerDto.coniformPassword)
+        throw new BadRequestException(ERROR_MESSAGES.AUTH_PASSWORDS_DONT_MATCH());
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
+      const hashedPassword = await bcrypt.hash(registerDto.password, globalAuthConfiguration.saltLevel);
+      const {email, name} = registerDto;
+      const user = await this.userService.create({email, name, hashedPassword});
+      return user;
+    }
 }

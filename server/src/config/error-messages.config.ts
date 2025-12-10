@@ -6,7 +6,7 @@ export const ERROR_MESSAGES = {
    DB_FOREIGN_KEY_VIOLATION: (entity: string = 'something') => `Cannot delete the resource because it\'s still being referenced by ${entity}.`,
 
    // general resource messages
-   RESOURCE_NOT_FOUND: (resource: string, slug: string) => `Could not find ${resource} with slug "${slug}".`,
+   RESOURCE_NOT_FOUND: (resource: string, value: string, valueIdentity: string = 'slug') => `Could not find ${resource} with ${valueIdentity} "${value}".`,
    NO_DATA_PROVIDED: () => `No data provided`,
 
    // product attributes validation messages
@@ -17,7 +17,9 @@ export const ERROR_MESSAGES = {
    // filter validation messages
    FILTER_WRONG_TYPE: (key: string, type: string) => `Wrong value type provided to the filter of ${key}. Expected ${type}`,
    FILTER_WRONG_SIGNATURE: (key: string) => `Wrong signature of a filter of ${key}`,
- 
-
+   
+   // authentication messages
+   AUTH_PASSWORDS_DONT_MATCH: () => `Coniform password and password do not match`,
+   AUTH_WRONG_PASSWORD: () => `Wrong password provided`,
    UNEXPECTED: (action: string) => `Unexpected error occured while ${action}. Report this to the devs.`
 }

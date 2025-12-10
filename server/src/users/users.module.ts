@@ -8,6 +8,7 @@ import { UserEntity } from './entities/user.entity.js';
     UserEntity
   ])],
   providers: [UsersService],
+  exports: [UsersService]
 
 })
 export class UsersModule {}

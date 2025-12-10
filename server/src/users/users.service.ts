@@ -20,10 +20,10 @@ export class UsersService {
     return await this.userRepository.find();
   }
 
-  async findOneByEmail(email: string) {
-    const user = await this.userRepository.findOne({where: {email}});
+  async findOneByEmail(email: string, selectPassword: boolean = false) {
+    const user = await this.userRepository.findOne({where: {email}, select: selectPassword ? {id: true, isAdmin: true, email: true, name: true, hashedPassword: true} : {}});
     if(!user)
-      throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('user', email));
+      throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('user', email, 'email'));
     return user;
   }
 

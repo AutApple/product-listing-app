@@ -14,7 +14,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 export async function getTypeOrmConfig(configService: ConfigService): Promise<TypeOrmModuleOptions> {
     return {
-        type: configService.getOrThrow<"postgres" | "mysql">('DB_TYPE'),
+        type: 'postgres',
         host: configService.getOrThrow<string>('DB_HOST'),
         port: configService.getOrThrow<number>('DB_PORT'),
         username: configService.getOrThrow<string>('DB_USER'),
