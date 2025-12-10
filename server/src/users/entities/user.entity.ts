@@ -4,7 +4,7 @@ import { Column, Entity } from 'typeorm';
 @Entity({
     name: 'users'
 })
-export class User extends AbstractEntity{
+export class UserEntity extends AbstractEntity{
     @Column({
         unique: true
     })
@@ -18,7 +18,7 @@ export class User extends AbstractEntity{
         select: false, 
         length: 100
     })
-    hashedPwd: string;
+    hashedPassword: string;
 
     @Column({
         name: 'is_admin',
