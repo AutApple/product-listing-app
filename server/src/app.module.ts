@@ -8,6 +8,8 @@ import { ProductsModule } from './products/products.module';
 import { ProductTypesModule } from './product-types/product-types.module';
 import { AttributesModule } from './attributes/attributes.module';
 import { CategoriesModule } from './categories/categories.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -19,7 +21,9 @@ import { CategoriesModule } from './categories/categories.module';
     ProductsModule,
     ProductTypesModule,
     AttributesModule,
-    CategoriesModule],
+    CategoriesModule,
+    UsersModule,
+    AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

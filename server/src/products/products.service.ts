@@ -3,7 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity.js';
-import { And, EntityManager, FindOperator, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, In, Repository } from 'typeorm';
+import { EntityManager, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
 import { ProductImageEntity } from './entities/product-image.entity.js';
 import { ProductTypesService } from '../product-types/product-types.service.js';
 import AttributeTypes from '../attributes/types/attribute.types.enum.js';
@@ -294,6 +294,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
       filterOptions
     )
   }
+
   async findAll(
     mergeSelectOptions: FindOptionsSelect<ProductEntity> = {},
     orderOptions: FindOptionsOrder<ProductEntity> = {},

@@ -76,7 +76,6 @@ export class ProductTypesService extends BaseService<ProductTypeEntity, OutputPr
     if (attributes && attributes.length > 0)
       productType.attributes = await this.makeAttributes(attributes);
 
-
     return new OutputProductTypeDTO(await this.productTypeRepository.save(productType));
   }
 
