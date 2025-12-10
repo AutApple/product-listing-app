@@ -1,5 +1,6 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { Column, Entity } from 'typeorm';
+import bcrypt from 'bcrypt';
 
 @Entity({
     name: 'users'
@@ -26,4 +27,8 @@ export class UserEntity extends AbstractEntity{
         default: false
     })
     isAdmin: boolean;
+
+    async matchesPassword(plainPassword: string): Promise<boolean> {
+        return await bcrypt.compare(plainPassword, this.hashedPassword);
+    }
 }

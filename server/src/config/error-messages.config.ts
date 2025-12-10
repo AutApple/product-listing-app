@@ -20,6 +20,6 @@ export const ERROR_MESSAGES = {
    
    // authentication messages
    AUTH_PASSWORDS_DONT_MATCH: () => `Coniform password and password do not match`,
-   AUTH_WRONG_PASSWORD: () => `Wrong password provided`,
+   AUTH_INVALID_CREDENTIALS: () => `Invalid credentials`,
    UNEXPECTED: (action: string) => `Unexpected error occured while ${action}. Report this to the devs.`
 }
