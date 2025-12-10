@@ -5,12 +5,25 @@ import { Column, Entity } from 'typeorm';
     name: 'users'
 })
 export class User extends AbstractEntity{
-    @Column()
+    @Column({
+        unique: true
+    })
     email: string;
+    
     @Column()
     name: string; 
+
     @Column({
-        name: 'hashed_pwd'
+        name: 'hashed_pwd',
+        select: false, 
+        length: 100
     })
     hashedPwd: string;
+
+    @Column({
+        name: 'is_admin',
+        type: 'boolean',
+        default: false
+    })
+    isAdmin: boolean;
 }
