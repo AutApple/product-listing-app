@@ -1,7 +1,18 @@
+// Secret codes are specified in environment variables
+
+
 interface AuthConfiguration {
     saltLevel: number;
+    jwtAccessSecret: string;
+    jwtRefreshSecret: string; 
+    jwtAccessTokenExpiration: number;
+    jwtRefreshTokenExpiration: number;
 }
 
 export const globalAuthConfiguration: AuthConfiguration = {
-    saltLevel: 10
+    saltLevel: 10,
+    jwtAccessSecret: process.env.JWT_ACCESS_SECRET ?? 'fallbackAccessSecretCode',
+    jwtRefreshSecret: process.env.JWT_REFRESH_SECRET ?? 'fallbackRefreshSecretCode',
+    jwtAccessTokenExpiration: 60 * 15,
+    jwtRefreshTokenExpiration: 60 * 60 * 24 * 10
 }

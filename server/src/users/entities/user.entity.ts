@@ -22,6 +22,15 @@ export class UserEntity extends AbstractEntity{
     hashedPassword: string;
 
     @Column({
+        name: 'hashed_rt',
+        length: 100,
+        nullable: true
+    })
+    hashedRefreshToken: string;
+
+
+
+    @Column({
         name: 'is_admin',
         type: 'boolean',
         default: false
@@ -29,6 +38,11 @@ export class UserEntity extends AbstractEntity{
     isAdmin: boolean;
 
     async matchesPassword(plainPassword: string): Promise<boolean> {
-        return await bcrypt.compare(plainPassword, this.hashedPassword);
+        return bcrypt.compare(plainPassword, this.hashedPassword);
+    }
+
+    async hasValidRefreshToken(token: string): Promise<boolean> {
+        if (!this.hashedRefreshToken) return false;
+        return bcrypt.compare(token, this.hashedRefreshToken);
     }
 }

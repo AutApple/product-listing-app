@@ -14,13 +14,16 @@ export class UsersService {
   constructor (
     @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>
   ) {}
-  async create(createUserDto: CreateUserDto): Promise<OutputUserDto> {
+  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const {password, ...userData} = createUserDto;
     const hashedPassword = await bcrypt.hash(password, globalAuthConfiguration.saltLevel);
     const user = this.userRepository.create({hashedPassword, ...userData});
-    return new OutputUserDto(await this.userRepository.save(user));
+    return await this.userRepository.save(user);
   }
 
+  async createDto(createUserDto: CreateUserDto): Promise<OutputUserDto> {
+    return new OutputUserDto(await this.create(createUserDto));
+  }
   async findAll(): Promise<OutputUserDto[]> {
     return (await this.userRepository.find()).map(u => new OutputUserDto(u));
   }
@@ -34,6 +37,12 @@ export class UsersService {
 
   async findOneByEmailDto(email: string): Promise<OutputUserDto> {
     return new OutputUserDto(await this.findOneByEmail(email, false));
+  }
+
+  async setRefreshToken(email: string, token: string): Promise<UserEntity> { 
+      const user = await this.findOneByEmail(email);
+      user.hashedRefreshToken = await bcrypt.hash(token, globalAuthConfiguration.saltLevel);
+      return await this.userRepository.save(user);
   }
 
   async update(email: string, updateUserDto: UpdateUserDto): Promise<OutputUserDto> {

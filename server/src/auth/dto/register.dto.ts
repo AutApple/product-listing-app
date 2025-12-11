@@ -5,10 +5,9 @@ export class RegisterDto {
     email: string; 
     @IsString()
     name: string;
-    
+
     @IsString() 
     password: string; 
     @IsString()
-    coniformPassword: string; 
     confirmPassword: string; 
 }
