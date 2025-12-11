@@ -16,4 +16,9 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto) {
     return await this.authService.register(registerDto);
   }
+
+  @Post ('refresh')
+  async refresh() {
+    return 'refresh route';
+  }
 }
