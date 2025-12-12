@@ -5,6 +5,7 @@ import { RegisterDto } from './dto/register.dto.js';
 import { AccessTokenGuard } from './guards/access-token.guard.js';
 import { RefreshTokenGuard } from './guards/refresh-token.guard.js';
 import { User } from './decorators/user.decorator.js';
+import { OutputUserDto } from '../users/dto/output/output-user.dto.js';
 
 @Controller('auth')
 export class AuthController {
@@ -32,8 +33,9 @@ export class AuthController {
     return await this.authService.logout(userEmail);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('me') 
-  async me() {
-    return 'me route';
+  async me(@User('email') email: string) {
+    return new OutputUserDto(await this.authService.me(email));
   }
 }

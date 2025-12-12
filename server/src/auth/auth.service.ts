@@ -76,4 +76,8 @@ export class AuthService {
       await this.userService.setRefreshToken(email, tokens.refreshToken);
       return tokens;
     }
+
+    async me (email: string) {
+      return await this.userService.findOneByEmail(email);
+    }
   }
