@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity.js';
@@ -27,19 +27,21 @@ export class UsersService {
   async findOneByEmail(email: string, selectPassword: boolean = false): Promise<UserEntity> {
     const user = await this.userRepository.findOne({where: {email}, select: selectPassword ? {id: true, isAdmin: true, email: true, name: true, hashedPassword: true} : {}});
     if(!user)
-      throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('user', email, 'email'));
+      throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('user', email, 'email'));
     return user;
   }
  
-  async setRefreshToken(email: string, token: string): Promise<UserEntity> { 
+  async setRefreshToken(email: string, token: string | null): Promise<UserEntity> { 
       const user = await this.findOneByEmail(email);
-      user.hashedRefreshToken = await bcrypt.hash(token, globalAuthConfiguration.saltLevel);
+
+      user.hashedRefreshToken = typeof(token) === 'string' ? await bcrypt.hash(token, globalAuthConfiguration.saltLevel) : null;
       return await this.userRepository.save(user);
   }
 
   async update(email: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
     const user = await this.findOneByEmail(email);
-    Object.assign(user, updateUserDto);
+    if (updateUserDto.name !== undefined) user.name = updateUserDto.name;
+    if (updateUserDto.email !== undefined) user.email = updateUserDto.email;
     await this.userRepository.save(user);
     return user;
   }

@@ -17,16 +17,18 @@ export class UserEntity extends AbstractEntity{
     @Column({
         name: 'hashed_pwd',
         select: false, 
-        length: 100
+        length: 100,
+        type: 'varchar'
     })
     hashedPassword: string;
 
     @Column({
         name: 'hashed_rt',
         length: 100,
-        nullable: true
+        nullable: true,
+        type: 'varchar'
     })
-    hashedRefreshToken: string;
+    hashedRefreshToken: string | null;
 
 
 

@@ -7,7 +7,7 @@ import { globalQueryParserConfig } from '../config/query-parser.config.js';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';
 import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
-import { toOutputDto } from 'src/common/utils/to-output-dto.js';
+import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { OutputProductTypeDTO } from './dto/output/output-product-type.dto.js';
 import { ProductTypeEntity } from './entities/product-type.entity.js';
 

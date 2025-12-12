@@ -2,7 +2,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { globalAuthConfiguration } from '../../config/auth.config.js';
 import { Request } from 'express';
-export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
+import { JwtPayload } from '../types/jwt-payload.type.js';
+export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     constructor () {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -10,7 +11,7 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
             passReqToCallback: true
         });
     }
-    validate(req: Request, payload: any) {
+    validate(req: Request, payload: JwtPayload) {
         const refreshToken = req.get('authorization')?.replace('Bearer', '').trim(); //extract refresh token from request
         return {
             ...payload,

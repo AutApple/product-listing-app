@@ -1,6 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { globalAuthConfiguration } from '../../config/auth.config.js';
+import { JwtPayload } from '../types/jwt-payload.type.js';
 export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     constructor () {
         super({
@@ -8,7 +9,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
             secretOrKey: globalAuthConfiguration.jwtAccessSecret
         });
     }
-    validate(payload: any) {
+    validate(payload: JwtPayload) {
         return payload;
     }
    
