@@ -13,11 +13,11 @@ import { OutputAttributeDTO } from './dto/output/output-attribute.dto.js';
 import { BaseService } from '../common/base.service.js';
 
 @Injectable()
-export class AttributesService extends BaseService<AttributeEntity, OutputAttributeDTO> {
+export class AttributesService extends BaseService<AttributeEntity> {
   constructor(
     @InjectRepository(AttributeEntity) private readonly attributeEntityRepository: Repository<AttributeEntity>
   ) {
-    super(attributeEntityRepository, OutputAttributeDTO, 'attribute');
+    super(attributeEntityRepository, 'attribute');
   }
 
   protected readonly defaultSelectOptions: FindOptionsSelect<AttributeEntity> = {
@@ -31,7 +31,7 @@ export class AttributesService extends BaseService<AttributeEntity, OutputAttrib
     }
   };
 
-  async create(createAttributeDto: CreateAttributeDto | CreateAttributeDto[]): Promise<OutputAttributeDTO | OutputAttributeDTO[]> {
+  async create(createAttributeDto: CreateAttributeDto | CreateAttributeDto[]): Promise<AttributeEntity | AttributeEntity[]> {
     const dtos: CreateAttributeDto[] = Array.isArray(createAttributeDto) ? createAttributeDto : [createAttributeDto];
     const attributes: AttributeEntity[] = [];
 
@@ -48,10 +48,10 @@ export class AttributesService extends BaseService<AttributeEntity, OutputAttrib
       }
     });
 
-    return attributes.length === 1 ? new OutputAttributeDTO(attributes[0]) : attributes.map(a => new OutputAttributeDTO(a));
+    return attributes.length === 1 ? attributes[0] : attributes;
   }
 
-  async update(slug: string, updateAttributeDto: UpdateAttributeDto): Promise<OutputAttributeDTO> {
+  async update(slug: string, updateAttributeDto: UpdateAttributeDto): Promise<AttributeEntity> {
     const attribute = await this.findOneBySlug(slug);
     const { enumValues, ...attributeData } = updateAttributeDto;
     Object.assign(attribute, attributeData);
@@ -60,7 +60,7 @@ export class AttributesService extends BaseService<AttributeEntity, OutputAttrib
       for (const value of enumValues)
         attribute.enumValues.push(new AttributeEnumValueEntity(value, attribute));
     }
-    return new OutputAttributeDTO(await this.attributeEntityRepository.save(attribute));
+    return await this.attributeEntityRepository.save(attribute);
   }
 
   async findAll(
@@ -68,7 +68,7 @@ export class AttributesService extends BaseService<AttributeEntity, OutputAttrib
     orderOptions: FindOptionsOrder<AttributeEntity> = {},
     skip: number = 0,
     take: number = 10
-  ): Promise<OutputAttributeDTO[]> {
+  ): Promise<AttributeEntity[]> {
     return super.findAll(mergeSelectOptions, orderOptions, skip, take);
   }
 
@@ -79,11 +79,8 @@ export class AttributesService extends BaseService<AttributeEntity, OutputAttrib
     return super.findOneBySlug(slug, mergeSelectOptions);
   }
 
-  async findOneBySlugDTO(slug: string, mergeSelectOptions: FindOptionsSelect<AttributeEntity> = {}): Promise<OutputAttributeDTO> {
-    return super.findOneBySlugDTO(slug, mergeSelectOptions);
-  }
 
-  async remove(slug: string): Promise<OutputAttributeDTO> {
+  async remove(slug: string): Promise<AttributeEntity> {
     return super.remove(slug);
   }
 }

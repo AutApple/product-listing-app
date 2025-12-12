@@ -5,7 +5,6 @@ import { UserEntity } from './entities/user.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { OutputUserDto } from './dto/output/output-user.dto.js';
 import { globalAuthConfiguration } from '../config/auth.config.js';
 import bcrypt from 'bcrypt';
 
@@ -21,11 +20,8 @@ export class UsersService {
     return await this.userRepository.save(user);
   }
 
-  async createDto(createUserDto: CreateUserDto): Promise<OutputUserDto> {
-    return new OutputUserDto(await this.create(createUserDto));
-  }
-  async findAll(): Promise<OutputUserDto[]> {
-    return (await this.userRepository.find()).map(u => new OutputUserDto(u));
+  async findAll(): Promise<UserEntity[]> {
+    return  await this.userRepository.find();
   }
 
   async findOneByEmail(email: string, selectPassword: boolean = false): Promise<UserEntity> {
@@ -34,27 +30,23 @@ export class UsersService {
       throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('user', email, 'email'));
     return user;
   }
-
-  async findOneByEmailDto(email: string): Promise<OutputUserDto> {
-    return new OutputUserDto(await this.findOneByEmail(email, false));
-  }
-
+ 
   async setRefreshToken(email: string, token: string): Promise<UserEntity> { 
       const user = await this.findOneByEmail(email);
       user.hashedRefreshToken = await bcrypt.hash(token, globalAuthConfiguration.saltLevel);
       return await this.userRepository.save(user);
   }
 
-  async update(email: string, updateUserDto: UpdateUserDto): Promise<OutputUserDto> {
+  async update(email: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
     const user = await this.findOneByEmail(email);
     Object.assign(user, updateUserDto);
     await this.userRepository.save(user);
-    return new OutputUserDto(user);
+    return user;
   }
 
-  async remove(email: string): Promise<OutputUserDto> {
+  async remove(email: string): Promise<UserEntity> {
     const user = await this.findOneByEmail(email);
     this.userRepository.remove(user);
-    return new OutputUserDto(user);
+    return user;
   }
 }

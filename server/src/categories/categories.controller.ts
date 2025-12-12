@@ -7,39 +7,51 @@ import { globalQueryParserConfig } from '../config/query-parser.config.js';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';
 import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
+import { toOutputDto } from '../common/utils/to-output-dto.js';
+import { OutputCategoryDTO } from './dto/output/output-category.dto.js';
+import { CategoryEntity } from './entities/category.entity.js';
 
 @Controller('admin/categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
+  
+  private dto(e: CategoryEntity | CategoryEntity[]): OutputCategoryDTO | OutputCategoryDTO[] {
+    return toOutputDto(e, OutputCategoryDTO);
+  }
 
   @Post()
-  create(@Body(new BulkOrSingleValidationPipe(CreateCategoryDto)) createCategoryDto: CreateCategoryDto | CreateCategoryDto[]) {
-    return this.categoriesService.create(createCategoryDto);
+  async create(@Body(new BulkOrSingleValidationPipe(CreateCategoryDto)) createCategoryDto: CreateCategoryDto | CreateCategoryDto[]) {
+    const data = await this.categoriesService.create(createCategoryDto);
+    return this.dto(data);
   }
 
   @Get()
-  findAll(@ParsedQuery({config: globalQueryParserConfig.categories, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
-    return this.categoriesService.findAll(
+  async findAll(@ParsedQuery({config: globalQueryParserConfig.categories, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
+    const data = await this.categoriesService.findAll(
         parsedQuery.selectOptions ?? {}, 
         parsedQuery.orderOptions ?? {}, 
         parsedQuery.paginationOptions?.skip ?? 0, //TODO: default pagination options config.
         parsedQuery.paginationOptions?.take ?? 10,
         parsedQuery.filterOptions ?? {}
     );
+    return this.dto(data);
   }
 
   @Get(':slug')
-  findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.categories, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
-    return this.categoriesService.findOneBySlugDTO(slug, parsedQuery.selectOptions ?? {});
+  async findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.categories, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
+    const data = await this.categoriesService.findOneBySlug(slug, parsedQuery.selectOptions ?? {});
+    return this.dto(data);
   }
 
   @Patch(':slug')
-  update(@Param('slug') slug: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoriesService.update(slug, updateCategoryDto);
+  async update(@Param('slug') slug: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+    const data = await this.categoriesService.update(slug, updateCategoryDto);
+    return this.dto(data);
   }
 
   @Delete(':slug')
-  remove(@Param('slug') slug: string) {
-    return this.categoriesService.remove(slug);
+  async remove(@Param('slug') slug: string) {
+    const data = await this.categoriesService.remove(slug);
+    return this.dto(data);
   }
 }

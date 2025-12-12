@@ -10,12 +10,12 @@ import { BaseService } from '../common/base.service.js';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 
 @Injectable()
-export class ProductTypesService extends BaseService<ProductTypeEntity, OutputProductTypeDTO> {
+export class ProductTypesService extends BaseService<ProductTypeEntity> {
   constructor(
     @InjectRepository(ProductTypeEntity) private readonly productTypeRepository: Repository<ProductTypeEntity>,
     private readonly attributesService: AttributesService
   ) {
-    super(productTypeRepository, OutputProductTypeDTO, 'product type');
+    super(productTypeRepository, 'product type');
   }
 
   protected readonly defaultSelectOptions: FindOptionsSelect<ProductTypeEntity> = {
@@ -45,7 +45,7 @@ export class ProductTypesService extends BaseService<ProductTypeEntity, OutputPr
     return entities;
   }
   
-  async create(createProductTypeDto: CreateProductTypeDto | CreateProductTypeDto[]): Promise<OutputProductTypeDTO | OutputProductTypeDTO[]> {
+  async create(createProductTypeDto: CreateProductTypeDto | CreateProductTypeDto[]): Promise<ProductTypeEntity | ProductTypeEntity[]> {
     const dtos: CreateProductTypeDto[] = Array.isArray(createProductTypeDto) ? createProductTypeDto : [createProductTypeDto];
     const productTypes: ProductTypeEntity[] = [];
     await this.productTypeRepository.manager.transaction(async (entityManager: EntityManager) => {
@@ -57,10 +57,10 @@ export class ProductTypesService extends BaseService<ProductTypeEntity, OutputPr
       }
     });
 
-    return productTypes.length === 1 ? new OutputProductTypeDTO(productTypes[0]) : productTypes.map(pt => new OutputProductTypeDTO(pt));
+    return productTypes.length === 1 ? productTypes[0] : productTypes;
   }
 
-  async update(slug: string, updateProductTypeDto: UpdateProductTypeDto): Promise<OutputProductTypeDTO> {
+  async update(slug: string, updateProductTypeDto: UpdateProductTypeDto): Promise<ProductTypeEntity> {
     const { attributes, ...productTypeData } = updateProductTypeDto;
     const productType = await this.findOneBySlug(slug, {
       attributes: {
@@ -76,7 +76,7 @@ export class ProductTypesService extends BaseService<ProductTypeEntity, OutputPr
     if (attributes && attributes.length > 0)
       productType.attributes = await this.makeAttributes(attributes);
 
-    return new OutputProductTypeDTO(await this.productTypeRepository.save(productType));
+    return await this.productTypeRepository.save(productType);
   }
 
   async findAll(
@@ -84,7 +84,7 @@ export class ProductTypesService extends BaseService<ProductTypeEntity, OutputPr
     orderOptions: FindOptionsOrder<ProductTypeEntity> = {},
     skip: number = 0,
     take: number = 10
-  ): Promise<OutputProductTypeDTO[]> {
+  ): Promise<ProductTypeEntity[]> {
     return super.findAll(mergeSelectOptions, orderOptions, skip, take);
   }
 
@@ -95,14 +95,8 @@ export class ProductTypesService extends BaseService<ProductTypeEntity, OutputPr
     return super.findOneBySlug(slug, mergeSelectOptions);
   }
 
-  async findOneBySlugDTO(
-    slug: string,
-    mergeSelectOptions: FindOptionsSelect<ProductTypeEntity> = {}
-  ): Promise<OutputProductTypeDTO> {
-    return super.findOneBySlugDTO(slug, mergeSelectOptions);
-  }
-
-  async remove(slug: string): Promise<OutputProductTypeDTO> {
+ 
+  async remove(slug: string): Promise<ProductTypeEntity> {
     return super.remove(slug);
   }
 

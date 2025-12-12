@@ -8,11 +8,11 @@ import { BaseService } from '../common/base.service.js';
 import { OutputCategoryDTO } from './dto/output/output-category.dto.js';
 
 @Injectable()
-export class CategoriesService extends BaseService<CategoryEntity, OutputCategoryDTO>{
+export class CategoriesService extends BaseService<CategoryEntity>{
   constructor(
     @InjectRepository(CategoryEntity) private readonly categoryRepository: Repository<CategoryEntity>
   ) {
-    super(categoryRepository, OutputCategoryDTO, 'category');
+    super(categoryRepository, 'category');
   }
   
   private readonly categoryMaxDepth: number = 10; // TODO: move to some separate config. Hard coded rn for prototyping purposes.
@@ -36,7 +36,7 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
       return relations;
   };
 
-  async getFlattenedCategoryTree(slug: string) {
+  async getFlattenedCategoryTree(slug: string): Promise<string[]> {
       const category = await this.findOneBySlug(slug, {}, this.buildDeepRelations('childrenCategories', this.categoryMaxDepth));
       
       const collectDescendantSlugs = (category: CategoryEntity, slugArray: string[] = []): string[] => {    
@@ -52,7 +52,7 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
   }
 
 
-  async create(createCategoryDto: CreateCategoryDto | CreateCategoryDto[]): Promise<OutputCategoryDTO[] | OutputCategoryDTO> {
+  async create(createCategoryDto: CreateCategoryDto | CreateCategoryDto[]): Promise<CategoryEntity[] | CategoryEntity> {
     const dtos: CreateCategoryDto[] = Array.isArray(createCategoryDto) ? createCategoryDto : [createCategoryDto];
     const categories: CategoryEntity[] = [];
     await this.categoryRepository.manager.transaction(async (entityManager: EntityManager) => {
@@ -66,16 +66,16 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
         }
     });
     
-    return categories.length === 1 ? new OutputCategoryDTO(categories[0]) : categories.map(c => new OutputCategoryDTO(c));
+    return categories.length === 1 ? categories[0] : categories;
   }
-  async update(slug: string, updateCategoryDto: UpdateCategoryDto): Promise<OutputCategoryDTO> {
+  async update(slug: string, updateCategoryDto: UpdateCategoryDto): Promise<CategoryEntity> {
     const category = await this.findOneBySlug(slug);
     const { parentCategorySlug, ...categoryData} = updateCategoryDto;
     Object.assign(category, categoryData);
     if (parentCategorySlug)
        category.parentCategory = await this.findOneBySlug(parentCategorySlug);
     await this.categoryRepository.save(category);
-    return new OutputCategoryDTO(category);
+    return category;
   }
 
   async findAll(
@@ -84,7 +84,7 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
       skip: number = 0,
       take: number = 10,
       filterOptions: FindOptionsWhere<CategoryEntity> = {},
-  ): Promise<OutputCategoryDTO[]>  {
+  ): Promise<CategoryEntity[]>  {
     const relations: string[] = this.buildDeepRelations('parentCategory', this.categoryMaxDepth);
     return super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions, relations);
   }
@@ -97,12 +97,9 @@ export class CategoriesService extends BaseService<CategoryEntity, OutputCategor
       const relations: string[] = [...customRelations, ...this.buildDeepRelations('parentCategory', this.categoryMaxDepth)];
       return super.findOneBySlug(slug, mergeSelectOptions, relations);
   }
+ 
   
-  async findOneBySlugDTO(slug: string,  mergeSelectOptions: FindOptionsSelect<CategoryEntity> = {}): Promise<OutputCategoryDTO> {
-    return super.findOneBySlugDTO(slug, mergeSelectOptions)
-  }
-  
-  async remove(slug: string): Promise<OutputCategoryDTO> {
+  async remove(slug: string): Promise<CategoryEntity> {
     return super.remove(slug);
   }
 }

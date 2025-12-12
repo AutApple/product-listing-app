@@ -7,41 +7,55 @@ import { globalQueryParserConfig } from '../config/query-parser.config.js';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';
 import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
+import { toOutputDto } from 'src/common/utils/to-output-dto.js';
+import { OutputProductTypeDTO } from './dto/output/output-product-type.dto.js';
+import { ProductTypeEntity } from './entities/product-type.entity.js';
 
 @Controller('admin/product-types')
 export class ProductTypesController {
-  constructor(private readonly productTypesService: ProductTypesService) {}
+  constructor(private readonly productTypesService: ProductTypesService) { }
+  
+  private dto(e: ProductTypeEntity | ProductTypeEntity[]): OutputProductTypeDTO | OutputProductTypeDTO[] {
+    return toOutputDto(e, OutputProductTypeDTO);
+  }
 
   @Post()
-  create(@Body(new BulkOrSingleValidationPipe(CreateProductTypeDto)) createProductTypeDto: CreateProductTypeDto | CreateProductTypeDto[]) {
-    return this.productTypesService.create(createProductTypeDto);
+  async create(@Body(new BulkOrSingleValidationPipe(CreateProductTypeDto)) createProductTypeDto: CreateProductTypeDto | CreateProductTypeDto[]) {
+    const data = await this.productTypesService.create(createProductTypeDto);
+    return this.dto(data); 
   }
 
   @Get()
-  findAll(@ParsedQuery({config: globalQueryParserConfig.productTypes, dto: QueryCommonDto}) queryResult: QueryParserResult) {
-    return this.productTypesService.findAll(
-        queryResult.selectOptions ?? {},
-        queryResult.orderOptions ?? {},
-        queryResult.paginationOptions?.skip ?? 0,
-        queryResult.paginationOptions?.take ?? 10 
+  async findAll(@ParsedQuery({ config: globalQueryParserConfig.productTypes, dto: QueryCommonDto }) queryResult: QueryParserResult) {
+    const data = await this.productTypesService.findAll(
+      queryResult.selectOptions ?? {},
+      queryResult.orderOptions ?? {},
+      queryResult.paginationOptions?.skip ?? 0,
+      queryResult.paginationOptions?.take ?? 10
     );
+    
+    return this.dto(data);
   }
 
   @Get(':slug')
-  findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.productTypes, dto: QueryCommonDto}) queryResult: QueryParserResult) {
-    return this.productTypesService.findOneBySlug(
+  async findOne(@Param('slug') slug: string, @ParsedQuery({ config: globalQueryParserConfig.productTypes, dto: QueryCommonDto }) queryResult: QueryParserResult) {
+    const data = await this.productTypesService.findOneBySlug(
       slug,
       queryResult.selectOptions ?? {}
     );
+
+    return this.dto(data);
   }
 
   @Patch(':slug')
-  update(@Param('slug') slug: string, @Body() updateProductTypeDto: UpdateProductTypeDto) {
-    return this.productTypesService.update(slug, updateProductTypeDto);
+  async update(@Param('slug') slug: string, @Body() updateProductTypeDto: UpdateProductTypeDto) {
+    const data = await this.productTypesService.update(slug, updateProductTypeDto);
+    return this.dto(data);
   }
 
   @Delete(':slug')
-  remove(@Param('slug') slug: string) {
-    return this.productTypesService.remove(slug);
+  async remove(@Param('slug') slug: string) {
+    const data = await this.productTypesService.remove(slug);
+    return this.dto(data);
   }
 }

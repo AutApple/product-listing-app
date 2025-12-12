@@ -21,7 +21,7 @@ import { ProductsFilterService } from './products-filter.service.js';
 
 
 @Injectable()
-export class ProductsService extends BaseService<ProductEntity, OutputProductDTO>{
+export class ProductsService extends BaseService<ProductEntity>{
   constructor(
     @InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>,
     @InjectRepository(ProductImageEntity) private readonly productImageRepository: Repository<ProductImageEntity>,
@@ -30,7 +30,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     private readonly categoriesService: CategoriesService,
     private readonly productsFilterService: ProductsFilterService
   ) { 
-    super(productRepository, OutputProductDTO, 'product')
+    super(productRepository, 'product')
   }
 
   protected readonly defaultSelectOptions: FindOptionsSelect<ProductEntity> = {
@@ -193,17 +193,17 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     return products;
   }
 
-  async create(dto: CreateProductDto | CreateProductDto[]): Promise<OutputProductDTO | OutputProductDTO[]> {
+  async create(dto: CreateProductDto | CreateProductDto[]): Promise<ProductEntity | ProductEntity[]> {
     const dtos: CreateProductDto[] = Array.isArray(dto) ? dto : [dto];
     
     const productTypeMap = await this.validateAndPreloadProductTypes(dtos);
     let products: ProductEntity[] = await this.createProductsWithAttributesAndImages(dtos, productTypeMap);
       
 
-    return (products.length === 1) ? new OutputProductDTO(products[0]) : products.map(p => new OutputProductDTO(p));
+    return (products.length === 1) ? products[0] : products;
   }
 
-  async update(slug: string, updateProductDto: UpdateProductDto): Promise<OutputProductDTO> {
+  async update(slug: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
     const product = await this.findOneBySlug(
         slug,
         {
@@ -270,7 +270,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
         product.images = images;  
     }
  
-    return new OutputProductDTO(product);
+    return product;
   }
 
   async findWithDynamicFilters(
@@ -280,7 +280,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     take: number = 10,
     filterOptions: FindOptionsWhere<ProductEntity> = {},
     fallbackFilterCollection: Record<string, FilterEntry[]> = {}
-  ): Promise<OutputProductDTO[]> {
+  ): Promise<ProductEntity[]> {
     //1. apply category filters 
     filterOptions = deepMergeObjects(filterOptions, await this.productsFilterService.createCategoryFilters(fallbackFilterCollection));
     //2. treat other fallback filters as an attribute filters
@@ -301,7 +301,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     skip: number = 0,
     take: number = 10,
     filterOptions: FindOptionsWhere<ProductEntity> = {},
-  ): Promise<OutputProductDTO[]> {
+  ): Promise<ProductEntity[]> {
     return super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions);
   }
 
@@ -312,11 +312,7 @@ export class ProductsService extends BaseService<ProductEntity, OutputProductDTO
     return super.findOneBySlug(slug, mergeSelectOptions);
   }
 
-  async findOneBySlugDTO(slug: string,  mergeSelectOptions: FindOptionsSelect<ProductEntity> = {}): Promise<OutputProductDTO> {
-    return super.findOneBySlugDTO(slug, mergeSelectOptions)
-  }
-
-  async remove(slug: string): Promise<OutputProductDTO> {
+  async remove(slug: string): Promise<ProductEntity> {
     return super.remove(slug);
   }
 }
