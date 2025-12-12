@@ -5,7 +5,6 @@ import { EntityManager, FindOptionsOrder, FindOptionsSelect, Repository } from '
 import { ProductTypeEntity } from './entities/product-type.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributesService } from '../attributes/attributes.service.js';
-import { OutputProductTypeDTO } from './dto/output/output-product-type.dto.js';
 import { BaseService } from '../common/base.service.js';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 
