@@ -11,6 +11,7 @@ import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { CategoryEntity } from '../categories/entities/category.entity.js';
 import { CategoriesModule } from '../categories/categories.module.js';
 import { ProductsFilterService } from './products-filter.service.js';
+import { WishlistEntity } from '../wishlist/entities/wishlist.entity.js';
 
 @Module({
   imports: [
@@ -20,12 +21,14 @@ import { ProductsFilterService } from './products-filter.service.js';
               ProductTypeEntity,
               ProductAttributeValueEntity,
               AttributeEntity,
-              CategoryEntity
+              CategoryEntity,
+              WishlistEntity
             ]), 
             ProductTypesModule,
             CategoriesModule
           ],
   controllers: [ProductsController],
   providers: [ProductsService, ProductsFilterService],
+  exports: [ProductsService]
 })
 export class ProductsModule {}

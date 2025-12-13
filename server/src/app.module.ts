@@ -10,6 +10,7 @@ import { AttributesModule } from './attributes/attributes.module';
 import { CategoriesModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -23,7 +24,8 @@ import { AuthModule } from './auth/auth.module';
     AttributesModule,
     CategoriesModule,
     UsersModule,
-    AuthModule],
+    AuthModule,
+    WishlistModule],
   controllers: [AppController],
   providers: [AppService],
 })
