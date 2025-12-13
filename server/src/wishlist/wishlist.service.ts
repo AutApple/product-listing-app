@@ -31,7 +31,7 @@ export class WishlistService {
       const wishlistItem = wishlist.items.find(w => w.product.slug === productSlug);
       if (!wishlistItem) {
         if (amount <= 0) return;
-        
+       
         const product: ProductEntity = await this.productsService.findOneBySlug(productSlug);
         wishlist.items.push(this.wishlistItemRepository.create({product, amount, wishlist}));
         await this.wishlistRepository.save(wishlist);
@@ -45,12 +45,12 @@ export class WishlistService {
         wishlistItem.amount = newAmount;
     }
 
-  async add(addToWishlistDto: ModifyWishlistDto, email: string): Promise<WishlistEntity> {
+    async add(addToWishlistDto: ModifyWishlistDto, email: string): Promise<WishlistEntity> {
       const wishlist = await this.getOrCreateWishlist(email);
       for (const item of addToWishlistDto.products) {
           await this.mergeOrCreateItem(item.slug, item.amount, wishlist);
       }
       await this.wishlistRepository.save(wishlist);
       return wishlist;
-  }
+    }
 }

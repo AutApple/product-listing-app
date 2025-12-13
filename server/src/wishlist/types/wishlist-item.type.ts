@@ -1,11 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsString } from 'class-validator';
+import { IsInt, IsNumber, IsString } from 'class-validator';
 
 export class WishlistItem {
     @IsString()
     slug: string;
     
     @IsNumber()
+    @IsInt()
     @Type(() => Number)
     amount: number;
 }
