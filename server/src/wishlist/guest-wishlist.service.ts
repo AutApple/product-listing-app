@@ -13,18 +13,15 @@ export class GuestWishlistService {
         @InjectRepository(WishlistEntity) private readonly wishlistRepository: Repository<WishlistEntity>,
         private readonly commonWishlistService: CommonWishlistService
     ){}
-  private checkSession(s: Record<string, any> | undefined): void {
-    if(!s) {
-      console.error('null session...');
-      
-    }
-  }
+  
+  
   private async createWishlist(session: Record<string, any>): Promise<WishlistEntity> {
       const anonymousId = uuidv7();
       session.anonymousId = anonymousId;
       const wishlist = this.wishlistRepository.create({anonymousId});
       return await this.wishlistRepository.save(wishlist);
   }
+
   async getOrCreateWishlist(session: Record<string, any> | undefined): Promise<WishlistEntity> {
     if (!session)
       throw new InternalServerErrorException(ERROR_MESSAGES.UNEXPECTED('session undefined'));
