@@ -18,7 +18,9 @@ export class GuestWishlistService {
     const anonymousId = uuidv7();
     session.anonymousId = anonymousId;
     const wishlist = this.wishlistRepository.create({ anonymousId });
-    return await this.wishlistRepository.save(wishlist);
+    wishlist.items = [];
+    await this.wishlistRepository.save(wishlist);  
+    return wishlist;
   }
 
   async getOrCreateWishlist(session: Record<string, any> | undefined): Promise<WishlistEntity> {

@@ -26,7 +26,7 @@ export class AuthWishlistService {
         for (const item of wishlist.items) {
             const findItemIdx = resultingWishlistItems.findIndex(i => i.product.slug === item.product.slug);
             if (findItemIdx !== -1) {
-              resultingWishlistItems[findItemIdx].amount += item.amount;
+              resultingWishlistItems[findItemIdx].amount = +resultingWishlistItems[findItemIdx].amount + +item.amount;
               continue;
             }
             resultingWishlistItems.push({... item});
@@ -66,7 +66,7 @@ export class AuthWishlistService {
 
         await this.wishlistItemRepository.remove(sessionWishlist.items);
         await this.wishlistRepository.remove(sessionWishlist);
-        
+
         session.anonymousId = null;
         return await this.wishlistRepository.save(userWishlist);
     }
