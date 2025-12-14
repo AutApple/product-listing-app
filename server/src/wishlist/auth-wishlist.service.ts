@@ -15,6 +15,7 @@ export class AuthWishlistService {
     private readonly usersService: UsersService,
     private readonly commonWishlistService: CommonWishlistService
   ) { }
+
   private mergeWishlistItems(... wishlists: WishlistEntity[]): WishlistItemEntity[] {
       const wishlistCopies: WishlistEntity[] = [];
       for (const w of wishlists)
@@ -62,6 +63,12 @@ export class AuthWishlistService {
           });
           userWishlist.items.push(newItem);
         }
+
+        await this.wishlistItemRepository.remove(sessionWishlist.items);
+        await this.wishlistRepository.remove(sessionWishlist);
+        
+        session.anonymousId = null;
+        return await this.wishlistRepository.save(userWishlist);
     }
         
     const user = await this.usersService.findOneByEmail(email);
