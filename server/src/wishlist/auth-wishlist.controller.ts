@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
-import { WishlistService } from './wishlist.service';
+import { AuthWishlistService } from './auth-wishlist.service';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard.js';
 import { User } from '../auth/decorators/user.decorator.js';
 import { WishlistEntity } from './entities/wishlist.entity.js';
@@ -8,8 +8,8 @@ import { OutputWishlistDto } from './dto/output/output-wishlist.dto.js';
 import { ModifyWishlistDto } from './dto/modify-wishlist.dto.js';
 
 @Controller('wishlist')
-export class WishlistController {
-  constructor(private readonly wishlistService: WishlistService) {}
+export class AuthWishlistController {
+  constructor(private readonly authWishlistService: AuthWishlistService) {}
 
   private dto(data: WishlistEntity) {
     return toOutputDto(data, OutputWishlistDto);
@@ -18,14 +18,14 @@ export class WishlistController {
   @UseGuards(AccessTokenGuard)
   @Get() 
   async findWishlist(@User('email') email: string) {
-    const data = await this.wishlistService.getOrCreateWishlist(email);
+    const data = await this.authWishlistService.getOrCreateWishlist(email);
     return this.dto(data);
   }
 
   @UseGuards(AccessTokenGuard)
   @Post()
   async addProducts(@Body() addToWishlistDto: ModifyWishlistDto, @User('email') email: string) {
-    const data = await this.wishlistService.add(addToWishlistDto, email);
+    const data = await this.authWishlistService.add(addToWishlistDto, email);
     return this.dto(data);
   }
 

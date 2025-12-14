@@ -23,5 +23,6 @@ export const ERROR_MESSAGES = {
    AUTH_INVALID_CREDENTIALS: () => `Invalid credentials`,
    AUTH_NO_USER: () => `No user provided in request`,
    AUTH_FORBIDDEN: () => `Forbidden`,
+
    UNEXPECTED: (action: string) => {console.error(`Unexpected error occured while ${action}.`); return `Unexpected internal server error`}
 }

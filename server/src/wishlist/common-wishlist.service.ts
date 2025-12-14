@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WishlistEntity } from './entities/wishlist.entity.js';
 import { Repository } from 'typeorm';
@@ -9,23 +9,14 @@ import { ProductEntity } from '../products/entities/product.entity.js';
 import { WishlistItemEntity } from './entities/wishlist-item.entity.js';
 
 @Injectable()
-export class WishlistService {
+export class CommonWishlistService {
   constructor(
     @InjectRepository(WishlistEntity) private readonly wishlistRepository: Repository<WishlistEntity>,
     @InjectRepository(WishlistItemEntity) private readonly wishlistItemRepository: Repository<WishlistItemEntity>,
-    private readonly usersService: UsersService,
     private readonly productsService: ProductsService
   ) {}
 
-  async getOrCreateWishlist(email: string): Promise<WishlistEntity> {
-      let wishlist: WishlistEntity | null = await this.wishlistRepository.findOne({where: {user: {email}}, relations: ['items', 'items.product']});
-      if (wishlist)
-        return wishlist; 
-      const user = await this.usersService.findOneByEmail(email);
-      wishlist = this.wishlistRepository.create({user});
-      return await this.wishlistRepository.save(wishlist);
-  }
-
+ 
   // Try to find existing wishlist item for the given product slug. If no exists - create one. If it exists - sum the amount & save  
   async mergeOrCreateItem(productSlug: string, amount: number, wishlist: WishlistEntity): Promise<void> {
       const wishlistItem = wishlist.items.find(w => w.product.slug === productSlug);
@@ -45,8 +36,7 @@ export class WishlistService {
         wishlistItem.amount = newAmount;
     }
 
-    async add(addToWishlistDto: ModifyWishlistDto, email: string): Promise<WishlistEntity> {
-      const wishlist = await this.getOrCreateWishlist(email);
+    async add(addToWishlistDto: ModifyWishlistDto, wishlist: WishlistEntity): Promise<WishlistEntity> {
       for (const item of addToWishlistDto.products) {
           await this.mergeOrCreateItem(item.slug, item.amount, wishlist);
       }
