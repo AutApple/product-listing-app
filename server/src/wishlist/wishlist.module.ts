@@ -20,4 +20,4 @@ import { CommonWishlistService } from './common-wishlist.service.js';
   controllers: [AuthWishlistController, GuestWishlistController],
   providers: [AuthWishlistService, GuestWishlistService, CommonWishlistService],
 })
-export class WishlistModule {}
+export class WishlistModule { }

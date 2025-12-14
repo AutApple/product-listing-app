@@ -10,16 +10,15 @@ import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 @Injectable()
 export class GuestWishlistService {
   constructor(
-        @InjectRepository(WishlistEntity) private readonly wishlistRepository: Repository<WishlistEntity>,
-        private readonly commonWishlistService: CommonWishlistService
-    ){}
-  
-  
+    @InjectRepository(WishlistEntity) private readonly wishlistRepository: Repository<WishlistEntity>,
+    private readonly commonWishlistService: CommonWishlistService
+  ) { }
+
   private async createWishlist(session: Record<string, any>): Promise<WishlistEntity> {
-      const anonymousId = uuidv7();
-      session.anonymousId = anonymousId;
-      const wishlist = this.wishlistRepository.create({anonymousId});
-      return await this.wishlistRepository.save(wishlist);
+    const anonymousId = uuidv7();
+    session.anonymousId = anonymousId;
+    const wishlist = this.wishlistRepository.create({ anonymousId });
+    return await this.wishlistRepository.save(wishlist);
   }
 
   async getOrCreateWishlist(session: Record<string, any> | undefined): Promise<WishlistEntity> {
@@ -27,11 +26,11 @@ export class GuestWishlistService {
       throw new InternalServerErrorException(ERROR_MESSAGES.UNEXPECTED('session undefined'));
     let anonymousId: string | undefined = session.anonymousId;
     if (!anonymousId)
-        return await this.createWishlist(session);
-    
-    let wishlist: WishlistEntity | null = await this.wishlistRepository.findOne({where: {anonymousId}, relations: ['items', 'items.product']});
+      return await this.createWishlist(session);
+
+    let wishlist: WishlistEntity | null = await this.wishlistRepository.findOne({ where: { anonymousId }, relations: ['items', 'items.product'] });
     if (wishlist)
-      return wishlist; 
+      return wishlist;
     return await this.createWishlist(session);
   }
 

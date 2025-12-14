@@ -14,33 +14,33 @@ export class CommonWishlistService {
     @InjectRepository(WishlistEntity) private readonly wishlistRepository: Repository<WishlistEntity>,
     @InjectRepository(WishlistItemEntity) private readonly wishlistItemRepository: Repository<WishlistItemEntity>,
     private readonly productsService: ProductsService
-  ) {}
+  ) { }
 
- 
+
   // Try to find existing wishlist item for the given product slug. If no exists - create one. If it exists - sum the amount & save  
   async mergeOrCreateItem(productSlug: string, amount: number, wishlist: WishlistEntity): Promise<void> {
-      const wishlistItem = wishlist.items.find(w => w.product.slug === productSlug);
-      if (!wishlistItem) {
-        if (amount <= 0) return;
-       
-        const product: ProductEntity = await this.productsService.findOneBySlug(productSlug);
-        wishlist.items.push(this.wishlistItemRepository.create({product, amount, wishlist}));
-        await this.wishlistRepository.save(wishlist);
-        return;
-      }
+    const wishlistItem = wishlist.items.find(w => w.product.slug === productSlug);
+    if (!wishlistItem) {
+      if (amount <= 0) return;
 
-      const newAmount = +wishlistItem.amount + amount; 
-      if (newAmount <= 0)
-        wishlist.items = wishlist.items.filter(i => i != wishlistItem);
-      else
-        wishlistItem.amount = newAmount;
-    }
-
-    async add(addToWishlistDto: ModifyWishlistDto, wishlist: WishlistEntity): Promise<WishlistEntity> {
-      for (const item of addToWishlistDto.products) {
-          await this.mergeOrCreateItem(item.slug, item.amount, wishlist);
-      }
+      const product: ProductEntity = await this.productsService.findOneBySlug(productSlug);
+      wishlist.items.push(this.wishlistItemRepository.create({ product, amount, wishlist }));
       await this.wishlistRepository.save(wishlist);
-      return wishlist;
+      return;
     }
+
+    const newAmount = +wishlistItem.amount + amount;
+    if (newAmount <= 0)
+      wishlist.items = wishlist.items.filter(i => i != wishlistItem);
+    else
+      wishlistItem.amount = newAmount;
+  }
+
+  async add(addToWishlistDto: ModifyWishlistDto, wishlist: WishlistEntity): Promise<WishlistEntity> {
+    for (const item of addToWishlistDto.products) {
+      await this.mergeOrCreateItem(item.slug, item.amount, wishlist);
+    }
+    await this.wishlistRepository.save(wishlist);
+    return wishlist;
+  }
 }

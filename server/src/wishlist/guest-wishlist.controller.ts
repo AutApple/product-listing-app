@@ -8,13 +8,13 @@ import type { Request } from 'express';
 
 @Controller('wishlist')
 export class GuestWishlistController {
-  constructor(private readonly guestWishlistService: GuestWishlistService) {}
+  constructor(private readonly guestWishlistService: GuestWishlistService) { }
 
   private dto(data: WishlistEntity) {
     return toOutputDto(data, OutputWishlistDto);
   }
 
-  @Get('guest') 
+  @Get('guest')
   async findWishlist(@Req() req: Request) {
     const data = await this.guestWishlistService.getOrCreateWishlist(req.session);
     return this.dto(data);
