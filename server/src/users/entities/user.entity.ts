@@ -1,7 +1,9 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import bcrypt from 'bcrypt';
 import { WishlistEntity } from '../../wishlist/entities/wishlist.entity.js';
+import { ReviewEntity } from '../../reviews/entities/review.entity.js';
+import { ReviewVoteEntity } from '../../reviews/entities/review-vote.entity.js';
 
 @Entity({
     name: 'users'
@@ -40,6 +42,12 @@ export class UserEntity extends AbstractEntity{
 
     @OneToOne(() => WishlistEntity, (w: WishlistEntity) => w.user)
     wishlist: WishlistEntity;
+
+    @OneToMany(() => ReviewEntity, e => e.author)
+    reviews: ReviewEntity[];
+
+    @OneToMany(() => ReviewVoteEntity, e => e.user) 
+    reviewVotes: ReviewVoteEntity;
 
     async matchesPassword(plainPassword: string): Promise<boolean> {
         return bcrypt.compare(plainPassword, this.hashedPassword);

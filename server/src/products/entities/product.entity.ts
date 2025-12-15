@@ -6,6 +6,7 @@ import { ProductTypeEntity } from '../../product-types/entities/product-type.ent
 import { ProductAttributeValueEntity } from './product-attribute-value.entity.js';
 import { CategoryEntity } from '../../categories/entities/category.entity.js';
 import { WishlistItemEntity } from '../../wishlist/entities/wishlist-item.entity.js';
+import { ReviewEntity } from '../../reviews/entities/review.entity.js';
 
 @Entity({
     name: 'products'
@@ -65,5 +66,8 @@ export class ProductEntity extends AbstractEntity {
     )
     attributeValues: ProductAttributeValueEntity[];
 
+
+    @OneToMany(() => ReviewEntity, e => e.product)
+    reviews: ReviewEntity[]
     
 }

@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ReviewsModule } from './reviews/reviews.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -27,7 +28,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     CategoriesModule,
     UsersModule,
     AuthModule,
-    WishlistModule],
+    WishlistModule,
+    ReviewsModule],
   controllers: [AppController],
   providers: [AppService],
 })
