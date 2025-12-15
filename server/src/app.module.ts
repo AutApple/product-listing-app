@@ -11,6 +11,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { WishlistModule } from './wishlist/wishlist.module';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -19,6 +20,7 @@ import { WishlistModule } from './wishlist/wishlist.module';
       useFactory: getTypeOrmConfig,
       inject: [ConfigService]
     }),
+    ScheduleModule.forRoot(),
     ProductsModule,
     ProductTypesModule,
     AttributesModule,

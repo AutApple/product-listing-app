@@ -8,6 +8,7 @@ import { GuestWishlistService } from './guest-wishlist.service.js';
 import { CommonWishlistService } from './common-wishlist.service.js';
 import { WishlistOrchestratorService } from './wishlist-orchestrator.service.js';
 import { WishlistController } from './wishlist.controller.js';
+import { WishlistCleanupService } from './wishlist-cleanup.service.js';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { WishlistController } from './wishlist.controller.js';
     AuthWishlistService, 
     GuestWishlistService, 
     CommonWishlistService,
-    WishlistOrchestratorService
+    WishlistOrchestratorService,
+    WishlistCleanupService
   ],
 })
 export class WishlistModule { }

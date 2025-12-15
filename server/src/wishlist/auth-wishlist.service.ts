@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service.js';
 import { ModifyWishlistDto } from './dto/modify-wishlist.dto.js';
 import { WishlistItemEntity } from './entities/wishlist-item.entity.js';
 import { CommonWishlistService } from './common-wishlist.service.js';
+import { addDays } from 'date-fns';
 
 @Injectable()
 export class AuthWishlistService {
@@ -81,7 +82,7 @@ export class AuthWishlistService {
     }
 
     // no session and no user wishlists
-    const wishlist = this.wishlistRepository.create({ user });
+    const wishlist = this.wishlistRepository.create({ user, expiresAt: addDays(new Date(), 2) });
     return await this.wishlistRepository.save(wishlist);
   }
 

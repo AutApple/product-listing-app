@@ -12,6 +12,8 @@ interface AuthConfiguration {
     
     jwtAccessTokenExpiration: number;
     jwtRefreshTokenExpiration: number;
+
+    anonymousWishlistsExpirationDays: number;
 }
 
 export const globalAuthConfiguration: AuthConfiguration = {
@@ -21,5 +23,6 @@ export const globalAuthConfiguration: AuthConfiguration = {
     jwtAccessTokenExpiration: 60 * 15,
     jwtRefreshTokenExpiration: 60 * 60 * 24 * 10,
     
-    sessionSecret: process.env.SESSION_SECRET ?? 'fallbackSessionSecret'
+    sessionSecret: process.env.SESSION_SECRET ?? 'fallbackSessionSecret',
+    anonymousWishlistsExpirationDays: 2
 }

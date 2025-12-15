@@ -6,6 +6,8 @@ import { ModifyWishlistDto } from './dto/modify-wishlist.dto.js';
 import { CommonWishlistService } from './common-wishlist.service.js';
 import { v7 as uuidv7 } from 'uuid';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { addDays } from 'date-fns';
+import { globalAuthConfiguration } from '../config/auth.config.js';
 
 @Injectable()
 export class GuestWishlistService {
@@ -19,6 +21,7 @@ export class GuestWishlistService {
     session.anonymousId = anonymousId;
     const wishlist = this.wishlistRepository.create({ anonymousId });
     wishlist.items = [];
+    wishlist.expiresAt = addDays(new Date(), globalAuthConfiguration.anonymousWishlistsExpirationDays);
     await this.wishlistRepository.save(wishlist);  
     return wishlist;
   }

@@ -10,9 +10,9 @@ export class OptionalGuard extends AuthGuard('jwt') {
 
   // ensure no error is thrown and user is either the payload or undefined
   handleRequest(err: any, user: any): any {
-    if (err || !user) {
+    if (err || !user) 
       return undefined; 
-    }
+    
     return user; 
   }
 }
