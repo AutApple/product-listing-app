@@ -24,7 +24,7 @@ export abstract class IdResourceService<
         super(repository);
     }
 
-    
+
     async findOneById(
         id: string,
         mergeSelectOptions: FindOptionsSelect<Entity> = {},
@@ -39,7 +39,7 @@ export abstract class IdResourceService<
         });
 
         if (!entity)
-            throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND(this.resourceName, slug));
+            throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND(this.resourceName, id, 'id'));
         return entity;
     }
 
