@@ -1,10 +1,11 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { UserEntity } from '../../users/entities/user.entity.js';
-import { Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Check, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { ReviewVoteEntity } from './review-vote.entity.js';
 import { ProductEntity } from '../../products/entities/product.entity.js';
 import { ReviewImageEntity } from './review-image.entity.js';
 
+@Check(`"rating" >= 1.0 AND "rating" <= 5.0`)
 @Entity()
 export class ReviewEntity extends AbstractEntity {
     
@@ -20,6 +21,11 @@ export class ReviewEntity extends AbstractEntity {
     @OneToMany(() => ReviewImageEntity, e => e.review)
     images: ReviewImageEntity[];
     
+    @Column({
+        type: 'decimal',
+        precision: 2,
+        scale: 1
+    })
     rating: number; // from 1.0 to 5.0
 
 
