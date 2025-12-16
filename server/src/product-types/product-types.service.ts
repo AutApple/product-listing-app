@@ -5,11 +5,11 @@ import { EntityManager, FindOptionsOrder, FindOptionsSelect, Repository } from '
 import { ProductTypeEntity } from './entities/product-type.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributesService } from '../attributes/attributes.service.js';
-import { BaseService } from '../common/base.service.js';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
+import { SlugResourceService } from '../common/slug-resource.service.js';
 
 @Injectable()
-export class ProductTypesService extends BaseService<ProductTypeEntity> {
+export class ProductTypesService extends SlugResourceService<ProductTypeEntity> {
   constructor(
     @InjectRepository(ProductTypeEntity) private readonly productTypeRepository: Repository<ProductTypeEntity>,
     private readonly attributesService: AttributesService

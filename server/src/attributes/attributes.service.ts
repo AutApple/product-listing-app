@@ -6,14 +6,10 @@ import { AttributeEntity } from './entities/attribute.entity.js';
 import { EntityManager, FindManyOptions, FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
 import { AttributeEnumValueEntity } from './entities/attribute-enum-value.entity.js';
 import AttributeTypes from './types/attribute.types.enum.js';
-import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
-import { extractRelationsFromSelect } from '../common/utils/extract-relations.js';
-import { OutputAttributeDTO } from './dto/output/output-attribute.dto.js';
-import { BaseService } from '../common/base.service.js';
+import { SlugResourceService } from '../common/slug-resource.service.js';
 
 @Injectable()
-export class AttributesService extends BaseService<AttributeEntity> {
+export class AttributesService extends SlugResourceService<AttributeEntity> {
   constructor(
     @InjectRepository(AttributeEntity) private readonly attributeEntityRepository: Repository<AttributeEntity>
   ) {

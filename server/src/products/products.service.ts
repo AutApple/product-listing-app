@@ -10,18 +10,17 @@ import AttributeTypes from '../attributes/types/attribute.types.enum.js';
 import { ProductAttributeValueEntity } from './entities/product-attribute-value.entity.js';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { OutputProductDTO } from './dto/output/output-product.dto.js';
-import { BaseService } from '../common/base.service.js';
 import { FilterEntry } from '../common/dto/query.common.dto.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 import { ProductTypeEntity } from '../product-types/entities/product-type.entity.js';
 import { CategoryEntity } from '../categories/entities/category.entity.js';
 import { CategoriesService } from '../categories/categories.service.js';
 import { ProductsFilterService } from './products-filter.service.js';
+import { SlugResourceService } from '../common/slug-resource.service.js';
 
 
 @Injectable()
-export class ProductsService extends BaseService<ProductEntity>{
+export class ProductsService extends SlugResourceService<ProductEntity>{
   constructor(
     @InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>,
     @InjectRepository(ProductImageEntity) private readonly productImageRepository: Repository<ProductImageEntity>,

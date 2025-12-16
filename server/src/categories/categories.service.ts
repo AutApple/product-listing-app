@@ -1,14 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryEntity } from './entities/category.entity.js';
 import { EntityManager, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
-import { BaseService } from '../common/base.service.js';
-import { OutputCategoryDTO } from './dto/output/output-category.dto.js';
+import { SlugResourceService } from '../common/slug-resource.service.js';
 
 @Injectable()
-export class CategoriesService extends BaseService<CategoryEntity>{
+export class CategoriesService extends SlugResourceService<CategoryEntity>{
   constructor(
     @InjectRepository(CategoryEntity) private readonly categoryRepository: Repository<CategoryEntity>
   ) {
