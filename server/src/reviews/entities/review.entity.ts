@@ -15,10 +15,14 @@ export class ReviewEntity extends AbstractEntity {
     @ManyToOne(() => ProductEntity, e => e.reviews)
     product: ProductEntity;
     
-    @OneToMany(() => ReviewVoteEntity, e => e.review)
+    @OneToMany(() => ReviewVoteEntity, e => e.review, { nullable: true })
     votes: ReviewVoteEntity[];
 
-    @OneToMany(() => ReviewImageEntity, e => e.review)
+    @OneToMany(() => ReviewImageEntity, e => e.review, {
+        cascade: true,
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+    })
     images: ReviewImageEntity[];
     
     @Column({
@@ -28,5 +32,9 @@ export class ReviewEntity extends AbstractEntity {
     })
     rating: number; // from 1.0 to 5.0
 
+    @Column({
+        type: 'varchar'
+    })
+    text: string; 
 
 }

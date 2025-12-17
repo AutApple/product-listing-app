@@ -7,7 +7,9 @@ export enum RatingType {
   DOWNVOTE = 'downvote',
 }
 
-@Entity()
+@Entity({
+  name: 'review_votes'
+})
 @Unique(['review', 'user']) // one user can have only one vote per specific review
 export class ReviewVoteEntity {
     @PrimaryColumn('uuid')
