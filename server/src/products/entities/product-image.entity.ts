@@ -16,12 +16,7 @@ export class ProductImageEntity {
 
     @ManyToOne(
         () => ProductEntity, 
-        (product: ProductEntity) => product.images, 
-        {
-            cascade: true,
-            onDelete: 'CASCADE',
-            onUpdate: 'CASCADE'
-        })
+        (product: ProductEntity) => product.images)
     @Exclude({ toPlainOnly: true })
     product: ProductEntity;
 }

@@ -17,13 +17,13 @@ export class ProductEntity extends AbstractEntity {
         length: defaultValidationConfig.product.maxSlugLength,
         unique: true
     })
-    slug: string
+    slug: string;
 
     @Column({
         type: 'varchar',
         length: defaultValidationConfig.product.maxTitleLength
     })
-    title: string
+    title: string;
 
     @Column({
         name: 'short_description',
@@ -31,14 +31,14 @@ export class ProductEntity extends AbstractEntity {
         type: 'varchar',
         length: defaultValidationConfig.product.maxShortDescriptionLength
     })
-    shortDescription: string
+    shortDescription: string;
 
-    @Column({ 
+    @Column({
         default: 'No description specified.',
         type: 'varchar',
         length: defaultValidationConfig.product.maxDescriptionLength
     })
-    description: string
+    description: string;
 
     @Column({
         default: 0,
@@ -49,18 +49,22 @@ export class ProductEntity extends AbstractEntity {
     @ManyToOne(() => CategoryEntity)
     category: CategoryEntity;
 
-    @OneToMany(() => ProductImageEntity, (productImage: ProductImageEntity) => productImage.product)
+    @OneToMany(() => ProductImageEntity, (productImage: ProductImageEntity) => productImage.product, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+    })
     images: ProductImageEntity[];
 
     @ManyToOne(() => ProductTypeEntity, (productType: ProductTypeEntity) => productType.products)
     productType: ProductTypeEntity;
 
-    
+
     @OneToMany(() => WishlistItemEntity, w => w.product)
     wishlistItems: WishlistItemEntity[];
 
     @OneToMany(
-        () => ProductAttributeValueEntity, 
+        () => ProductAttributeValueEntity,
         (productAttributeValue: ProductAttributeValueEntity) => productAttributeValue.product,
         { cascade: true }
     )
@@ -68,6 +72,6 @@ export class ProductEntity extends AbstractEntity {
 
 
     @OneToMany(() => ReviewEntity, e => e.product)
-    reviews: ReviewEntity[]
-    
+    reviews: ReviewEntity[];
+
 }
