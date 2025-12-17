@@ -50,9 +50,7 @@ export class ProductEntity extends AbstractEntity {
     category: CategoryEntity;
 
     @OneToMany(() => ProductImageEntity, (productImage: ProductImageEntity) => productImage.product, {
-        cascade: true,
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        cascade: ['insert', 'update', 'remove']
     })
     images: ProductImageEntity[];
 
@@ -66,12 +64,12 @@ export class ProductEntity extends AbstractEntity {
     @OneToMany(
         () => ProductAttributeValueEntity,
         (productAttributeValue: ProductAttributeValueEntity) => productAttributeValue.product,
-        { cascade: true }
+        { cascade: ['insert', 'update', 'remove'] }
     )
     attributeValues: ProductAttributeValueEntity[];
 
 
-    @OneToMany(() => ReviewEntity, e => e.product)
+    @OneToMany(() => ReviewEntity, e => e.product, { cascade: ['insert', 'update', 'remove'] })
     reviews: ReviewEntity[];
 
 }

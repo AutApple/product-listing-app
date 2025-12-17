@@ -15,7 +15,7 @@ export class ReviewEntity extends AbstractEntity {
     @ManyToOne(() => ProductEntity, e => e.reviews)
     product: ProductEntity;
     
-    @OneToMany(() => ReviewVoteEntity, e => e.review, { nullable: true })
+    @OneToMany(() => ReviewVoteEntity, e => e.review, { nullable: true, cascade: true })
     votes: ReviewVoteEntity[];
 
     @OneToMany(() => ReviewImageEntity, e => e.review, {

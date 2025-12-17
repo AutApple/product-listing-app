@@ -15,7 +15,7 @@ export class ReviewVoteEntity {
     @PrimaryColumn('uuid')
     id: string;
     
-    @ManyToOne(() => ReviewEntity, e => e.votes)
+    @ManyToOne(() => ReviewEntity, e => e.votes, {cascade: ['insert', 'update']})
     review: ReviewEntity;
 
     @ManyToOne(() => UserEntity, e => e.reviewVotes)
