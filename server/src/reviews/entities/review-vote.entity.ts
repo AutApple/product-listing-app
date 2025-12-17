@@ -1,8 +1,8 @@
 import { UserEntity } from '../../users/entities/user.entity.js';
-import { Column, Entity, ManyToOne, PrimaryColumn, Unique } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { ReviewEntity } from './review.entity.js';
 
-export enum RatingType {
+export enum VoteType {
   UPVOTE = 'upvote',
   DOWNVOTE = 'downvote',
 }
@@ -12,7 +12,7 @@ export enum RatingType {
 })
 @Unique(['review', 'user']) // one user can have only one vote per specific review
 export class ReviewVoteEntity {
-    @PrimaryColumn('uuid')
+    @PrimaryGeneratedColumn('uuid')
     id: string;
     
     @ManyToOne(() => ReviewEntity, e => e.votes, {cascade: ['insert', 'update']})
@@ -23,8 +23,8 @@ export class ReviewVoteEntity {
     
     @Column({
         type: 'enum',
-        enum: RatingType,
+        enum: VoteType,
         enumName: 'review_rating_type'
     })
-    rating: RatingType; 
+    vote: VoteType; 
 }

@@ -7,10 +7,15 @@ import { User } from '../auth/decorators/user.decorator.js';
 import { ReviewEntity } from './entities/review.entity.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { OutputReviewDto } from './dto/output/output-review.dto.js';
+import { ReviewsVoteService } from './reviews-vote.service.js';
+import { VoteReviewDto } from './dto/vote-review.dto.js';
 
 @Controller('reviews')
 export class ReviewsController {
-  constructor(private readonly reviewsService: ReviewsService) {}
+  constructor(
+    private readonly reviewsService: ReviewsService,
+    private readonly reviewsVoteService: ReviewsVoteService
+  ) {}
   
   private dto(e: ReviewEntity | ReviewEntity[]) {
     return toOutputDto(e, OutputReviewDto);
@@ -47,5 +52,18 @@ export class ReviewsController {
     const data = await  this.reviewsService.findOneById(id);
     return this.dto(data);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id/vote')
+  async vote(@Body() voteReviewDto: VoteReviewDto, @Param('id') id: string, @User('email') email: string) {
+    return await this.reviewsVoteService.vote(voteReviewDto.vote, id, email);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete(':id/vote')
+  async removeVote(@Param('id') id: string, @User('email') email: string) {
+    return await this.reviewsVoteService.remove(id, email);
+  } 
+
 
 }
