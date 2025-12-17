@@ -69,7 +69,7 @@ export class ReviewsService extends IdResourceService<ReviewEntity>{
   }
   
    
-  async removeSelf(id: string, email: string): Promise<ReviewEntity> {
+  async validateUserAndRemove(id: string, email: string): Promise<ReviewEntity> {
     // override generic removal logic with user checks
     const review = await this.findOneById(id);
     if (review.author.email === email) {

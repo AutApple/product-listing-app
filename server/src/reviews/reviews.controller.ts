@@ -32,7 +32,7 @@ export class ReviewsController {
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
   async remove(@Param('id') id: string, @User('email') email: string) {
-    return this.reviewsService.removeSelf(id, email);
+    return this.reviewsService.validateUserAndRemove(id, email);
   }
 
 
