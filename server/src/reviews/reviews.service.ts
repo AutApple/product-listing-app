@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ReviewEntity } from './entities/review.entity.js';
@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductsService } from '../products/products.service.js';
 import { UsersService } from '../users/users.service.js';
 import { ReviewImageEntity } from './entities/review-image.entity.js';
+import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 
 @Injectable()
 export class ReviewsService extends IdResourceService<ReviewEntity>{
@@ -30,7 +31,6 @@ export class ReviewsService extends IdResourceService<ReviewEntity>{
     
     if (images.length > 0) {
         const imageEntities: ReviewImageEntity[] = images.map(url => this.reviewImageRepository.create({url, review}));
-        await this.reviewImageRepository.save(imageEntities);
         review.images = imageEntities;
     }
  
@@ -39,7 +39,12 @@ export class ReviewsService extends IdResourceService<ReviewEntity>{
   }
 
   async update(id: string, updateReviewDto: UpdateReviewDto, email: string) {
-    return `This action updates a #${id} review`;
+    // TODO: maybe some kind of review history logging on update.
+    const review = await this.findOneById(id);
+    const { text, rating } = updateReviewDto;
+    if (text) review.text = text;
+    if (rating) review.rating = rating; 
+    return await this.reviewRepository.save(review);
   }
 
   
@@ -51,19 +56,30 @@ export class ReviewsService extends IdResourceService<ReviewEntity>{
     take: number = 10,
     filterOptions: FindOptionsWhere<ReviewEntity> = {},
   ): Promise<ReviewEntity[]> {
-    return super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions);
+    return super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions, ['product', 'author', 'images']);
   }
   
   async findOneById(
-      slug: string, 
+      id: string, 
       mergeSelectOptions: FindOptionsSelect<ReviewEntity> = {},
       customRelations: string[] = []
   ): Promise<ReviewEntity> {
-      return super.findOneById(slug, mergeSelectOptions, customRelations);
+      const r = [...customRelations, 'product', 'author', 'images']
+      return super.findOneById(id, mergeSelectOptions, r);
   }
   
    
-  async removeSelf(slug: string, email: string): Promise<ReviewEntity> {
-    return super.remove(slug);
+  async removeSelf(id: string, email: string): Promise<ReviewEntity> {
+    // override generic removal logic with user checks
+    const review = await this.findOneById(id);
+    if (review.author.email === email) {
+        await this.reviewRepository.remove(review);
+        return review;
+    }
+    const user = await this.usersService.findOneByEmail(email);
+    if (!user.isAdmin)
+        throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN);
+    await this.reviewRepository.remove(review);
+    return review;
   }
 }

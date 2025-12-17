@@ -6,7 +6,7 @@ import { ReviewEntity } from './review.entity.js';
     name: 'review_images'
 })
 export class ReviewImageEntity extends AbstractEntity {
-    @ManyToOne(() => ReviewEntity, e => e.images)
+    @ManyToOne(() => ReviewEntity, e => e.images, {cascade: ['insert', 'update']})
     review: ReviewEntity;
 
     @Column({

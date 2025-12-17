@@ -6,14 +6,7 @@ import { extractRelationsFromSelect } from './utils/extract-relations.js';
 import { NotFoundException } from '@nestjs/common';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 
-/**
- * @description Service method used to retrieve specific resource by it's slug. 
- * @async
- * @param {string} slug - Slug of a resource
- * @param {FindOptionsSelect<Entity>} [mergeSelectOptions={}] - what specific fields should be retrieved besides the ones that are specified in default configuration
- * @throws {NotFoundException} - if no resouce was found with given slug.
- * @returns {Promise<Entity>} - a promise that resolves to a specific TypeORM entity with a given slug
- */
+
 export abstract class IdResourceService<
     Entity extends MinimalEntity
 > extends BaseService<Entity> {
@@ -24,7 +17,14 @@ export abstract class IdResourceService<
         super(repository);
     }
 
-
+    /**
+     * @description Service method used to retrieve specific resource by it's id. 
+     * @async
+     * @param {string} id - id of a resource
+     * @param {FindOptionsSelect<Entity>} [mergeSelectOptions={}] - what specific fields should be retrieved besides the ones that are specified in default configuration
+     * @throws {NotFoundException} - if no resouce was found with given id.
+     * @returns {Promise<Entity>} - a promise that resolves to a specific TypeORM entity with a given id
+     */
     async findOneById(
         id: string,
         mergeSelectOptions: FindOptionsSelect<Entity> = {},
@@ -49,7 +49,7 @@ export abstract class IdResourceService<
      * @async
      * @param {string} id - id of a resource
      * @param {FindOptionsSelect<Entity>} [mergeSelectOptions={}] - what specific fields should be retrieved besides the ones that are specified in default configuration
-     * @throws {NotFoundException} - if no resouce was found with given slug.
+     * @throws {NotFoundException} - if no resouce was found with given id.
      * @returns {Promise<Entity>} - a promise that resolves to a resource data in a format of output DTO
      */
     async remove(id: string): Promise<Entity> {

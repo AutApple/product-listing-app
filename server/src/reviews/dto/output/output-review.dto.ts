@@ -13,6 +13,7 @@ export class OutputReviewDto {
     text: string;
 
     constructor(review: ReviewEntity) {
+        this.id = review.id;
         this.productSlug = review.product.slug;
         this.userName = review.author.name;
         this.aggregatedVotes = 0; //FIXME: aggregatedVotes logic

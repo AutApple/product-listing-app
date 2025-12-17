@@ -25,25 +25,27 @@ export class ReviewsController {
 
   @UseGuards(AccessTokenGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto, @User('email') email: string) {
+  async update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto, @User('email') email: string) {
     return this.reviewsService.update(id, updateReviewDto, email);
   }
   
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
-  remove(@Param('id') id: string, @User('email') email: string) {
+  async remove(@Param('id') id: string, @User('email') email: string) {
     return this.reviewsService.removeSelf(id, email);
   }
 
 
   @Get()
-  findAll() {
-    return this.reviewsService.findAll();
+  async findAll() {
+    const data = await this.reviewsService.findAll();
+    return this.dto(data);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewsService.findOneById(id);
+  async findOne(@Param('id') id: string) {
+    const data = await  this.reviewsService.findOneById(id);
+    return this.dto(data);
   }
 
 }

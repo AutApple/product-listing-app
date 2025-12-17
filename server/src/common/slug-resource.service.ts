@@ -6,14 +6,7 @@ import { extractRelationsFromSelect } from './utils/extract-relations.js';
 import { NotFoundException } from '@nestjs/common';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 
-/**
- * @description Service method used to retrieve specific resource by it's slug. 
- * @async
- * @param {string} slug - Slug of a resource
- * @param {FindOptionsSelect<Entity>} [mergeSelectOptions={}] - what specific fields should be retrieved besides the ones that are specified in default configuration
- * @throws {NotFoundException} - if no resouce was found with given slug.
- * @returns {Promise<Entity>} - a promise that resolves to a specific TypeORM entity with a given slug
- */
+
 export abstract class SlugResourceService<
     Entity extends { slug: string; } & MinimalEntity
 > extends BaseService<Entity> {
@@ -23,6 +16,15 @@ export abstract class SlugResourceService<
     ) {
         super(repository);
     }
+
+    /**
+     * @description Service method used to retrieve specific resource by it's slug. 
+     * @async
+     * @param {string} slug - Slug of a resource
+     * @param {FindOptionsSelect<Entity>} [mergeSelectOptions={}] - what specific fields should be retrieved besides the ones that are specified in default configuration
+     * @throws {NotFoundException} - if no resouce was found with given slug.
+     * @returns {Promise<Entity>} - a promise that resolves to a specific TypeORM entity with a given slug
+     */
     async findOneBySlug(
         slug: string,
         mergeSelectOptions: FindOptionsSelect<Entity> = {},
