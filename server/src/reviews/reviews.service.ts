@@ -9,6 +9,7 @@ import { ProductsService } from '../products/products.service.js';
 import { UsersService } from '../users/users.service.js';
 import { ReviewImageEntity } from './entities/review-image.entity.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { ReviewsVoteService } from './reviews-vote.service.js';
 
 @Injectable()
 export class ReviewsService extends IdResourceService<ReviewEntity>{
@@ -16,7 +17,8 @@ export class ReviewsService extends IdResourceService<ReviewEntity>{
     @InjectRepository(ReviewEntity) private readonly reviewRepository: Repository<ReviewEntity>,
     @InjectRepository(ReviewImageEntity) private readonly reviewImageRepository: Repository<ReviewImageEntity>,
     private readonly productsService: ProductsService,
-    private readonly usersService: UsersService 
+    private readonly usersService: UsersService,
+    private readonly reviewsVoteService: ReviewsVoteService
   ) { 
     super(reviewRepository, 'review');
   }
@@ -56,7 +58,8 @@ export class ReviewsService extends IdResourceService<ReviewEntity>{
     take: number = 10,
     filterOptions: FindOptionsWhere<ReviewEntity> = {},
   ): Promise<ReviewEntity[]> {
-    return super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions, ['product', 'author', 'images']);
+    const reviews = await super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions, ['product', 'author', 'images']);
+    return reviews;
   }
   
   async findOneById(
@@ -65,7 +68,9 @@ export class ReviewsService extends IdResourceService<ReviewEntity>{
       customRelations: string[] = []
   ): Promise<ReviewEntity> {
       const r = [...customRelations, 'product', 'author', 'images']
-      return super.findOneById(id, mergeSelectOptions, r);
+      const review = await super.findOneById(id, mergeSelectOptions, r);
+      review.reviewVoteScore = await this.reviewsVoteService.getAggregatedVotes(review.id) ?? 0;
+      return review;
   }
   
    

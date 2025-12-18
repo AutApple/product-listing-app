@@ -17,7 +17,7 @@ export class OutputProductDTO {
     title: string; 
     shortDescription: string;
     description: string; 
-    productType: string;
+    type: string;
     category: string;
 
     price: number;
@@ -32,7 +32,7 @@ export class OutputProductDTO {
         this.shortDescription = product.shortDescription;
         this.description = product.description;
         this.price = product.price;
-        this.productType = product.productType.slug; 
+        this.type = product.productType.slug; 
         this.category = product.category.slug; 
 
         if(product.attributeValues) {

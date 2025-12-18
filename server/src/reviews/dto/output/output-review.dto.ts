@@ -1,11 +1,10 @@
 import { ReviewEntity } from 'src/reviews/entities/review.entity.js';
-import { UserEntity } from 'src/users/entities/user.entity.js';
 
 export class OutputReviewDto {
     id?: string; 
     productSlug: string; 
     userName: string;
-    aggregatedVotes: number;
+    aggregatedReviewScore: number;
     images: string[];
     rating: number;
     createdAt: string; 
@@ -16,7 +15,7 @@ export class OutputReviewDto {
         this.id = review.id;
         this.productSlug = review.product.slug;
         this.userName = review.author.name;
-        this.aggregatedVotes = 0; //FIXME: aggregatedVotes logic
+        this.aggregatedReviewScore = review.reviewVoteScore ?? 0;
         this.images = [];
         if (review.images)
             this.images = review.images.map(i => i.url);

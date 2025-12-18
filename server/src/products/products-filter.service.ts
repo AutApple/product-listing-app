@@ -6,9 +6,10 @@ import { And, FindOperator, In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { ProductEntity } from './entities/product.entity.js';
-import { attributeTypeToFilterType } from '../common/utils/attribute-to-filter-type.js';
+import { attributeTypeToFieldType } from '../common/utils/attribute-to-filter-type.js';
 import { FilterConditionBuilder } from '../common/utils/filter-condition-builder.js';
-import { FilterType } from '../query-parser/types/query-parser-config.type.js';
+import { FieldType } from '../query-parser/types/query-parser-config.type.js';
+import AttributeTypes from 'src/attributes/types/attribute.types.enum.js';
 
 
 @Injectable()
@@ -45,7 +46,7 @@ export class ProductsFilterService {
             const attribute = await this.attributeRepository.findOne({ where: { slug } });
             if (!attribute) throw new BadRequestException(ERROR_MESSAGES.ATTRIBUTE_NOT_FOUND(slug));
 
-            const type = attributeTypeToFilterType(attribute.type);
+            const type = attributeTypeToFieldType(attribute.type as AttributeTypes);
             let value: FindOperator<unknown>;
 
             if (filterCollection[slug].length === 1)
@@ -54,9 +55,9 @@ export class ProductsFilterService {
                 value = And(...filterCollection[slug].map(v => filterConditionBuilder.buildFindOperator(v, type)));
 
             const dict = {
-                [FilterType.NUMBER]: 'valueInt',
-                [FilterType.STRING]: 'valueString',
-                [FilterType.BOOLEAN]: 'valueBool'
+                [FieldType.NUMBER]: 'valueInt',
+                [FieldType.STRING]: 'valueString',
+                [FieldType.BOOLEAN]: 'valueBool'
             };
 
             //attributeValues: [{attribute: {slug: key}, value(Type) = value}, ...]

@@ -1,23 +1,20 @@
-export enum FilterType {
+export enum FieldType {
      STRING = 'string', 
      BOOLEAN = 'boolean',
-     NUMBER = 'number'
+     NUMBER = 'number',
+     COLLECTION = 'collection'
 }
 
-interface FilterMapEntry {
+interface TypeOrmField {
     path: string; // dot-separated path
-    type: FilterType; // type of that field
-}
-
-
-interface QueryFilterOptions {
-    filterQueryMap: Record<string, FilterMapEntry> // explicitly defined filtering fields
-    enableFallbackCollection: boolean;
+    type?: FieldType; // type of that field
 }
 
 export interface QueryParserConfiguration {
-    includeMap?: Record<string, object>;
-    orderOptions?: string[];
-    filterOptions?: QueryFilterOptions;
-    searchFieldPath?: string; // dot-separated path to the field that would be used for ?search=
+    fields: Record<string, TypeOrmField | TypeOrmField[]>;
+    includeFields?: string[];
+    orderFields?: string[];
+    filterFields?: string[];
+    enableFilterFallbackCollection: boolean;
+    searchField?: string; // field slug that would be used for ?search=
 }

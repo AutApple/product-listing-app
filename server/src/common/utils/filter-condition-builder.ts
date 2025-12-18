@@ -1,11 +1,11 @@
 import { Equal, FindOperator, In, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual } from 'typeorm';
-import { FilterType } from '../../query-parser/types/query-parser-config.type.js';
+import { FieldType } from '../../query-parser/types/query-parser-config.type.js';
 import { FilterEntry } from '../dto/query.common.dto.js';
 import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { ERROR_MESSAGES } from '../../config/error-messages.config.js';
 
 export class FilterConditionBuilder {
-    public convertToType(value: string, type: FilterType): string | number | boolean | undefined {
+    public convertToType(value: string, type: FieldType): string | number | boolean | undefined {
             function convertToNumber (v: string): number | undefined {
                 const num = Number(v);
                 if(isNaN(num)) return undefined;
@@ -27,7 +27,7 @@ export class FilterConditionBuilder {
             return result;
     }
     
-     public buildFindOperator(obj: FilterEntry, type: FilterType): FindOperator<unknown>{
+     public buildFindOperator(obj: FilterEntry, type: FieldType): FindOperator<unknown>{
             type OperatorFunction = (value: any) => FindOperator<unknown>;
             const ops: Record<string, OperatorFunction>  = {
                 'eq': Equal,
@@ -38,7 +38,7 @@ export class FilterConditionBuilder {
             }
             if(obj.values.length > 1 && obj.operation !== 'eq') // Multiple values for non-eq operations are forbidden
                 throw new BadRequestException(ERROR_MESSAGES.FILTER_WRONG_SIGNATURE(obj.key)) 
-            if (obj.operation !== 'eq' && type !== FilterType.NUMBER) // Numeric comparasion on non-numeric values is forbidden
+            if (obj.operation !== 'eq' && type !== FieldType.NUMBER) // Numeric comparasion on non-numeric values is forbidden
                 throw new BadRequestException(ERROR_MESSAGES.FILTER_WRONG_SIGNATURE(obj.key))
             // 1. convert
             const values: Array<string | boolean | number | undefined> = obj.values.map(v => this.convertToType(v, type));

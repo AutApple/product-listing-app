@@ -47,6 +47,6 @@ export class ReviewsVoteService {
             .where('rv.reviewId = :reviewId', { reviewId: id })
             .setParameters({ up: VoteType.UPVOTE, down: VoteType.DOWNVOTE })
             .getRawOne();
-        return voteScore;
+        return Number(voteScore.score);
     }
 }

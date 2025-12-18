@@ -37,4 +37,6 @@ export class ReviewEntity extends AbstractEntity {
     })
     text: string; 
 
+    reviewVoteScore?: number; // being explicitly set in review service
+
 }

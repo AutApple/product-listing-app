@@ -1,88 +1,55 @@
-import { FilterType, QueryParserConfiguration } from '../query-parser/types/query-parser-config.type.js';
-
-// which stuff corresponds to which selections 
-const productSelects = {
-    attributes: {
-        attributeValues: {
-        productId: true,
-        attributeId: true,
-        product: false,
-        attribute: {
-            id: true,
-            updatedAt: false,
-            createdAt: false,
-            slug: true,
-            type: true,
-            title: true
-        },
-        valueString: true,
-        valueBool: true,
-        valueInt: true
-        }
-    },
-    type: {
-        productType: {
-            slug: true,
-            attributes: {
-                id: true,
-                slug: true,
-                type: true,
-                enumValues: {
-                    id: true,
-                    attribute: true,
-                    value: true
-                }
-            }
-        }
-    },
-    images: {
-        images: {    
-            id: true,
-            url: true
-        }
-    }
-}
-
+import { FieldType, QueryParserConfiguration } from '../query-parser/types/query-parser-config.type.js';
 
 const products: QueryParserConfiguration = {
-    includeMap: {
-        'attributes': productSelects.attributes,
-        'images': productSelects.images,
-        'productType': productSelects.type
-    },
-    orderOptions: ['createdAt', 'updatedAt'],
-    filterOptions: {
-        filterQueryMap: {
-            'type': {
-                path: 'productType.slug',
-                type: FilterType.STRING
-            },
-            'price': {
-                path: 'price',
-                type: FilterType.NUMBER
-            }
+    fields: {
+        'attributes': [
+            { path: 'attributeValues.attributeId' },
+            { path: 'attributeValues.productId' },
+            { path: 'attributeValues.attribute.id' },
+            { path: 'attributeValues.attribute.slug' },
+            { path: 'attributeValues.attribute.title' },
+            { path: 'attributeValues.attribute.type' },
+            { path: 'attributeValues.valueString' },
+            { path: 'attributeValues.valueBool' },
+            { path: 'attributeValues.valueInt' }
+        ],
+        'images': [{ path: 'images.id', type: FieldType.STRING }, { path: 'images.url', type: FieldType.STRING }],
+        'type': {
+            type: FieldType.STRING,
+            path: 'productType.slug'
         },
-        enableFallbackCollection: true
+        'price': {
+            type: FieldType.NUMBER,
+            path: 'price'
+        },
+        'title': {
+            type: FieldType.STRING,
+            path: 'title'
+        }
     },
-    searchFieldPath: 'title'
+    orderFields: ['createdAt', 'updatedAt'], //FIXME: look and fix ordering logic (its outdated)
+    filterFields: ['type', 'price'],
+    includeFields: ['attributes', 'type', 'images'],
+    enableFilterFallbackCollection: true,
+    searchField: 'title'
 };
 
 const productTypes: QueryParserConfiguration = {
-    includeMap: {},
-    orderOptions: []
-}
+    fields: {},
+    enableFilterFallbackCollection: false
+};
 
 const attributes: QueryParserConfiguration = {
-    includeMap: {},
-    orderOptions: []
-}
+    fields: {},
+    enableFilterFallbackCollection: false
+
+};
 
 const categories: QueryParserConfiguration = {
-    includeMap: {},
-    orderOptions: []
-}
-
+    fields: {},
+    enableFilterFallbackCollection: false
+};
 
 export const globalQueryParserConfig: Record<string, QueryParserConfiguration> = {
     products, productTypes, attributes, categories
-}
+};
