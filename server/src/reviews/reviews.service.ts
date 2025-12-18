@@ -9,21 +9,22 @@ import { ProductsService } from '../products/products.service.js';
 import { UsersService } from '../users/users.service.js';
 import { ReviewImageEntity } from './entities/review-image.entity.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { ReviewsVoteService } from './reviews-vote.service.js';
+import { ReviewView } from './views/review.view.js';
+import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 
 @Injectable()
-export class ReviewsService extends IdResourceService<ReviewEntity>{
+export class ReviewsService extends IdResourceService<ReviewView>{
   constructor(
     @InjectRepository(ReviewEntity) private readonly reviewRepository: Repository<ReviewEntity>,
     @InjectRepository(ReviewImageEntity) private readonly reviewImageRepository: Repository<ReviewImageEntity>,
+    @InjectRepository(ReviewView) private readonly reviewViewRepository: Repository<ReviewView>,
     private readonly productsService: ProductsService,
     private readonly usersService: UsersService,
-    private readonly reviewsVoteService: ReviewsVoteService
   ) { 
-    super(reviewRepository, 'review');
+    super(reviewViewRepository, 'review');
   }
   
-  async create(createReviewDto: CreateReviewDto, email: string) {
+  async create(createReviewDto: CreateReviewDto, email: string): Promise<ReviewView> {
     const { productSlug, text, rating, images } = createReviewDto;
     
     const product = await this.productsService.findOneBySlug(productSlug); 
@@ -37,54 +38,71 @@ export class ReviewsService extends IdResourceService<ReviewEntity>{
     }
  
     
-    return await this.reviewRepository.save(review);
+    const savedReview = await this.reviewRepository.save(review);
+    const reviewView = new ReviewView();
+
+    reviewView.id = savedReview.id;
+    reviewView.productSlug = productSlug; 
+    reviewView.userName = user.name;
+    reviewView.userEmail = email;
+    reviewView.reviewVoteScore = 0;
+    reviewView.text = text;
+    reviewView.rating = rating;
+    reviewView.images = review.images;
+    return reviewView; 
   }
 
-  async update(id: string, updateReviewDto: UpdateReviewDto, email: string) {
+
+  async update(id: string, updateReviewDto: UpdateReviewDto, email: string): Promise<ReviewView> {
     // TODO: maybe some kind of review history logging on update.
+    
     const review = await this.findOneById(id);
+    if (email !== review.userEmail)
+      throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN);
     const { text, rating } = updateReviewDto;
-    if (text) review.text = text;
-    if (rating) review.rating = rating; 
-    return await this.reviewRepository.save(review);
+    let updateObject = {};
+    if (text) deepMergeObjects(updateObject, {text});
+    if (rating) deepMergeObjects(updateObject, {rating}); 
+    await this.reviewRepository.update({id: review.id}, updateObject);
+    Object.assign(review, updateObject);
+    return review;
   }
 
-  
-
-  async findAll(
+  override async findAll(
     mergeSelectOptions: FindOptionsSelect<ReviewEntity> = {},
     orderOptions: FindOptionsOrder<ReviewEntity> = {},
     skip: number = 0,
     take: number = 10,
     filterOptions: FindOptionsWhere<ReviewEntity> = {},
-  ): Promise<ReviewEntity[]> {
-    const reviews = await super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions, ['product', 'author', 'images']);
+  ): Promise<ReviewView[]> {
+    const qb = this.reviewRepository.createQueryBuilder('review');
+    qb.andWhere(filterOptions);
+    const reviews = await super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions);
     return reviews;
   }
   
   async findOneById(
       id: string, 
-      mergeSelectOptions: FindOptionsSelect<ReviewEntity> = {},
+      mergeSelectOptions: FindOptionsSelect<ReviewView> = {},
       customRelations: string[] = []
-  ): Promise<ReviewEntity> {
-      const r = [...customRelations, 'product', 'author', 'images']
-      const review = await super.findOneById(id, mergeSelectOptions, r);
-      review.reviewVoteScore = await this.reviewsVoteService.getAggregatedVotes(review.id) ?? 0;
+  ): Promise<ReviewView> {
+      const review = await super.findOneById(id, mergeSelectOptions, customRelations);
+      // review.reviewVoteScore = await this.reviewsVoteService.getAggregatedVotes(review.id) ?? 0;
       return review;
   }
   
    
-  async validateUserAndRemove(id: string, email: string): Promise<ReviewEntity> {
+  async validateUserAndRemove(id: string, email: string): Promise<ReviewView> {
     // override generic removal logic with user checks
     const review = await this.findOneById(id);
-    if (review.author.email === email) {
-        await this.reviewRepository.remove(review);
+    if (review.userEmail === email) {
+        await this.reviewRepository.delete({id: review.id});
         return review;
     }
     const user = await this.usersService.findOneByEmail(email);
     if (!user.isAdmin)
         throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN);
-    await this.reviewRepository.remove(review);
+    await this.reviewRepository.delete({id: review.id});
     return review;
   }
 }

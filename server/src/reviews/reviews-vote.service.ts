@@ -38,15 +38,5 @@ export class ReviewsVoteService {
         await this.reviewVoteRepository.remove(voteEntity);
         return true;
     }
-
-
-    async getAggregatedVotes(id: string) {
-        const voteScore = await this.reviewVoteRepository
-            .createQueryBuilder('rv')
-            .select('COALESCE(SUM(CASE rv.vote WHEN :up THEN 1 WHEN :down THEN -1 ELSE 0 END),0)', 'score')
-            .where('rv.reviewId = :reviewId', { reviewId: id })
-            .setParameters({ up: VoteType.UPVOTE, down: VoteType.DOWNVOTE })
-            .getRawOne();
-        return Number(voteScore.score);
-    }
+    
 }

@@ -6,7 +6,9 @@ import { ProductEntity } from '../../products/entities/product.entity.js';
 import { ReviewImageEntity } from './review-image.entity.js';
 
 @Check(`"rating" >= 1.0 AND "rating" <= 5.0`)
-@Entity()
+@Entity({
+    name: 'reviews'
+})
 export class ReviewEntity extends AbstractEntity {
     
     @ManyToOne(() => UserEntity, e => e.reviews)

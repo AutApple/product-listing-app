@@ -7,7 +7,7 @@ export enum FieldType {
 interface TypeOrmField {
     path: string; // dot-separated path
     type?: FieldType; // type of that field
-    aggregate?: boolean; // 
+    isViewEntity?: boolean; // 
 }
 
 export interface QueryParserConfiguration {

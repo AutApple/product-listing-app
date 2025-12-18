@@ -8,13 +8,15 @@ import { ReviewEntity } from './entities/review.entity.js';
 import { UsersModule } from '../users/users.module.js';
 import { ProductsModule } from '../products/products.module.js';
 import { ReviewsVoteService } from './reviews-vote.service.js';
+import { ReviewView } from './views/review.view.js';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       ReviewImageEntity, 
       ReviewVoteEntity,
-      ReviewEntity
+      ReviewEntity,
+      ReviewView
     ]),
     UsersModule, 
     ProductsModule

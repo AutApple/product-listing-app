@@ -1,4 +1,4 @@
-import { ReviewEntity } from 'src/reviews/entities/review.entity.js';
+import { ReviewView } from 'src/reviews/views/review.view.js';
 
 export class OutputReviewDto {
     id?: string; 
@@ -11,10 +11,10 @@ export class OutputReviewDto {
     updatedAt: string;
     text: string;
 
-    constructor(review: ReviewEntity) {
+    constructor(review: ReviewView) {
         this.id = review.id;
-        this.productSlug = review.product.slug;
-        this.userName = review.author.name;
+        this.productSlug = review.productSlug;
+        this.userName = review.userName;
         this.aggregatedReviewScore = review.reviewVoteScore ?? 0;
         this.images = [];
         if (review.images)

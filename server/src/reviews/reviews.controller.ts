@@ -9,6 +9,7 @@ import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { OutputReviewDto } from './dto/output/output-review.dto.js';
 import { ReviewsVoteService } from './reviews-vote.service.js';
 import { VoteReviewDto } from './dto/vote-review.dto.js';
+import { ReviewView } from './views/review.view.js';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -17,7 +18,7 @@ export class ReviewsController {
     private readonly reviewsVoteService: ReviewsVoteService
   ) {}
   
-  private dto(e: ReviewEntity | ReviewEntity[]) {
+  private dto(e: ReviewView | ReviewView[]) {
     return toOutputDto(e, OutputReviewDto);
   }
 
