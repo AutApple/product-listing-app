@@ -1,4 +1,4 @@
-import { And, Equal, FindOperator, In, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Raw } from 'typeorm';
+import { And, Equal, FindOperator, FindOptionsOrder, In, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Raw } from 'typeorm';
 import { FilterEntry, QueryCommonDto } from '../common/dto/query.common.dto.js';
 import { FieldType, QueryParserConfiguration } from './types/query-parser-config.type.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
@@ -22,11 +22,17 @@ export class QueryParser {
     constructor(private query: QueryCommonDto, private config?: QueryParserConfiguration) { }
 
     // Converts sorting options into TypeORM ordering format
-    private sortOptionToKeyValue(sort_option: string): { [key: string]: 'ASC' | 'DESC'; } {
+    private sortOptionToKeyValue(sort_option: string): FindOptionsOrder<unknown> {
         const isDesc: boolean = (sort_option.charAt(0) === '-');
         const value: 'ASC' | 'DESC' = isDesc ? 'DESC' : 'ASC';
         const key: string = isDesc ? sort_option.slice(1) : sort_option;
-        return { [key]: value };
+        
+        if(!this.config?.orderFields?.find(v => v === key))
+            return {};
+        if(!this.config.fields[key] || Array.isArray(this.config.fields[key]))
+            return {};
+
+        return this.makeFieldObject(this.config.fields[key].path, value);
     }
 
 
@@ -133,7 +139,7 @@ export class QueryParser {
         return this;
     }
 
-    parseSort() { // FIXME: nested objects ordering and how tf on earth it even works??????? 
+    parseSort() {
         if (!this.query.sort || !this.config?.orderFields)
             return this;
         for (const s of this.query.sort)

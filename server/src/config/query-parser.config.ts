@@ -25,9 +25,15 @@ const products: QueryParserConfiguration = {
         'title': {
             type: FieldType.STRING,
             path: 'title'
+        },
+        'createdAt': {
+            path: 'createdAt'
+        },
+        'updatedAt': {
+            path: 'updatedAt'
         }
     },
-    orderFields: ['createdAt', 'updatedAt'], //FIXME: look and fix ordering logic (its outdated)
+    orderFields: ['createdAt', 'updatedAt'],
     filterFields: ['type', 'price'],
     includeFields: ['attributes', 'type', 'images'],
     enableFilterFallbackCollection: true,
