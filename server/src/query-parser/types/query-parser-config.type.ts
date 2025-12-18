@@ -1,17 +1,17 @@
 export enum FieldType {
      STRING = 'string', 
      BOOLEAN = 'boolean',
-     NUMBER = 'number',
-     COLLECTION = 'collection'
+     NUMBER = 'number'
 }
 
 interface TypeOrmField {
     path: string; // dot-separated path
     type?: FieldType; // type of that field
+    aggregate?: boolean; // 
 }
 
 export interface QueryParserConfiguration {
-    fields: Record<string, TypeOrmField | TypeOrmField[]>;
+    fields: Record<string, TypeOrmField | TypeOrmField[]>; // can be either one field, either multiple fields (in case if it's object)
     includeFields?: string[];
     orderFields?: string[];
     filterFields?: string[];
