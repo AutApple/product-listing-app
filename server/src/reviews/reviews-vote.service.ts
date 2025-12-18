@@ -1,20 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ReviewsService } from './reviews.service.js';
 import { UsersService } from '../users/users.service.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ReviewVoteEntity, VoteType } from './entities/review-vote.entity.js';
 import { Repository } from 'typeorm';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { ReviewEntity } from './entities/review.entity.js';
 
 @Injectable()
 export class ReviewsVoteService {
     constructor(
-        private readonly reviewsService: ReviewsService,
         private readonly usersService: UsersService,
-        @InjectRepository(ReviewVoteEntity) private readonly reviewVoteRepository: Repository<ReviewVoteEntity>
+        @InjectRepository(ReviewVoteEntity) private readonly reviewVoteRepository: Repository<ReviewVoteEntity>,
+        @InjectRepository(ReviewEntity) private readonly reviewRepository: Repository<ReviewEntity>
     ) { }
 
-    async vote(vote: VoteType, id: string, email: string) {
+    async vote(vote: VoteType, id: string, email: string): Promise<ReviewVoteEntity> {
         let voteEntity = await this.reviewVoteRepository.findOne({where: {review: {id}, user: {email}}});
         if (voteEntity) {
             voteEntity.vote = vote;
@@ -22,10 +22,13 @@ export class ReviewsVoteService {
         }
         
         const user = await this.usersService.findOneByEmail(email);
-        const review = await this.reviewsService.findOneById(id);
+        
+        const review = await this.reviewRepository.findOne({where: {id}, relations: ['author', 'product']});
+        if (!review)
+            throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('review', id, 'id'));
+        
         voteEntity = this.reviewVoteRepository.create({user, review, vote})
-        await this.reviewVoteRepository.save(voteEntity);
-        return true;
+        return await this.reviewVoteRepository.save(voteEntity);
     }
 
     async remove(id: string, email: string) {
@@ -36,4 +39,14 @@ export class ReviewsVoteService {
         return true;
     }
 
+
+    async getAggregatedVotes(id: string) {
+        const voteScore = await this.reviewVoteRepository
+            .createQueryBuilder('rv')
+            .select('COALESCE(SUM(CASE rv.vote WHEN :up THEN 1 WHEN :down THEN -1 ELSE 0 END),0)', 'score')
+            .where('rv.reviewId = :reviewId', { reviewId: id })
+            .setParameters({ up: VoteType.UPVOTE, down: VoteType.DOWNVOTE })
+            .getRawOne();
+        return voteScore;
+    }
 }
