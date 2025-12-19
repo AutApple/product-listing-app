@@ -21,7 +21,7 @@ export class ReviewsService extends IdResourceService<ReviewView>{
     private readonly productsService: ProductsService,
     private readonly usersService: UsersService,
   ) { 
-    super(reviewViewRepository, 'review');
+    super(reviewViewRepository, 'review', false);
   }
   
   async create(createReviewDto: CreateReviewDto, email: string): Promise<ReviewView> {
