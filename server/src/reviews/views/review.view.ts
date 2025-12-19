@@ -1,8 +1,12 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 import { ReviewEntity } from '../entities/review.entity.js';
+import { VoteType } from '../entities/review-vote.entity.js';
+
+
+
 
 @ViewEntity({
-  name: 'review_stats_view',
+  name: 'review_view',
   expression: `
     SELECT
       r.id,
@@ -21,8 +25,8 @@ import { ReviewEntity } from '../entities/review.entity.js';
       COALESCE(
         SUM(
           CASE rv.vote
-            WHEN 'upvote'   THEN 1
-            WHEN 'downvote' THEN -1
+            WHEN '${VoteType.UPVOTE}'  THEN 1
+            WHEN '${VoteType.DOWNVOTE}' THEN -1
             ELSE 0
           END
         ),
@@ -104,5 +108,7 @@ export class ReviewView {
     this.text = entity.text;
     this.rating = entity.rating;
     this.images = entity.images;
+    this.createdAt = entity.createdAt;
+    this.updatedAt = entity.updatedAt;
   }
 }
