@@ -5,7 +5,8 @@ import { MinimalEntity } from './entities/minimal.entity.js';
 
 export class BaseService <Entity extends MinimalEntity> {
     constructor(
-        protected readonly repository: Repository<Entity>
+        protected readonly repository: Repository<Entity>,
+        protected readonly loadRelations: boolean = true
     ) { }
 
     protected readonly defaultSelectOptions: FindOptionsSelect<Entity> = {}
@@ -33,7 +34,7 @@ export class BaseService <Entity extends MinimalEntity> {
             order: orderOptions, 
             select: selectOptions, 
             where: filterOptions,
-            relations,
+            relations: this.loadRelations ? relations : [],
             skip,
             take
         });

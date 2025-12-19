@@ -30,7 +30,7 @@ export class ProductsService extends SlugResourceService<ProductView> {
     private readonly categoriesService: CategoriesService,
     private readonly productsFilterService: ProductsFilterService
   ) {
-    super(productViewRepository, 'product');
+    super(productViewRepository, 'product', false);
   }
 
   protected readonly defaultSelectOptions: FindOptionsSelect<ProductView> = {
@@ -47,6 +47,7 @@ export class ProductsService extends SlugResourceService<ProductView> {
     averageRating: true,
     reviewCount: true
   };
+
   private validateAttributeValues(
     rawAttributeValues: [{ key: string, value: (number | boolean | string); }],
     allowedAttributes: AttributeEntity[]

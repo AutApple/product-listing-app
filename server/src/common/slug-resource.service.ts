@@ -12,9 +12,10 @@ export abstract class SlugResourceService<
 > extends BaseService<Entity> {
     protected constructor(
         protected readonly repository: Repository<Entity>,
-        protected readonly resourceName: string
+        protected readonly resourceName: string,
+        protected readonly loadRelations: boolean = true
     ) {
-        super(repository);
+        super(repository, loadRelations);
     }
 
     /**
@@ -35,7 +36,7 @@ export abstract class SlugResourceService<
         const entity = await this.repository.findOne({
             where: { slug } as FindOptionsWhere<Entity>,
             select: selectOptions,
-            relations
+            relations: this.loadRelations ? relations : []
         });
 
         if (!entity)
