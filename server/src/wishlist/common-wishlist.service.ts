@@ -23,7 +23,7 @@ export class CommonWishlistService {
     if (!wishlistItem) {
       if (amount <= 0) return;
 
-      const product: ProductEntity = await this.productsService.findOneBySlug(productSlug);
+      const product: ProductEntity = await this.productsService.findEntityBySlug(productSlug);
       wishlist.items.push(this.wishlistItemRepository.create({ product, amount, wishlist }));
       await this.wishlistRepository.save(wishlist);
       return;

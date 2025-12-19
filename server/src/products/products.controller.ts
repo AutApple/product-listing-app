@@ -9,13 +9,13 @@ import { globalQueryParserConfig } from '../config/query-parser.config.js';
 import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
 import { OutputProductDTO } from './dto/output/output-product.dto.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
-import { ProductEntity } from './entities/product.entity.js';
+import { ProductView } from './views/product.view.js';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
   
-  private dto(e: ProductEntity | ProductEntity[]): OutputProductDTO | OutputProductDTO[] {
+  private dto(e: ProductView | ProductView[]): OutputProductDTO | OutputProductDTO[] {
     return toOutputDto(e, OutputProductDTO);
   }
   

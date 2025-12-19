@@ -27,7 +27,7 @@ export class ReviewsService extends IdResourceService<ReviewView>{
   async create(createReviewDto: CreateReviewDto, email: string): Promise<ReviewView> {
     const { productSlug, text, rating, images } = createReviewDto;
     
-    const product = await this.productsService.findOneBySlug(productSlug); 
+    const product = await this.productsService.findEntityBySlug(productSlug); 
     const user = await this.usersService.findOneByEmail(email);
 
     const review = this.reviewRepository.create({product, author: user, text, rating, images: []});

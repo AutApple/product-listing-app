@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CategoriesService } from '../categories/categories.service.js';
 import { FilterEntry } from '../common/dto/query.common.dto.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { And, FindOperator, In, Repository } from 'typeorm';
+import { And, FindOperator, FindOptionsWhere, In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { ProductEntity } from './entities/product.entity.js';
@@ -10,6 +10,7 @@ import { attributeTypeToFieldType } from '../common/utils/attribute-to-filter-ty
 import { FilterConditionBuilder } from '../common/utils/filter-condition-builder.js';
 import { FieldType } from '../query-parser/types/query-parser-config.type.js';
 import AttributeTypes from 'src/attributes/types/attribute.types.enum.js';
+import { ProductView } from './views/product.view.js';
 
 
 @Injectable()
@@ -21,7 +22,7 @@ export class ProductsFilterService {
         @InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>
     ) { }
 
-    public async createCategoryFilters(filterCollection: Record<string, FilterEntry[]>): Promise<object> {
+    public async createCategoryFilters(filterCollection: Record<string, FilterEntry[]>): Promise<FindOptionsWhere<ProductView>> {
         const containsCategoryFilter = Object.keys(filterCollection).find(key => key === 'category');
         if (!containsCategoryFilter)
             return {}
@@ -36,10 +37,10 @@ export class ProductsFilterService {
                 categorySlugs.push(... await this.categoriesService.getFlattenedCategoryTree(value)); // search within specified categories and their children
         }
         delete filterCollection['category'];
-        return { category: { slug: In(categorySlugs) } };
+        return { categorySlug: In(categorySlugs) };
     }
 
-    public async createAttributeFilters(filterCollection: Record<string, FilterEntry[]>): Promise<object> {
+    public async createAttributeFilters(filterCollection: Record<string, FilterEntry[]>): Promise<FindOptionsWhere<ProductView>> {
         const attrValueConditions: Array<object> = [];
         const filterConditionBuilder = new FilterConditionBuilder();
         for (const slug of Object.keys(filterCollection)) {

@@ -15,7 +15,7 @@ interface AttributeValueView {
     name: 'product_view',
     expression: `
         SELECT
-            p.id AS "productId",
+            p.id,
             p.slug,
             p.title,
             p.short_description AS "shortDescription",
@@ -86,7 +86,7 @@ interface AttributeValueView {
 })
 export class ProductView {
     @ViewColumn()
-    productId: string;
+    id: string;
     
     @ViewColumn()
     createdAt: Date;
@@ -129,7 +129,7 @@ export class ProductView {
 
     public static generateFromEntity (entity: ProductEntity) {
         const pv = new ProductView();
-        pv.productId = entity.id;
+        pv.id = entity.id;
         pv.createdAt = entity.createdAt;
         pv.updatedAt = entity.updatedAt; 
         pv.shortDescription = entity.shortDescription;
