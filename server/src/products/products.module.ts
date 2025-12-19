@@ -12,6 +12,7 @@ import { CategoryEntity } from '../categories/entities/category.entity.js';
 import { CategoriesModule } from '../categories/categories.module.js';
 import { ProductsFilterService } from './products-filter.service.js';
 import { WishlistEntity } from '../wishlist/entities/wishlist.entity.js';
+import { ProductView } from './views/product.view.js';
 
 @Module({
   imports: [
@@ -22,7 +23,9 @@ import { WishlistEntity } from '../wishlist/entities/wishlist.entity.js';
               ProductAttributeValueEntity,
               AttributeEntity,
               CategoryEntity,
-              WishlistEntity
+              WishlistEntity,
+
+              ProductView
             ]), 
             ProductTypesModule,
             CategoriesModule
