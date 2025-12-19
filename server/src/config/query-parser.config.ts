@@ -3,20 +3,17 @@ import { FieldType, QueryParserConfiguration } from '../query-parser/types/query
 const products: QueryParserConfiguration = {
     fields: {
         'attributes': [
-            { path: 'attributeValues.attributeId' },
-            { path: 'attributeValues.productId' },
-            { path: 'attributeValues.attribute.id' },
-            { path: 'attributeValues.attribute.slug' },
-            { path: 'attributeValues.attribute.title' },
-            { path: 'attributeValues.attribute.type' },
+            { path: 'attributeValues.slug' },
+            { path: 'attributeValues.title' },
+            { path: 'attributeValues.type' },
             { path: 'attributeValues.valueString' },
             { path: 'attributeValues.valueBool' },
             { path: 'attributeValues.valueInt' }
         ],
-        'images': [{ path: 'images.id', type: FieldType.STRING }, { path: 'images.url', type: FieldType.STRING }],
+        'images': [{ path: 'images.url', type: FieldType.STRING }],
         'type': {
             type: FieldType.STRING,
-            path: 'productType.slug'
+            path: 'productTypeSlug'
         },
         'price': {
             type: FieldType.NUMBER,
@@ -31,10 +28,14 @@ const products: QueryParserConfiguration = {
         },
         'updatedAt': {
             path: 'updatedAt'
+        },
+        'averageRating': {
+            path: 'averageRating',
+            type: FieldType.NUMBER
         }
     },
-    orderFields: ['createdAt', 'updatedAt'],
-    filterFields: ['type', 'price'],
+    orderFields: ['createdAt', 'updatedAt', 'averageRating'],
+    filterFields: ['type', 'price', 'averageRating'],
     includeFields: ['attributes', 'type', 'images'],
     enableFilterFallbackCollection: true,
     searchField: 'title'
