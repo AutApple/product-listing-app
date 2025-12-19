@@ -127,20 +127,21 @@ export class ProductView {
     @ViewColumn()
     images: Array<{ url: string }>; 
 
-    public populateFromEntity (entity: ProductEntity) {
-        this.productId = entity.id;
-        this.createdAt = entity.createdAt;
-        this.updatedAt = entity.updatedAt; 
-        this.shortDescription = entity.shortDescription;
-        this.title = entity.title;
-        this.description = entity.description;
-        this.price = entity.price; 
-        this.averageRating = 0;
-        this.reviewCount = 0;
-        this.images = entity.images; 
-        this.categorySlug = entity.category.slug;
+    public static generateFromEntity (entity: ProductEntity) {
+        const pv = new ProductView();
+        pv.productId = entity.id;
+        pv.createdAt = entity.createdAt;
+        pv.updatedAt = entity.updatedAt; 
+        pv.shortDescription = entity.shortDescription;
+        pv.title = entity.title;
+        pv.description = entity.description;
+        pv.price = entity.price; 
+        pv.averageRating = 0;
+        pv.reviewCount = 0;
+        pv.images = entity.images; 
+        pv.categorySlug = entity.category.slug;
         for (const av of entity.attributeValues)
-            this.attributeValues.push(
+            pv.attributeValues.push(
                 {
                     slug: av.attribute.slug,
                     title: av.attribute.title,
@@ -150,5 +151,6 @@ export class ProductView {
                     valueString: av.valueString
                 }
             );
+        return pv;
     }
 }

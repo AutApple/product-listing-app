@@ -1,6 +1,7 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 import { ReviewEntity } from '../entities/review.entity.js';
 import { VoteType } from '../entities/review-vote.entity.js';
+import { resolveObjectURL } from 'buffer';
 
 
 
@@ -99,16 +100,20 @@ export class ReviewView {
   @ViewColumn()
   images: Array<{ url: string }>; 
 
-  public populateFromEntity (entity: ReviewEntity) {
-    this.id = entity.id;
-    this.productSlug = entity.product.slug; 
-    this.userName = entity.author.name;
-    this.userEmail = entity.author.email;
-    this.reviewVoteScore = 0;
-    this.text = entity.text;
-    this.rating = entity.rating;
-    this.images = entity.images;
-    this.createdAt = entity.createdAt;
-    this.updatedAt = entity.updatedAt;
+  public static generateFromEntity (entity: ReviewEntity) {
+    const rv = new ReviewView();
+
+    rv.id = entity.id;
+    rv.productSlug = entity.product.slug; 
+    rv.userName = entity.author.name;
+    rv.userEmail = entity.author.email;
+    rv.reviewVoteScore = 0;
+    rv.text = entity.text;
+    rv.rating = entity.rating;
+    rv.images = entity.images;
+    rv.createdAt = entity.createdAt;
+    rv.updatedAt = entity.updatedAt;
+
+    return rv;
   }
 }

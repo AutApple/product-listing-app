@@ -38,10 +38,8 @@ export class ReviewsService extends IdResourceService<ReviewView>{
     }
  
     
-    const savedReview = await this.reviewRepository.save(review);
-    const reviewView = new ReviewView();
-    reviewView.populateFromEntity(savedReview);
-    return reviewView; 
+    const savedReview = await this.reviewRepository.save(review);;
+    return ReviewView.generateFromEntity(savedReview); 
   }
 
 
