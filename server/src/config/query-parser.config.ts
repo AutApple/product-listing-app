@@ -57,6 +57,36 @@ const categories: QueryParserConfiguration = {
     enableFilterFallbackCollection: false
 };
 
+const reviews: QueryParserConfiguration = {
+    fields: {
+        'createdAt': {
+            path: 'createdAt'
+        },
+        'updatedAt': {
+            path: 'updatedAt'
+        },
+        'rating': {
+            path: 'rating',
+            type: FieldType.NUMBER,
+        },
+        'voteScore': {
+            path: 'reviewVoteScore',
+            type: FieldType.NUMBER,
+        },
+        'product': {
+            path: 'productSlug',
+            type: FieldType.STRING,
+        }
+
+    },
+    orderFields: ['createdAt', 'updatedAt', 'rating', 'voteScore'],
+    filterFields: ['createdAt', 'updatedAt', 'rating', 'product', 'voteScore'],
+    includeFields: [],
+    enableFilterFallbackCollection: true,
+    searchField: 'title'
+};
+
+
 export const globalQueryParserConfig: Record<string, QueryParserConfiguration> = {
-    products, productTypes, attributes, categories
+    products, productTypes, attributes, categories, reviews
 };

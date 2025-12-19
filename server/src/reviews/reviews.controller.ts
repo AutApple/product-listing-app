@@ -10,6 +10,10 @@ import { OutputReviewDto } from './dto/output/output-review.dto.js';
 import { ReviewsVoteService } from './reviews-vote.service.js';
 import { VoteReviewDto } from './dto/vote-review.dto.js';
 import { ReviewView } from './views/review.view.js';
+import { globalQueryParserConfig } from '../config/query-parser.config.js';
+import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
+import { QueryCommonDto } from '../common/dto/query.common.dto.js';
+import type { QueryParserResult } from '../query-parser/query-parser.js';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -42,11 +46,18 @@ export class ReviewsController {
   }
 
 
-  @Get()
-  async findAll() {
-    const data = await this.reviewsService.findAll();
-    return this.dto(data);
-  }
+   @Get()
+    async findAll(@ParsedQuery({ config: globalQueryParserConfig.reviews, dto: QueryCommonDto }) queryResult: QueryParserResult) {
+      const data = await this.reviewsService.findAll(
+        queryResult.selectOptions ?? {},
+        queryResult.orderOptions ?? {},
+        queryResult.paginationOptions?.skip ?? 0,
+        queryResult.paginationOptions?.take ?? 10,
+        queryResult.filterOptions ?? {}
+      );
+      
+      return this.dto(data);
+    }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {

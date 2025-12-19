@@ -35,8 +35,6 @@ export class QueryParser {
         return this.makeFieldObject(this.config.fields[key].path, value);
     }
 
-
-
     /**
      * @description converts path like node1.node2.node3 to an object of {node1: {node2: {node3: value}}}
      * @param {string} path - dot-separated path

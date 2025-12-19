@@ -58,17 +58,14 @@ export class ReviewsService extends IdResourceService<ReviewView>{
     return review;
   }
 
-  override async findAll(
-    mergeSelectOptions: FindOptionsSelect<ReviewEntity> = {},
-    orderOptions: FindOptionsOrder<ReviewEntity> = {},
+  async findAll(
+    mergeSelectOptions: FindOptionsSelect<ReviewView> = {},
+    orderOptions: FindOptionsOrder<ReviewView> = {},
     skip: number = 0,
     take: number = 10,
-    filterOptions: FindOptionsWhere<ReviewEntity> = {},
+    filterOptions: FindOptionsWhere<ReviewView> = {},
   ): Promise<ReviewView[]> {
-    const qb = this.reviewRepository.createQueryBuilder('review');
-    qb.andWhere(filterOptions);
-    const reviews = await super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions);
-    return reviews;
+    return super.findAll(mergeSelectOptions, orderOptions, skip, take, filterOptions);
   }
   
   async findOneById(
