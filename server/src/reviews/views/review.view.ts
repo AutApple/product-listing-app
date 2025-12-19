@@ -1,10 +1,6 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 import { ReviewEntity } from '../entities/review.entity.js';
 import { VoteType } from '../entities/review-vote.entity.js';
-import { resolveObjectURL } from 'buffer';
-
-
-
 
 @ViewEntity({
   name: 'review_view',
