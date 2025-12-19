@@ -161,8 +161,7 @@ export class QueryParser {
         if (Object.keys(this.paginationOptions).length > 0) Object.assign(result, { paginationOptions: this.paginationOptions });
         if (Object.keys(this.filterOptions).length > 0) Object.assign(result, { filterOptions: this.filterOptions });
         if (Object.keys(this.filterFallbackCollection).length > 0) Object.assign(result, { filterFallbackCollection: this.filterFallbackCollection });
-        
-        console.log(result);
+ 
         return result;
     }
 }
