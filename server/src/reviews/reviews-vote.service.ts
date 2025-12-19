@@ -38,5 +38,4 @@ export class ReviewsVoteService {
         await this.reviewVoteRepository.remove(voteEntity);
         return true;
     }
-    
 }
