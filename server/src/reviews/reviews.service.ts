@@ -40,15 +40,7 @@ export class ReviewsService extends IdResourceService<ReviewView>{
     
     const savedReview = await this.reviewRepository.save(review);
     const reviewView = new ReviewView();
-
-    reviewView.id = savedReview.id;
-    reviewView.productSlug = productSlug; 
-    reviewView.userName = user.name;
-    reviewView.userEmail = email;
-    reviewView.reviewVoteScore = 0;
-    reviewView.text = text;
-    reviewView.rating = rating;
-    reviewView.images = review.images;
+    reviewView.populateFromEntity(savedReview);
     return reviewView; 
   }
 

@@ -1,5 +1,5 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
-import { VoteType } from '../entities/review-vote.entity.js';
+import { ReviewEntity } from '../entities/review.entity.js';
 
 @ViewEntity({
   name: 'review_stats_view',
@@ -94,4 +94,15 @@ export class ReviewView {
 
   @ViewColumn()
   images: Array<{ url: string }>; 
+
+  public populateFromEntity (entity: ReviewEntity) {
+    this.id = entity.id;
+    this.productSlug = entity.product.slug; 
+    this.userName = entity.author.name;
+    this.userEmail = entity.author.email;
+    this.reviewVoteScore = 0;
+    this.text = entity.text;
+    this.rating = entity.rating;
+    this.images = entity.images;
+  }
 }
