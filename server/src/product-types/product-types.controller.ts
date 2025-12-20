@@ -10,6 +10,7 @@ import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-valid
 import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { OutputProductTypeDTO } from './dto/output/output-product-type.dto.js';
 import { ProductTypeEntity } from './entities/product-type.entity.js';
+import { AdminGuard } from '../auth/guards/admin.guard.js';
 
 @Controller('admin/product-types')
 export class ProductTypesController {
@@ -46,13 +47,14 @@ export class ProductTypesController {
 
     return this.dto(data);
   }
-
+  @UseGuards(AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateProductTypeDto: UpdateProductTypeDto) {
     const data = await this.productTypesService.update(slug, updateProductTypeDto);
     return this.dto(data);
   }
 
+  @UseGuards(AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
     const data = await this.productTypesService.remove(slug);

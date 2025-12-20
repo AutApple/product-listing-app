@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -10,6 +10,7 @@ import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-valid
 import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { OutputCategoryDTO } from './dto/output/output-category.dto.js';
 import { CategoryEntity } from './entities/category.entity.js';
+import { AdminGuard } from '../auth/guards/admin.guard.js';
 
 @Controller('admin/categories')
 export class CategoriesController {
@@ -19,6 +20,7 @@ export class CategoriesController {
     return toOutputDto(e, OutputCategoryDTO);
   }
 
+  @UseGuards(AdminGuard)
   @Post()
   async create(@Body(new BulkOrSingleValidationPipe(CreateCategoryDto)) createCategoryDto: CreateCategoryDto | CreateCategoryDto[]) {
     const data = await this.categoriesService.create(createCategoryDto);
@@ -43,12 +45,14 @@ export class CategoriesController {
     return this.dto(data);
   }
 
+  @UseGuards(AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     const data = await this.categoriesService.update(slug, updateCategoryDto);
     return this.dto(data);
   }
 
+  @UseGuards(AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
     const data = await this.categoriesService.remove(slug);

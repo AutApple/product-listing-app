@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -10,6 +10,7 @@ import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-valid
 import { OutputProductDTO } from './dto/output/output-product.dto.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { ProductView } from './views/product.view.js';
+import { AdminGuard } from '../auth/guards/admin.guard.js';
 
 @Controller('products')
 export class ProductsController {
@@ -19,6 +20,7 @@ export class ProductsController {
     return toOutputDto(e, OutputProductDTO);
   }
   
+  @UseGuards(AdminGuard)
   @Post()
   async create(@Body(new BulkOrSingleValidationPipe(CreateProductDto)) createProductDto: CreateProductDto | CreateProductDto[]) {
     const data = await this.productsService.create(createProductDto);
@@ -40,18 +42,21 @@ export class ProductsController {
     return this.dto(data);
   }
 
+
   @Get(':slug')
   async findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.products, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
     const data = await this.productsService.findOneBySlug(slug, parsedQuery.selectOptions ?? {});
     return this.dto(data);
   }
 
+  @UseGuards(AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateProductDto: UpdateProductDto) {
     const data = await this.productsService.update(slug, updateProductDto);
     return this.dto(data);
   }
 
+  @UseGuards(AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
     const data = await this.productsService.remove(slug);

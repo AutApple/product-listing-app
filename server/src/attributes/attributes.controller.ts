@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AttributesService } from './attributes.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
@@ -10,6 +10,7 @@ import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-valid
 import { AttributeEntity } from './entities/attribute.entity.js';
 import { OutputAttributeDTO } from './dto/output/output-attribute.dto.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
+import { AdminGuard } from 'src/auth/guards/admin.guard.js';
 
 @Controller('admin/attributes')
 export class AttributesController {
@@ -19,6 +20,7 @@ export class AttributesController {
       return toOutputDto(e, OutputAttributeDTO);
   }
   
+  @UseGuards(AdminGuard)
   @Post()
   async create(@Body(new BulkOrSingleValidationPipe(CreateAttributeDto)) createAttributeDto: CreateAttributeDto | CreateAttributeDto[]) {
     const data = await this.attributesService.create(createAttributeDto);
@@ -45,12 +47,14 @@ export class AttributesController {
     return this.dto(data);
   }
 
+  @UseGuards(AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateAttributeDto: UpdateAttributeDto) {
     const data = await this.attributesService.update(slug, updateAttributeDto);
     return this.dto(data);
   }
 
+  @UseGuards(AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
     const data = await this.attributesService.remove(slug);
