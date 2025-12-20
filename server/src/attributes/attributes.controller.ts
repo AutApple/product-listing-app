@@ -10,7 +10,7 @@ import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-valid
 import { AttributeEntity } from './entities/attribute.entity.js';
 import { OutputAttributeDTO } from './dto/output/output-attribute.dto.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
-import { AdminGuard } from 'src/auth/guards/admin.guard.js';
+import { AdminGuard } from '../auth/guards/admin.guard.js';
 
 @Controller('admin/attributes')
 export class AttributesController {

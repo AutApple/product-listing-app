@@ -4,6 +4,8 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { TypeORMErrorFilter } from './common/filters/typeorm-errors.filter.js';
 import session from 'express-session';
 import { globalAuthConfiguration } from './config/auth.config.js';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import defaultCommonConfig from './config/common.config.js';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
@@ -28,6 +30,16 @@ async function bootstrap() {
   // TypeORM errors filter
   app.useGlobalFilters(new TypeORMErrorFilter());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+
+  const config = new DocumentBuilder()
+    .setTitle(defaultCommonConfig.apiTitle)
+    .setDescription(defaultCommonConfig.apiDescription)
+    .setVersion(defaultCommonConfig.apiVersion)
+    .build();
+  
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
