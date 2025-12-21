@@ -1,1 +1,1 @@
-// No controller yet (probably will be admin-specific CRUD)
+// No controller (probably will be admin-specific CRUD either stays blank)
