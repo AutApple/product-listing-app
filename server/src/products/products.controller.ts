@@ -11,9 +11,11 @@ import { OutputProductDto } from './dto/output/output-product.dto.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { ProductView } from './views/product.view.js';
 import { AdminGuard } from '../auth/guards/admin.guard.js';
-import { ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam} from '@nestjs/swagger';
 import { ApiCommonQueryManyResources, ApiCommonQueryOneResource } from '../swagger/decorators/common-query.decorator.js';
 import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
+import { ApiCommonDeleteResource } from '../swagger/decorators/common-delete.decorator.js';
+import { ApiCommonUpdateResource } from '../swagger/decorators/common-update.decorator.js';
 
 @Controller('products')
 export class ProductsController {
@@ -59,11 +61,7 @@ export class ProductsController {
     return this.dto(data);
   }
 
-  @ApiOperation( {summary: 'Admin-only: Update a product'})
-  @ApiBody({ type: UpdateProductDto })
-  @ApiBearerAuth()
-  @ApiOkResponse({ type: OutputProductDto, description: 'Updated product object' })
-  @ApiForbiddenResponse({ description: 'Forbidden: Admins only route' })
+  @ApiCommonUpdateResource('product', CreateProductDto, OutputProductDto)
   @UseGuards(AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateProductDto: UpdateProductDto) {
@@ -71,10 +69,7 @@ export class ProductsController {
     return this.dto(data);
   }
 
-  @ApiOperation( {summary: 'Admin-only: Delete a product'})
-  @ApiBearerAuth()
-  @ApiOkResponse({ type: OutputProductDto, description: 'Deleted  product object' })
-  @ApiForbiddenResponse({ description: 'Forbidden: Admins only route' })
+  @ApiCommonDeleteResource('product', OutputProductDto)
   @UseGuards(AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
