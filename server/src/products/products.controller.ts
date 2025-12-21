@@ -11,8 +11,9 @@ import { OutputProductDto } from './dto/output/output-product.dto.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { ProductView } from './views/product.view.js';
 import { AdminGuard } from '../auth/guards/admin.guard.js';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ApiCommonQueryManyResources, ApiCommonQueryOneResource } from '../swagger/decorators/common-query.decorator.js';
+import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
 
 @Controller('products')
 export class ProductsController {
@@ -50,11 +51,7 @@ export class ProductsController {
     return this.dto(data);
   }
 
-  @ApiOperation( {summary: 'Admin-only: Post a new product'})
-  @ApiBody({ type: CreateProductDto })
-  @ApiBearerAuth()
-  @ApiCreatedResponse({ type: OutputProductDto, description: 'Newly created product object' })
-  @ApiForbiddenResponse({ description: 'Forbidden: Admins only route' })
+  @ApiCommonCreateResource('product', CreateProductDto, OutputProductDto)
   @UseGuards(AdminGuard)
   @Post()
   async create(@Body(new BulkOrSingleValidationPipe(CreateProductDto)) createProductDto: CreateProductDto | CreateProductDto[]) {
