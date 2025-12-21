@@ -35,12 +35,14 @@ async function bootstrap() {
     .setTitle(defaultCommonConfig.apiTitle)
     .setDescription(defaultCommonConfig.apiDescription)
     .setVersion(defaultCommonConfig.apiVersion)
+    .addBearerAuth()
     .build();
   
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
       docExpansion: 'list',
+      persistAuthorization: true
     }
   });
 
