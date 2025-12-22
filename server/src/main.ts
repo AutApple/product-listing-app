@@ -43,9 +43,10 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
       supportedSubmitMethods: [],
-      docExpansion: 'list',
+      docExpansion: 'none',
       defaultModelRendering: 'model',
       defaultModelsExpandDepth: -1,
+      filter: true
     },
     customCss: theme.getBuffer(SwaggerThemeNameEnum.DARK)
   });
