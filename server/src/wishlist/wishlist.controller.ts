@@ -32,7 +32,7 @@ export class WishlistController {
 
   @ApiTags('Wishlist / Write')
   @ApiOperation({summary: 'Update a wishlist that is tied to the session (or user in case if auth bearer provided)'})
-  @ApiBody({type: ModifyWishlistDto, description: 'Add specified items to wishlist. In order to remove use negative amount in WishlistItem'})
+  @ApiBody({type: ModifyWishlistDto, description: 'Add specified items to wishlist. In order to remove or reduce items use negative amount in WishlistItem'})
   @ApiOkResponse({type: OutputWishlistDto, description: 'Updated wishlist'})
   @UseGuards(OptionalGuard)
   @Patch()
