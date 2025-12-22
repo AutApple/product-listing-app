@@ -11,11 +11,10 @@ import { OutputProductDto } from './dto/output/output-product.dto.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { ProductView } from './views/product.view.js';
 import { AdminGuard } from '../auth/guards/admin.guard.js';
-import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam} from '@nestjs/swagger';
-import { ApiCommonQueryManyResources, ApiCommonQueryOneResource } from '../swagger/decorators/common-query.decorator.js';
 import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
 import { ApiCommonDeleteResource } from '../swagger/decorators/common-delete.decorator.js';
 import { ApiCommonUpdateResource } from '../swagger/decorators/common-update.decorator.js';
+import { ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/decorators/common-find.decorator.js';
 
 @Controller('products')
 export class ProductsController {
@@ -25,9 +24,7 @@ export class ProductsController {
     return toOutputDto(e, OutputProductDto);
   }
   
-  @ApiOperation({ summary: 'Search products with query' })
-  @ApiCommonQueryManyResources('product')
-  @ApiOkResponse({ type: [OutputProductDto], description: 'List of a products shaped by specified query parameters' })
+  @ApiCommonFindManyResources('product', OutputProductDto)
   @Get()
   async findAll(@ParsedQuery({ config: globalQueryParserConfig.products, dto: QueryCommonDto }) parsedQuery: QueryParserResult) {
     const data = await this.productsService.findWithDynamicFilters(
@@ -42,11 +39,7 @@ export class ProductsController {
     return this.dto(data);
   }
 
-  @ApiOperation({ summary: 'Retrieve specified product' })
-  @ApiParam({ name: 'slug', description: 'Slug of a product' })
-  @ApiCommonQueryOneResource('product')
-  @ApiOkResponse({ type: OutputProductDto, description: 'Return product with a specified slug' })
-  @ApiNotFoundResponse ({ description: 'Not Found: There is no product with a specified slug'})
+  @ApiCommonFindOneResource('product', OutputProductDto)
   @Get(':slug')
   async findOne(@Param('slug') slug: string, @ParsedQuery({ config: globalQueryParserConfig.products, dto: QueryCommonDto }) parsedQuery: QueryParserResult) {
     const data = await this.productsService.findOneBySlug(slug, parsedQuery.selectOptions ?? {});
