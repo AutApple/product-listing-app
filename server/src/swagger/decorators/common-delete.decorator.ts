@@ -7,7 +7,7 @@ export function ApiCommonDeleteResource<ODto>(
     adminOnly: boolean = true,
 ) {
     return applyDecorators(
-        ApiTags(`${resourceName.charAt(0).toUpperCase() + resourceName.slice(1)}s / Write`),
+        ApiTags(`${resourceName.charAt(0).toUpperCase() + resourceName.slice(1)} / Write`),
         ApiExtraModels(outputDto),
         ApiOperation({
             summary: `${adminOnly ? 'Admin-only: ' : ''}Remove a ${resourceName} by slug`

@@ -8,7 +8,7 @@ export function ApiCommonUpdateResource<BDto, ODto>(
     adminOnly: boolean = true
 ) {
     return applyDecorators(
-        ApiTags(`${resourceName.charAt(0).toUpperCase() + resourceName.slice(1)}s / Write`),
+        ApiTags(`${resourceName.charAt(0).toUpperCase() + resourceName.slice(1)} / Write`),
         ApiExtraModels(bodyDto, outputDto),
         ApiOperation({
             summary: `${adminOnly ? 'Admin-only: ' : ''}Update ${resourceName}`
