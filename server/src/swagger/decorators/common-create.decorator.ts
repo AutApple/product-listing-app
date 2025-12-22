@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiExtraModels, ApiForbiddenResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { capitalizeString } from '../utils/capitalizeString.js';
 
 export function ApiCommonCreateResource<BDto, ODto>(
     resourceName: string,
@@ -8,7 +9,7 @@ export function ApiCommonCreateResource<BDto, ODto>(
     adminOnly: boolean = true
 ) {
     return applyDecorators(
-        ApiTags(`${resourceName.charAt(0).toUpperCase() + resourceName.slice(1)} / Write`),
+        ApiTags(`${capitalizeString(resourceName)} / Write`),
         ApiExtraModels(bodyDto, outputDto),
         ApiOperation({
             summary: `${adminOnly ? 'Admin-only: ' : ''}Create a new ${resourceName}`

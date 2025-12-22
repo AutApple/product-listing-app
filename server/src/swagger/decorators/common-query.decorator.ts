@@ -3,7 +3,6 @@ import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 export function ApiCommonQueryOneResource(resourceName: string) {
     return applyDecorators(
-      ApiTags(`${resourceName.charAt(0).toUpperCase() + resourceName.slice(1)} / Read`),
       ApiQuery({
         name: 'include',
         required: false,
@@ -18,7 +17,6 @@ export function ApiCommonQueryOneResource(resourceName: string) {
 
 export function ApiCommonQueryManyResources(resourceName: string) {
     return applyDecorators( 
-        ApiTags(`${resourceName.charAt(0).toUpperCase() + resourceName.slice(1)} / Read`),
         ApiQuery({ name: 'offset', type: Number, required: false, description: `How much ${resourceName}s to skip`, example: 0 }),
         ApiQuery({ name: 'limit', type: Number, required: false, description: `How much ${resourceName}s to take`, example: 10 }),
         ApiQuery({ name: 'search', type: String, required: false, description: 'Search term' }),

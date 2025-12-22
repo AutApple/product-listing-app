@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBearerAuth, ApiExtraModels, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { capitalizeString } from '../utils/capitalizeString.js';
 
 export function ApiCommonDeleteResource<ODto>(
     resourceName: string,
@@ -7,7 +8,7 @@ export function ApiCommonDeleteResource<ODto>(
     adminOnly: boolean = true,
 ) {
     return applyDecorators(
-        ApiTags(`${resourceName.charAt(0).toUpperCase() + resourceName.slice(1)} / Write`),
+        ApiTags(`${capitalizeString(resourceName)} / Write`),
         ApiExtraModels(outputDto),
         ApiOperation({
             summary: `${adminOnly ? 'Admin-only: ' : ''}Remove a ${resourceName} by slug`
