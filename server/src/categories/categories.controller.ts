@@ -8,25 +8,23 @@ import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';
 import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
-import { OutputCategoryDTO } from './dto/output/output-category.dto.js';
+import { OutputCategoryDTO as OutputCategoryDto } from './dto/output/output-category.dto.js';
 import { CategoryEntity } from './entities/category.entity.js';
 import { AdminGuard } from '../auth/guards/admin.guard.js';
+import { ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/decorators/common-find.decorator.js';
+import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
+import { ApiCommonUpdateResource } from '../swagger/decorators/common-update.decorator.js';
+import { ApiCommonDeleteResource } from '../swagger/decorators/common-delete.decorator.js';
 
 @Controller('admin/categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
   
-  private dto(e: CategoryEntity | CategoryEntity[]): OutputCategoryDTO | OutputCategoryDTO[] {
-    return toOutputDto(e, OutputCategoryDTO);
+  private dto(e: CategoryEntity | CategoryEntity[]): OutputCategoryDto | OutputCategoryDto[] {
+    return toOutputDto(e, OutputCategoryDto);
   }
 
-  @UseGuards(AdminGuard)
-  @Post()
-  async create(@Body(new BulkOrSingleValidationPipe(CreateCategoryDto)) createCategoryDto: CreateCategoryDto | CreateCategoryDto[]) {
-    const data = await this.categoriesService.create(createCategoryDto);
-    return this.dto(data);
-  }
-
+  @ApiCommonFindManyResources('category', OutputCategoryDto)
   @Get()
   async findAll(@ParsedQuery({config: globalQueryParserConfig.categories, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
     const data = await this.categoriesService.findAll(
@@ -39,12 +37,22 @@ export class CategoriesController {
     return this.dto(data);
   }
 
+  @ApiCommonFindOneResource('category', OutputCategoryDto)
   @Get(':slug')
   async findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.categories, dto: QueryCommonDto}) parsedQuery: QueryParserResult) {
     const data = await this.categoriesService.findOneBySlug(slug, parsedQuery.selectOptions ?? {});
     return this.dto(data);
   }
 
+  @ApiCommonCreateResource('category', CreateCategoryDto, OutputCategoryDto)
+  @UseGuards(AdminGuard)
+  @Post()
+  async create(@Body(new BulkOrSingleValidationPipe(CreateCategoryDto)) createCategoryDto: CreateCategoryDto | CreateCategoryDto[]) {
+    const data = await this.categoriesService.create(createCategoryDto);
+    return this.dto(data);
+  }
+
+  @ApiCommonUpdateResource('category', CreateCategoryDto, OutputCategoryDto)
   @UseGuards(AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateCategoryDto: UpdateCategoryDto) {
@@ -52,6 +60,7 @@ export class CategoriesController {
     return this.dto(data);
   }
 
+  @ApiCommonDeleteResource('category', OutputCategoryDto)
   @UseGuards(AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {

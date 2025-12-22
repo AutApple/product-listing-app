@@ -8,25 +8,23 @@ import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';
 import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
 import { AttributeEntity } from './entities/attribute.entity.js';
-import { OutputAttributeDTO } from './dto/output/output-attribute.dto.js';
+import { OutputAttributeDTO as OutputAttributeDto } from './dto/output/output-attribute.dto.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
 import { AdminGuard } from '../auth/guards/admin.guard.js';
+import { ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/decorators/common-find.decorator.js';
+import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
+import { ApiCommonUpdateResource } from '../swagger/decorators/common-update.decorator.js';
+import { ApiCommonDeleteResource } from '../swagger/decorators/common-delete.decorator.js';
 
 @Controller('admin/attributes')
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
   
-  private dto(e: AttributeEntity | AttributeEntity[]): OutputAttributeDTO | OutputAttributeDTO[] {
-      return toOutputDto(e, OutputAttributeDTO);
-  }
-  
-  @UseGuards(AdminGuard)
-  @Post()
-  async create(@Body(new BulkOrSingleValidationPipe(CreateAttributeDto)) createAttributeDto: CreateAttributeDto | CreateAttributeDto[]) {
-    const data = await this.attributesService.create(createAttributeDto);
-    return this.dto(data);
+  private dto(e: AttributeEntity | AttributeEntity[]): OutputAttributeDto | OutputAttributeDto[] {
+      return toOutputDto(e, OutputAttributeDto);
   }
 
+  @ApiCommonFindManyResources('attribute', OutputAttributeDto)
   @Get()
   async findAll(@ParsedQuery({config: globalQueryParserConfig.attributes, dto: QueryCommonDto}) queryResult: QueryParserResult) {
     const data = await this.attributesService.findAll(
@@ -38,6 +36,7 @@ export class AttributesController {
     return this.dto(data);
   }
 
+  @ApiCommonFindOneResource('attribute', OutputAttributeDto)
   @Get(':slug')
   async findOne(@Param('slug') slug: string, @ParsedQuery({config: globalQueryParserConfig.attributes, dto: QueryCommonDto}) queryResult: QueryParserResult) {
     const data = await this.attributesService.findOneBySlug(
@@ -47,6 +46,15 @@ export class AttributesController {
     return this.dto(data);
   }
 
+  @ApiCommonCreateResource('attribute', CreateAttributeDto, OutputAttributeDto)
+  @UseGuards(AdminGuard)
+  @Post()
+  async create(@Body(new BulkOrSingleValidationPipe(CreateAttributeDto)) createAttributeDto: CreateAttributeDto | CreateAttributeDto[]) {
+    const data = await this.attributesService.create(createAttributeDto);
+    return this.dto(data);
+  }
+
+  @ApiCommonUpdateResource('attribute', CreateAttributeDto, OutputAttributeDto)
   @UseGuards(AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateAttributeDto: UpdateAttributeDto) {
@@ -54,6 +62,7 @@ export class AttributesController {
     return this.dto(data);
   }
 
+  @ApiCommonDeleteResource('attribute', OutputAttributeDto)
   @UseGuards(AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
