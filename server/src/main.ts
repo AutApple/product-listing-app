@@ -35,15 +35,13 @@ async function bootstrap() {
     .setTitle(defaultCommonConfig.apiTitle)
     .setDescription(defaultCommonConfig.apiDescription)
     .setVersion(defaultCommonConfig.apiVersion)
-    .addBearerAuth()
     .build();
   
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, { autoTagControllers: false });
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
       supportedSubmitMethods: [],
       docExpansion: 'list',
-      persistAuthorization: true,
       defaultModelRendering: 'model'
     }
   });
