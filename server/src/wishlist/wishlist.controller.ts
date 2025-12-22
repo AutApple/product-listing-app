@@ -17,7 +17,7 @@ export class WishlistController {
     return toOutputDto(data, OutputWishlistDto);
   }
 
-  @ApiTags('Wishlist / Read')
+  @ApiTags('Wishlist')
   @ApiOperation({summary: 'Get wishlist that is tied to the session (or user in case if auth bearer provided)'})
   @ApiOkResponse({type: OutputWishlistDto, description: 'Wishlist that is tied to the session (or user in case if auth bearer provided)'})
   @UseGuards(OptionalGuard)
@@ -30,7 +30,7 @@ export class WishlistController {
     return this.dto(data);
   }
 
-  @ApiTags('Wishlist / Write')
+  @ApiTags('Wishlist')
   @ApiOperation({summary: 'Update a wishlist that is tied to the session (or user in case if auth bearer provided)'})
   @ApiBody({type: ModifyWishlistDto, description: 'Add specified items to wishlist. In order to remove or reduce items use negative amount in WishlistItem'})
   @ApiOkResponse({type: OutputWishlistDto, description: 'Updated wishlist'})
