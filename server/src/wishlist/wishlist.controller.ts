@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Session, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Session, UseGuards, Patch } from '@nestjs/common';
 import { User } from '../auth/decorators/user.decorator.js';
 import { WishlistEntity } from './entities/wishlist.entity.js';
 import { toOutputDto } from '../common/utils/to-output-dto.js';
@@ -7,6 +7,7 @@ import { ModifyWishlistDto } from './dto/modify-wishlist.dto.js';
 import { WishlistOrchestratorService } from './wishlist-orchestrator.service.js';
 import { JwtPayload } from '../auth/types/jwt-payload.type.js';
 import { OptionalGuard } from '../auth/guards/optional.guard.js';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('wishlist')
 export class WishlistController {
@@ -16,6 +17,9 @@ export class WishlistController {
     return toOutputDto(data, OutputWishlistDto);
   }
 
+  @ApiTags('Wishlist / Read')
+  @ApiOperation({summary: 'Get wishlist that is tied to the session (or user in case if auth bearer provided)'})
+  @ApiOkResponse({type: OutputWishlistDto, description: 'Wishlist that is tied to the session (or user in case if auth bearer provided)'})
   @UseGuards(OptionalGuard)
   @Get()
   async findWishlist(
@@ -26,8 +30,12 @@ export class WishlistController {
     return this.dto(data);
   }
 
+  @ApiTags('Wishlist / Write')
+  @ApiOperation({summary: 'Update a wishlist that is tied to the session (or user in case if auth bearer provided)'})
+  @ApiBody({type: ModifyWishlistDto, description: 'Add specified items to wishlist. In order to remove use negative amount in WishlistItem'})
+  @ApiOkResponse({type: OutputWishlistDto, description: 'Updated wishlist'})
   @UseGuards(OptionalGuard)
-  @Post()
+  @Patch()
   async addProducts(
     @Body() addToWishlistDto: ModifyWishlistDto, 
     @User() user: JwtPayload | undefined,

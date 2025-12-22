@@ -6,6 +6,7 @@ import session from 'express-session';
 import { globalAuthConfiguration } from './config/auth.config.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import defaultCommonConfig from './config/common.config.js';
+import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
@@ -38,12 +39,15 @@ async function bootstrap() {
     .build();
   
   const document = SwaggerModule.createDocument(app, config, { autoTagControllers: false });
+  const theme = new SwaggerTheme();
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
       supportedSubmitMethods: [],
       docExpansion: 'list',
-      defaultModelRendering: 'model'
-    }
+      defaultModelRendering: 'model',
+      defaultModelsExpandDepth: -1,
+    },
+    customCss: theme.getBuffer(SwaggerThemeNameEnum.DARK)
   });
 
   await app.listen(process.env.PORT ?? 3000);

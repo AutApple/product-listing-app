@@ -1,8 +1,26 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from '../../entities/user.entity.js';
 
 export class OutputUserDto {
-    email: string; 
+    @ApiProperty({
+        name: 'email',
+        description: 'Email of a user',
+        type: 'string'
+    })
+    email: string;
+
+    @ApiProperty({
+        name: 'email',
+        description: 'Display name of a user',
+        type: 'string'
+    })
     name: string;
+    
+    @ApiProperty({
+        name: 'isAdmin',
+        description: 'Flag indicating whether user is admin or not',
+        type: 'boolean'
+    })
     isAdmin: boolean;
     
     constructor (user: UserEntity) {
