@@ -14,7 +14,7 @@ import { globalQueryParserConfig } from '../config/query-parser.config.js';
 import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
 import { QueryCommonDto } from '../common/dto/query.common.dto.js';
 import type { QueryParserResult } from '../query-parser/query-parser.js';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/decorators/common-find.decorator.js';
 import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
 import { ApiAuthHeader } from '../swagger/decorators/auth-header.decorator.js';
@@ -80,6 +80,17 @@ export class ReviewsController {
   }
 
   @ApiTags('Review / Vote')
+  @ApiOperation({
+    summary: 'Upsert a vote for a review with given ID'
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of a review'
+  })
+  @ApiOkResponse({
+    type: VoteReviewDto,
+    description: 'Upserted vote review entity'
+  })
   @UseGuards(AccessTokenGuard)
   @Patch(':id/vote')
   async vote(@Body() voteReviewDto: VoteReviewDto, @Param('id') id: string, @User('email') email: string) {
@@ -87,6 +98,17 @@ export class ReviewsController {
   }
 
   @ApiTags('Review / Vote')
+  @ApiOperation({
+    summary: 'Delete a vote for a review with given ID'
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of a review'
+  })
+  @ApiOkResponse({
+    type: VoteReviewDto,
+    description: 'Deleted vote review entity'
+  })
   @UseGuards(AccessTokenGuard)
   @Delete(':id/vote')
   async removeVote(@Param('id') id: string, @User('email') email: string) {

@@ -36,6 +36,6 @@ export class ReviewsVoteService {
         if (!voteEntity)
             throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('vote', id, 'id'));
         await this.reviewVoteRepository.remove(voteEntity);
-        return true;
+        return voteEntity;
     }
 }
