@@ -1,7 +1,7 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { CategoryEntity } from '../../entities/category.entity.js';
 
-export class OutputCategoryDTO {
+export class OutputCategoryDto {
     @ApiProperty({
         type: 'string',
         name: 'slug',

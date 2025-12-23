@@ -1,20 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { AttributesService } from './attributes.service';
-import { CreateAttributeDto } from './dto/create-attribute.dto';
-import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
-import { globalQueryParserConfig } from '../config/query-parser.config.js';
-import { QueryCommonDto } from '../common/dto/query.common.dto.js';
-import type { QueryParserResult } from '../query-parser/query-parser.js';
-import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
-import { AttributeEntity } from './entities/attribute.entity.js';
-import { OutputAttributeDTO as OutputAttributeDto } from './dto/output/output-attribute.dto.js';
-import { toOutputDto } from '../common/utils/to-output-dto.js';
+import { AttributeEntity, CreateAttributeDto, UpdateAttributeDto, OutputAttributeDto } from './';
+import { toOutputDto, QueryCommonDto, BulkOrSingleValidationPipe } from '../common/';
+import { ParsedQuery, type QueryParserResult } from '../query-parser/';
+import { globalQueryParserConfig } from '../config/';
 import { AdminGuard } from '../auth/guards/admin.guard.js';
-import { ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/decorators/common-find.decorator.js';
-import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
-import { ApiCommonUpdateResource } from '../swagger/decorators/common-update.decorator.js';
-import { ApiCommonDeleteResource } from '../swagger/decorators/common-delete.decorator.js';
+import { ApiCommonCreateResource, ApiCommonUpdateResource, ApiCommonDeleteResource, ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/';
+import { AttributesService } from './attributes.service.js';
 
 @Controller('admin/attributes')
 export class AttributesController {

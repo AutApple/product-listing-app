@@ -1,11 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserEntity } from './entities/user.entity.js';
+import { CreateUserDto, UpdateUserDto, UserEntity  } from './';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { globalAuthConfiguration } from '../config/auth.config.js';
+import { ERROR_MESSAGES, globalAuthConfiguration } from '../config/';
 import bcrypt from 'bcrypt';
 
 @Injectable()

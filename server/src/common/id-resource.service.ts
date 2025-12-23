@@ -1,10 +1,7 @@
 import { FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
-import { BaseService } from './base.service.js';
-import { MinimalEntity } from './entities/minimal.entity.js';
-import { deepMergeObjects } from './utils/deep-merge-objects.js';
-import { extractRelationsFromSelect } from './utils/extract-relations.js';
 import { NotFoundException } from '@nestjs/common';
-import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { BaseService, MinimalEntity, deepMergeObjects, extractRelationsFromSelect } from './';
+import { ERROR_MESSAGES } from '../config/';
 
 
 export abstract class IdResourceService<

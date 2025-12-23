@@ -1,12 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateProductTypeDto } from './dto/create-product-type.dto';
-import { UpdateProductTypeDto } from './dto/update-product-type.dto';
+import { Injectable } from '@nestjs/common';
+import { CreateProductTypeDto, UpdateProductTypeDto, ProductTypeEntity } from './';
 import { EntityManager, FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
-import { ProductTypeEntity } from './entities/product-type.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AttributeEntity } from '../attributes/';
+import { SlugResourceService } from '../common/';
 import { AttributesService } from '../attributes/attributes.service.js';
-import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
-import { SlugResourceService } from '../common/slug-resource.service.js';
 
 @Injectable()
 export class ProductTypesService extends SlugResourceService<ProductTypeEntity> {

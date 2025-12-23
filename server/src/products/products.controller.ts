@@ -1,20 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { QueryCommonDto } from '../common/dto/query.common.dto.js';
-import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
-import type { QueryParserResult } from '../query-parser/query-parser.js';
-import { globalQueryParserConfig } from '../config/query-parser.config.js';
-import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
-import { OutputProductDto } from './dto/output/output-product.dto.js';
-import { toOutputDto } from '../common/utils/to-output-dto.js';
-import { ProductView } from './views/product.view.js';
+import { CreateProductDto, UpdateProductDto, ProductView, OutputProductDto } from './';
+import { ParsedQuery, type QueryParserResult } from '../query-parser/';
+import { globalQueryParserConfig } from '../config/';
+import { toOutputDto, BulkOrSingleValidationPipe, QueryCommonDto } from '../common/';
 import { AdminGuard } from '../auth/guards/admin.guard.js';
-import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
-import { ApiCommonDeleteResource } from '../swagger/decorators/common-delete.decorator.js';
-import { ApiCommonUpdateResource } from '../swagger/decorators/common-update.decorator.js';
-import { ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/decorators/common-find.decorator.js';
+import { ApiCommonCreateResource, ApiCommonDeleteResource, ApiCommonUpdateResource, ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/';
 
 @Controller('products')
 export class ProductsController {
@@ -24,7 +15,7 @@ export class ProductsController {
     return toOutputDto(e, OutputProductDto);
   }
   
-  @ApiCommonFindManyResources('product', OutputProductDto)
+  @ApiCommonFindManyResources('product', OutputProductDto, true)
   @Get()
   async findAll(@ParsedQuery({ config: globalQueryParserConfig.products, dto: QueryCommonDto }) parsedQuery: QueryParserResult) {
     const data = await this.productsService.findWithDynamicFilters(
@@ -46,7 +37,7 @@ export class ProductsController {
     return this.dto(data);
   }
 
-  @ApiCommonCreateResource('product', CreateProductDto, OutputProductDto)
+  @ApiCommonCreateResource('product', CreateProductDto, OutputProductDto, true)
   @UseGuards(AdminGuard)
   @Post()
   async create(@Body(new BulkOrSingleValidationPipe(CreateProductDto)) createProductDto: CreateProductDto | CreateProductDto[]) {

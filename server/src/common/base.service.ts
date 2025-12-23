@@ -1,7 +1,5 @@
 import { FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
-import { extractRelationsFromSelect } from './utils/extract-relations.js';
-import { deepMergeObjects } from './utils/deep-merge-objects.js';
-import { MinimalEntity } from './entities/minimal.entity.js';
+import { extractRelationsFromSelect, deepMergeObjects, MinimalEntity } from './';
 
 export class BaseService <Entity extends MinimalEntity> {
     constructor(

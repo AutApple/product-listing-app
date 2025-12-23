@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AttributesService } from './attributes.service';
+import { AttributeEntity, AttributeEnumValueEntity } from './';
 import { AttributesController } from './attributes.controller';
-import { TypeORMError } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AttributeEntity } from './entities/attribute.entity.js';
-import { AttributeEnumValueEntity } from './entities/attribute-enum-value.entity.js';
+import { AttributesService } from './attributes.service.js';
 
 @Module({
   imports: [TypeOrmModule.forFeature([AttributeEntity, AttributeEnumValueEntity])],

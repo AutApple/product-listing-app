@@ -1,20 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ProductTypesService } from './product-types.service';
-import { CreateProductTypeDto } from './dto/create-product-type.dto';
-import { UpdateProductTypeDto } from './dto/update-product-type.dto';
-import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
-import { globalQueryParserConfig } from '../config/query-parser.config.js';
-import { QueryCommonDto } from '../common/dto/query.common.dto.js';
-import type { QueryParserResult } from '../query-parser/query-parser.js';
-import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
-import { toOutputDto } from '../common/utils/to-output-dto.js';
-import { OutputProductTypeDTO as OutputProductTypeDto } from './dto/output/output-product-type.dto.js';
-import { ProductTypeEntity } from './entities/product-type.entity.js';
-import { AdminGuard } from '../auth/guards/admin.guard.js';
-import { ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/decorators/common-find.decorator.js';
-import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
-import { ApiCommonUpdateResource } from '../swagger/decorators/common-update.decorator.js';
-import { ApiCommonDeleteResource } from '../swagger/decorators/common-delete.decorator.js';
+import { ParsedQuery, type QueryParserResult } from '../query-parser/';
+import { globalQueryParserConfig } from '../config/';
+import { BulkOrSingleValidationPipe, toOutputDto, QueryCommonDto } from '../common/';
+import { ProductTypeEntity, OutputProductTypeDto, CreateProductTypeDto, UpdateProductTypeDto } from './';
+import { AdminGuard } from '../auth/';
+import { ApiCommonFindManyResources, ApiCommonFindOneResource, ApiCommonCreateResource,  ApiCommonUpdateResource, ApiCommonDeleteResource } from '../swagger/';
+import { ProductTypesService } from './product-types.service.js';
 
 @Controller('admin/product-types')
 export class ProductTypesController {

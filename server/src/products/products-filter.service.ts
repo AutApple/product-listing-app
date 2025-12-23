@@ -1,16 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CategoriesService } from '../categories/categories.service.js';
-import { FilterEntry } from '../common/dto/query.common.dto.js';
+import { FilterEntry, attributeTypeToFieldType, FilterConditionBuilder  } from '../common/';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 import { And, FindOperator, FindOptionsWhere, In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
-import { ProductEntity } from './entities/product.entity.js';
-import { attributeTypeToFieldType } from '../common/utils/attribute-to-filter-type.js';
-import { FilterConditionBuilder } from '../common/utils/filter-condition-builder.js';
-import { FieldType } from '../query-parser/types/query-parser-config.type.js';
-import AttributeTypes from 'src/attributes/types/attribute.types.enum.js';
-import { ProductView } from './views/product.view.js';
+import { ProductEntity, ProductView } from './';
+import { FieldType } from '../query-parser/';
+import { AttributeTypes }  from '../attributes/';
+import { CategoriesService } from '../categories/categories.service.js';
+
 
 
 @Injectable()

@@ -1,11 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateAttributeDto } from './dto/create-attribute.dto';
-import { UpdateAttributeDto } from './dto/update-attribute.dto';
+import { Injectable } from '@nestjs/common';
+import { CreateAttributeDto, UpdateAttributeDto } from './dto/';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AttributeEntity } from './entities/attribute.entity.js';
-import { EntityManager, FindManyOptions, FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
-import { AttributeEnumValueEntity } from './entities/attribute-enum-value.entity.js';
-import AttributeTypes from './types/attribute.types.enum.js';
+import { EntityManager, FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
+import { AttributeEnumValueEntity, AttributeEntity, AttributeTypes } from './';
 import { SlugResourceService } from '../common/slug-resource.service.js';
 
 @Injectable()
@@ -40,7 +37,7 @@ export class AttributesService extends SlugResourceService<AttributeEntity> {
         if (enumValues && attribute.type === AttributeTypes.ENUM)
           for (const value of enumValues)
             attribute.enumValues.push(new AttributeEnumValueEntity(value, attribute));
-        attributes.push(await this.attributeEntityRepository.save(attribute));
+        attributes.push(await entityManager.save(attribute));
       }
     });
 

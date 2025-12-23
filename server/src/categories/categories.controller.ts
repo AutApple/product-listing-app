@@ -1,20 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
-import { globalQueryParserConfig } from '../config/query-parser.config.js';
-import { QueryCommonDto } from '../common/dto/query.common.dto.js';
-import type { QueryParserResult } from '../query-parser/query-parser.js';
-import { BulkOrSingleValidationPipe } from '../common/pipes/bulk-or-single-validation.pipe.js';
-import { toOutputDto } from '../common/utils/to-output-dto.js';
-import { OutputCategoryDTO as OutputCategoryDto } from './dto/output/output-category.dto.js';
-import { CategoryEntity } from './entities/category.entity.js';
-import { AdminGuard } from '../auth/guards/admin.guard.js';
-import { ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/decorators/common-find.decorator.js';
-import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
-import { ApiCommonUpdateResource } from '../swagger/decorators/common-update.decorator.js';
-import { ApiCommonDeleteResource } from '../swagger/decorators/common-delete.decorator.js';
+import {  CreateCategoryDto, UpdateCategoryDto, OutputCategoryDto, CategoryEntity  } from './';
+import { ParsedQuery, type QueryParserResult } from '../query-parser/';
+import { globalQueryParserConfig } from '../config/';
+import { QueryCommonDto, toOutputDto, BulkOrSingleValidationPipe } from '../common/';
+import { AdminGuard } from '../auth/';
+import { ApiCommonFindManyResources, ApiCommonFindOneResource, ApiCommonCreateResource, ApiCommonUpdateResource, ApiCommonDeleteResource } from '../swagger/';
+import { CategoriesService } from './categories.service.js';
 
 @Controller('admin/categories')
 export class CategoriesController {

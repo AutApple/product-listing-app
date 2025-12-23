@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import AttributeTypes from '../../../attributes/types/attribute.types.enum.js';
+import { AttributeTypes } from '../../../attributes/types/attribute.types.enum.js';
 import { ProductView } from '../../../products/views/product.view.js';
 
 class AttributeValueDto {

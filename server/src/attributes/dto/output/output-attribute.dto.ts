@@ -1,8 +1,8 @@
-import AttributeTypes from '../../types/attribute.types.enum.js';
+import { AttributeTypes } from '../../types/attribute.types.enum.js';
 import { AttributeEntity } from '../../entities/attribute.entity.js';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class OutputAttributeDTO {
+export class OutputAttributeDto {
      @ApiProperty({
             type: 'string',
             name: 'slug',

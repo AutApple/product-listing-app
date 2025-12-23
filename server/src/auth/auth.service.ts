@@ -1,17 +1,14 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { AuthCredentialsDto } from './dto/auth-credentials.dto.js';
-import { RegisterDto } from './dto/register.dto.js';
-import { UsersService } from '../users/users.service.js';
-import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { OutputUserDto } from '../users/dto/output/output-user.dto.js';
-import { UserEntity } from '../users/entities/user.entity.js';
-import { OutputAuthDto } from './dto/output/output-auth.dto.js';
+import { ERROR_MESSAGES } from '../config/';
+import { UserEntity } from '../users/';
+import { OutputAuthDto, RegisterDto, AuthCredentialsDto } from './';
 import { JwtService } from '@nestjs/jwt';
 import { globalAuthConfiguration } from '../config/auth.config.js';
+import { UsersService } from '../users/users.service.js';
 @Injectable()
 export class AuthService {
     constructor (
-      private readonly userService: UsersService,
+      private readonly usersService: UsersService,
       private readonly jwtService: JwtService
     ) {}
 
@@ -31,7 +28,7 @@ export class AuthService {
       const {email, password} = authDto;
       let user: UserEntity;
       try { 
-        user = await this.userService.findOneByEmail(email, true);
+        user = await this.usersService.findOneByEmail(email, true);
       } catch (e: unknown) {
         if (e instanceof NotFoundException) 
            throw new UnauthorizedException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS());
@@ -47,7 +44,7 @@ export class AuthService {
 
     async makeAndUpdateRefreshToken(userId: string, email: string) {
       const tokens = await this.getTokens(userId, email);
-      await this.userService.setRefreshToken(email, tokens.refreshToken);
+      await this.usersService.setRefreshToken(email, tokens.refreshToken);
       return tokens;
     }
 
@@ -59,25 +56,25 @@ export class AuthService {
       if(registerDto.password !== registerDto.confirmPassword)
         throw new BadRequestException(ERROR_MESSAGES.AUTH_PASSWORDS_DONT_MATCH());
       const {email, name, password} = registerDto;
-      const user = await this.userService.create({email, name, password});
+      const user = await this.usersService.create({email, name, password});
       return await this.makeAndUpdateRefreshToken(user.id, user.email);
     }
     
     async logout(email: string): Promise<boolean> {
-      await this.userService.setRefreshToken(email, null);
+      await this.usersService.setRefreshToken(email, null);
       return true;
     }
     
     async refreshTokens(email: string, refreshToken: string): Promise<OutputAuthDto> {
-      const user = await this.userService.findOneByEmail(email);
+      const user = await this.usersService.findOneByEmail(email);
       if (!await user.hasValidRefreshToken(refreshToken)) 
         throw new ForbiddenException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS);
       const tokens = await this.getTokens(user.id, user.email);
-      await this.userService.setRefreshToken(email, tokens.refreshToken);
+      await this.usersService.setRefreshToken(email, tokens.refreshToken);
       return tokens;
     }
 
     async me (email: string) {
-      return await this.userService.findOneByEmail(email);
+      return await this.usersService.findOneByEmail(email);
     }
   }

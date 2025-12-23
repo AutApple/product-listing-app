@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { OutputAttributeDTO } from '../../../attributes/dto/output/output-attribute.dto.js';
+import { OutputAttributeDto } from '../../../attributes/dto/output/output-attribute.dto.js';
 import { ProductTypeEntity } from '../../entities/product-type.entity.js';
 
-export class OutputProductTypeDTO { 
+export class OutputProductTypeDto { 
     @ApiProperty({
             type: 'string',
             name: 'slug',
@@ -11,14 +11,14 @@ export class OutputProductTypeDTO {
     slug: string; 
     
     @ApiProperty({
-        type: [OutputAttributeDTO],
+        type: [OutputAttributeDto],
         name: 'attributes',
         description: 'Full attribute objects that belong to a product type'
     })
-    attributes: OutputAttributeDTO[];
+    attributes: OutputAttributeDto[];
 
     constructor (productType: ProductTypeEntity) {
         this.slug = productType.slug;
-        this.attributes = productType.attributes.map(v => new OutputAttributeDTO(v));
+        this.attributes = productType.attributes.map(v => new OutputAttributeDto(v));
     }
 }

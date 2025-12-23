@@ -1,8 +1,8 @@
-import { And, Equal, FindOperator, FindOptionsOrder, In, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual, Raw } from 'typeorm';
+import { And, FindOperator, FindOptionsOrder, Raw } from 'typeorm';
 import { FilterEntry, QueryCommonDto } from '../common/dto/query.common.dto.js';
-import { FieldType, QueryParserConfiguration } from './types/query-parser-config.type.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 import { FilterConditionBuilder } from '../common/utils/filter-condition-builder.js';
+import { FieldType, QueryParserConfiguration } from './types/query-parser-config.type.js';
 
 export interface QueryParserResult {
     selectOptions?: object;
@@ -26,10 +26,10 @@ export class QueryParser {
         const isDesc: boolean = (sort_option.charAt(0) === '-');
         const value: 'ASC' | 'DESC' = isDesc ? 'DESC' : 'ASC';
         const key: string = isDesc ? sort_option.slice(1) : sort_option;
-        
-        if(!this.config?.orderFields?.find(v => v === key))
+
+        if (!this.config?.orderFields?.find(v => v === key))
             return {};
-        if(!this.config.fields[key] || Array.isArray(this.config.fields[key]))
+        if (!this.config.fields[key] || Array.isArray(this.config.fields[key]))
             return {};
 
         return this.makeFieldObject(this.config.fields[key].path, value);
@@ -60,17 +60,17 @@ export class QueryParser {
     parseSearchString() {
         if (!this.query.search || !this.config?.searchField)
             return this;
-        
+
         const searchFieldKey = this.config.searchField;
         const fieldConfig = this.config.fields[searchFieldKey];
-        
+
         if (!fieldConfig || Array.isArray(fieldConfig)) return this;
-    
+
         const whereValue = Raw(
             (alias) => `word_similarity(${alias}, :searchTerm) >= :threshold`,
             {
                 searchTerm: this.query.search,
-                threshold: 0.3 
+                threshold: 0.3
             }
         );
 
@@ -94,15 +94,15 @@ export class QueryParser {
         for (const key of Object.keys(this.query.filters)) { // TODO: check if its a field but not specified in filterFields
             if (Array.isArray(this.config.fields[key])) // skip if specified filter is in not config filter fields or its multiple fields
                 continue;
-            
+
             const pathToField: string | undefined = this.config?.fields[key]?.path;
             const type: FieldType | undefined = this.config?.fields[key]?.type;
 
             if (!pathToField || !type) {
-                
+
                 if (this.config.enableFilterFallbackCollection)
                     this.filterFallbackCollection = deepMergeObjects(this.filterFallbackCollection, { [key]: this.query.filters[key] }) as Record<string, FilterEntry[]>;// fallback filtering logic
-                continue; 
+                continue;
             }
 
             let filterConditionBuilder = new FilterConditionBuilder();
@@ -123,10 +123,10 @@ export class QueryParser {
         if (!this.query.include || !this.config?.includeFields)
             return this;
         for (const includeOption of this.query.include) {
-            if(!this.config.fields[includeOption])
+            if (!this.config.fields[includeOption])
                 continue;
             let selectOption = {};
-            
+
             if (!Array.isArray(this.config.fields[includeOption]))
                 selectOption = this.makeFieldObject(this.config.fields[includeOption].path, true);
             else
@@ -159,7 +159,7 @@ export class QueryParser {
         if (Object.keys(this.paginationOptions).length > 0) Object.assign(result, { paginationOptions: this.paginationOptions });
         if (Object.keys(this.filterOptions).length > 0) Object.assign(result, { filterOptions: this.filterOptions });
         if (Object.keys(this.filterFallbackCollection).length > 0) Object.assign(result, { filterFallbackCollection: this.filterFallbackCollection });
- 
+
         return result;
     }
 }

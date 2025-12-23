@@ -30,12 +30,12 @@ export function ApiCommonQueryManyResources(resourceName: string) {
             description: 'Comma-separated list of relations to include',
             example: ['attributes', 'images'],
         }),
-        ApiQuery({
-            name: 'filter',
-            type: String,
-            required: false,
-            description: 'Filters in the form filter[property]=value1,value2,...',
-            example: { color: ['red','blue'], size: ['M'] },
-        })
+        // ApiQuery({
+        //     name: 'filter',
+        //     type: String,
+        //     required: false,
+        //     description: 'Filters in the form filter[property]=value1,value2,...',
+        //     example: { color: ['red','blue'], size: ['M'] },
+        // })
     );
 }

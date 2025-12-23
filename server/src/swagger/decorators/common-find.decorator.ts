@@ -22,10 +22,27 @@ export function ApiCommonFindOneResource<ODto>(
 export function ApiCommonFindManyResources<ODto>(
     resourceName: string, 
     outputDtoClass: new (... args: any[]) => ODto, 
+    showFilteringInfo: boolean = false
 ) {
     return applyDecorators(
       ApiTags(`${capitalizeString(resourceName)} / Read`),
-      ApiOperation({ summary: `Retrieve many of ${resourceName} objects` }),
+      ApiOperation({ 
+        summary: `Retrieve many of ${resourceName} objects`,
+        description: showFilteringInfo ? `
+                                            Filtering system
+
+                                            This endpoint supports advanced filtering via query parameters.
+        
+                                            - Filters are combined using AND (filter_gt[weight]=20&filter[hasNFC]=true)
+                                            - Multiple values separated via coma (filter[color]=red,black,white)
+
+                                            Examples:
+                                              
+                                              ?filter_gte[price]=10&filter_lte[price]=100 
+                                              ?filter[category]=books,electronics
+                                              ?filter[color]=red
+                                               ` : '' 
+}),
       ApiCommonQueryManyResources(resourceName),
       ApiOkResponse({ type: [outputDtoClass], description: `Return many of ${resourceName} object` })
     );

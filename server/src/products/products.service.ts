@@ -1,24 +1,15 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto, UpdateProductDto, ProductEntity, ProductImageEntity, ProductAttributeValueEntity, ProductView } from './';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductEntity } from './entities/product.entity.js';
 import { EntityManager, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
-import { ProductImageEntity } from './entities/product-image.entity.js';
+import { ProductTypeEntity } from '../product-types/';
 import { ProductTypesService } from '../product-types/product-types.service.js';
-import AttributeTypes from '../attributes/types/attribute.types.enum.js';
-import { ProductAttributeValueEntity } from './entities/product-attribute-value.entity.js';
-import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
+import { AttributeTypes, AttributeEntity } from '../attributes/';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { FilterEntry } from '../common/dto/query.common.dto.js';
-import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
-import { ProductTypeEntity } from '../product-types/entities/product-type.entity.js';
-import { CategoryEntity } from '../categories/entities/category.entity.js';
-import { CategoriesService } from '../categories/categories.service.js';
+import { CategoryEntity } from '../categories/';
 import { ProductsFilterService } from './products-filter.service.js';
-import { SlugResourceService } from '../common/slug-resource.service.js';
-import { ProductView } from './views/product.view.js';
-
+import { SlugResourceService, deepMergeObjects, FilterEntry } from '../common/';
+import { CategoriesService } from '../categories/categories.service.js';
 
 @Injectable()
 export class ProductsService extends SlugResourceService<ProductView> {
@@ -161,7 +152,6 @@ export class ProductsService extends SlugResourceService<ProductView> {
     productTypeMap: Map<string, ProductTypeEntity>
   ) {
     const products: ProductEntity[] = [];
-
     await this.productRepository.manager.transaction(async (entityManager: EntityManager) => {
       for (const dto of dtos) {
         const { attributes, imageUrls, productTypeSlug, categorySlug, ...productData } = dto;
@@ -202,7 +192,6 @@ export class ProductsService extends SlugResourceService<ProductView> {
     const productTypeMap = await this.validateAndPreloadProductTypes(dtos);
     let products: ProductEntity[] = await this.createProductsWithAttributesAndImages(dtos, productTypeMap);
 
-
     return (products.length === 1) ? ProductView.generateFromEntity(products[0]) : products.map(p => ProductView.generateFromEntity(p));
   }
 
@@ -233,6 +222,7 @@ export class ProductsService extends SlugResourceService<ProductView> {
       );
       product.attributeValues = newValues;
     }
+
     await this.productRepository.save(product);
 
     if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
@@ -256,7 +246,6 @@ export class ProductsService extends SlugResourceService<ProductView> {
     filterOptions = deepMergeObjects(filterOptions, await this.productsFilterService.createCategoryFilters(fallbackFilterCollection));
     // 2. treat other fallback filters as an attribute filters
     filterOptions = deepMergeObjects(filterOptions, await this.productsFilterService.createAttributeFilters(fallbackFilterCollection));
-
     return await this.findAll(
       mergeSelectOptions,
       orderOptions,
