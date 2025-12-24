@@ -40,7 +40,7 @@ export class ProductsFilterService {
     public async createAttributeFilters(
         filterCollection: Record<string, FilterEntry[]>
     ): Promise<FindOptionsWhere<ProductView>> {
-        // TODO: rework whole filtering (common as well) logic to use qb. it's broken and producing or instead of and
+        // TODO: MAYBE rework whole filtering (common as well) logic to use qb. at least something to consider
         const qb = this.productRepository.createQueryBuilder('p');
 
         const dict = {
@@ -66,33 +66,29 @@ export class ProductsFilterService {
 
             const filters = filterCollection[slug];
 
+            // For each filter slug, value and operator construct SELECT p.id WHERE EXISTS (attribute value filtered with specified conditions) AND WHERE EXISTS(...) ...
             qb.andWhere(qb2 => {
+                // It's going to check whether each individual attribute with specified filter exist on the product using EXISTS.
                 const subQuery = qb2
                     .subQuery()
-                    .select('1')
+                    .select('1') // EXISTS doesn't care about amount or specific columns. all it checks is whether that SELECT statement retrieves at least one row. 
                     .from(ProductAttributeValueEntity, 'av')
                     .innerJoin('av.attribute', 'a')
                     .where('av.productId = p.id')
-                    .andWhere(`a.slug = :slug_${i}`);
+                    .andWhere(`a.slug = :slug_${i}`); // first WHERE on attribute value will check whether slug of an attribute matches the one in the filter 
+                // now for each filter (in case if there is multiple filters on the same slug, like filter_gt[weight] = 20 & filter_lt[weight] = 40)
+                filters.forEach((f, j) => {
+                    const op = filterConditionBuilder.buildFindOperator(f, type); // FIXME: very messy. add separate buildSQLFindOperator into the filter condition builder / consider making cleaner architecture
+                    subQuery.andWhere(`av.${field} ${this.operatorToSql(op, i, j)}`); // make filter for an attribute value
+                    qb.setParameter(`v_${i}_${j}`, op.value); 
+                });
 
-                if (filters.length === 1) {
-                    const op = filterConditionBuilder.buildFindOperator(filters[0], type);
-                    subQuery.andWhere(`av.${field} ${this.operatorToSql(op, i, 0)}`);
-                    qb.setParameter(`v_${i}_0`, op.value);
-                } else {
-                    filters.forEach((f, j) => {
-                        const op = filterConditionBuilder.buildFindOperator(f, type);
-                        subQuery.andWhere(`av.${field} ${this.operatorToSql(op, i, j)}`);
-                        qb.setParameter(`v_${i}_${j}`, op.value);
-                    });
-                }
+                qb.setParameter(`slug_${i}`, slug); // add slug to the parameters
 
-                qb.setParameter(`slug_${i}`, slug);
-
-                return `EXISTS ${subQuery.getQuery()}`;
+                return `EXISTS ${subQuery.getQuery()}`; // return EXISTS with constructed query
             });
 
-            i++;
+            i++; 
         }
 
         const ids = await qb.select('p.id').getMany();
