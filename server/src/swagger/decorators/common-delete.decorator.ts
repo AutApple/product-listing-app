@@ -1,5 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiBearerAuth, ApiExtraModels, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiExtraModels, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { capitalizeString } from '../utils/capitalizeString.js';
 
 export function ApiCommonDeleteResource<ODto>(
@@ -18,6 +18,7 @@ export function ApiCommonDeleteResource<ODto>(
         ApiOkResponse({
            schema: {description: 'Removed object', $ref: getSchemaPath(outputDto)}
         }),
+        ApiBadRequestResponse({description: 'Bad Request: Can\'t remove resource because some other resources are referencing it'}),
         adminOnly? ApiForbiddenResponse({ description: 'Forbidden: Admins only route' }) : () => {},
         ApiNotFoundResponse({description: `No ${resourceName} with specified slug found`})
     );

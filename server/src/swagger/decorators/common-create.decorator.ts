@@ -1,12 +1,13 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiExtraModels, ApiForbiddenResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiExtraModels, ApiForbiddenResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { capitalizeString } from '../utils/capitalizeString.js';
 
 export function ApiCommonCreateResource<BDto, ODto>(
     resourceName: string,
     bodyDto: new (...args: any[]) => BDto,
     outputDto: new (...args: any[]) => ODto,
-    adminOnly: boolean = true
+    adminOnly: boolean = true,
+    canConflict: boolean = true
 ) {
     return applyDecorators(
         ApiTags(`${capitalizeString(resourceName)} / Write`),
@@ -31,6 +32,8 @@ export function ApiCommonCreateResource<BDto, ODto>(
                 ]
             }
         }),
-        adminOnly? ApiForbiddenResponse({ description: 'Forbidden: Admins only route' }) : () => {}
+        ApiBadRequestResponse({description: `Bad Request: ${capitalizeString(resourceName)} missing required fields`}),
+        adminOnly? ApiForbiddenResponse({ description: 'Forbidden: Admin-only route' }) : () => {},
+        canConflict? ApiConflictResponse({ description: `Conflict: ${capitalizeString(resourceName)} with specified slug already exists` }) : () => {}
     );
 }

@@ -1,8 +1,8 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-import { RegisterDto, AccessTokenGuard, RefreshTokenGuard, AuthCredentialsDto } from './';
+import { RegisterDto, AccessTokenGuard, RefreshTokenGuard, AuthCredentialsDto, OutputAuthDto } from './';
 import { User } from './decorators/user.decorator.js';
 import { OutputUserDto } from '../users/dto/output/output-user.dto.js';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ApiAuthHeader } from '../swagger/decorators/auth-header.decorator.js';
 import { AuthService } from './auth.service.js';
 
@@ -14,11 +14,15 @@ export class AuthController {
   @ApiOperation({
     summary: 'Provide auth credentials and get access and refresh tokens'
   })
+  @ApiOkResponse({type: OutputAuthDto, description: 'Access and refresh tokens'})
+  @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid credentials' })
   @Post('login')
   async login(@Body() loginDto: AuthCredentialsDto) {
     return await this.authService.login(loginDto);
   }
-
+  @ApiCreatedResponse({type: OutputAuthDto, description: 'Access and refresh tokens'})
+  @ApiBadRequestResponse({ description: 'Bad Request: required fields missing' })
+  @ApiConflictResponse({ description: 'Conflict: User with specified email already exists '})
   @ApiOperation({
     summary: 'Register a new account'
   })
@@ -33,16 +37,21 @@ export class AuthController {
   })
   @ApiAuthHeader(true)
   @ApiTags('Auth')
+  @ApiOkResponse({type: OutputAuthDto, description: 'Access and refresh tokens'})
+  @ApiUnauthorizedResponse({ description: 'Unauthorized: no valid refresh token provided' })
   @UseGuards(RefreshTokenGuard)
   @Post ('refresh')
   async refresh(@User('email') email: string, @User('refreshToken') refreshToken: string) {
     return await this.authService.refreshTokens(email, refreshToken);
   }
 
+  
   @ApiTags('Auth')
   @ApiOperation({
     summary: 'Delete refresh token from user associated with access token'
   })
+  @ApiOkResponse({type: 'boolean', description: 'Always returns true on successfull logout'})
+  @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
   @ApiAuthHeader()
   @UseGuards(AccessTokenGuard)
   @Post('logout') 
@@ -54,6 +63,8 @@ export class AuthController {
   @ApiOperation({
     summary: 'Get user object associated with access token in a header'
   })
+  @ApiOkResponse({type: OutputUserDto, description: 'User object associated with provided credentials'})
+  @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
   @ApiAuthHeader()
   @UseGuards(AccessTokenGuard)
   @Post('me') 

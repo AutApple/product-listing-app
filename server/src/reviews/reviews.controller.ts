@@ -20,7 +20,7 @@ export class ReviewsController {
     return toOutputDto(e, OutputReviewDto);
   }
 
-  @ApiCommonCreateResource('review', CreateReviewDto, OutputReviewDto, false)
+  @ApiCommonCreateResource('review', CreateReviewDto, OutputReviewDto, false, false)
   @ApiAuthHeader()
   @UseGuards(AccessTokenGuard)
   @Post()
