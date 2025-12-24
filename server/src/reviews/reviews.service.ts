@@ -43,7 +43,7 @@ export class ReviewsService extends IdResourceService<ReviewView>{
     
     const review = await this.findOneById(id);
     if (email !== review.userEmail)
-      throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN);
+      throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN());
     const { text, rating } = updateReviewDto;
     let updateObject = {};
     if (text) deepMergeObjects(updateObject, {text});
@@ -83,7 +83,7 @@ export class ReviewsService extends IdResourceService<ReviewView>{
     }
     const user = await this.usersService.findOneByEmail(email);
     if (!user.isAdmin)
-        throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN);
+        throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN());
     await this.reviewRepository.delete({id: review.id});
     return review;
   }

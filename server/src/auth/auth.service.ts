@@ -37,7 +37,7 @@ export class AuthService {
       }
       
       if (!await user.matchesPassword(password))
-        throw new UnauthorizedException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS);
+        throw new UnauthorizedException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS());
       
       return user;
     }
@@ -68,7 +68,7 @@ export class AuthService {
     async refreshTokens(email: string, refreshToken: string): Promise<OutputAuthDto> {
       const user = await this.usersService.findOneByEmail(email);
       if (!await user.hasValidRefreshToken(refreshToken)) 
-        throw new ForbiddenException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS);
+        throw new ForbiddenException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS());
       const tokens = await this.getTokens(user.id, user.email);
       await this.usersService.setRefreshToken(email, tokens.refreshToken);
       return tokens;

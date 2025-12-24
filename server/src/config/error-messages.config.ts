@@ -21,9 +21,10 @@ export const ERROR_MESSAGES = {
    FILTER_WRONG_SIGNATURE: (key: string) => `Wrong signature of a filter of ${key}`,
    
    // authentication messages
-   AUTH_PASSWORDS_DONT_MATCH: () => `Coniform password and password do not match`,
-   AUTH_INVALID_CREDENTIALS: () => `Invalid credentials`,
-   AUTH_FORBIDDEN: () => `Forbidden`,
-
-   UNEXPECTED: (action: string) => {console.error(`Unexpected error occured while ${action}.`); return `Unexpected internal server error`}
+   AUTH_PASSWORDS_DONT_MATCH: () => `Coniform password and password do not match.`,
+   AUTH_INVALID_CREDENTIALS: () => `Invalid credentials.`,
+   AUTH_FORBIDDEN: () => `Forbidden.`,
+   AUTH_REQUIRED: () => `Authorization required.`,
+   AUTH_REFRESH_TOKEN_REQUIRED: () => `Provide refresh token in the header`,
+   UNEXPECTED: (action: string) => {console.error(`Unexpected error occured while ${action}.`); return `Unexpected internal server error.`}
 }

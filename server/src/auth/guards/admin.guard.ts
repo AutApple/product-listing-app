@@ -11,13 +11,13 @@ export class AdminGuard implements CanActivate {
     const payload = context.switchToHttp().getRequest<{ user?: JwtPayload }>().user;
 
     if (!payload)
-      throw new ForbiddenException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS);
+      throw new ForbiddenException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS());
     
 
     const user = await this.usersService.findOneByEmail(payload.email);
 
     if (!user.isAdmin)
-      throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN);
+      throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN());
     
 
     return true;
