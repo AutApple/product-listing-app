@@ -2,8 +2,10 @@ export const ERROR_MESSAGES = {
    //database messages
    DB_ERROR_GENERAL: () => 'Database query failed.',
    
-   DB_UNIQUE_CONSTRAINT_VIOLATION: (field: string = '') => `Field ${field} should be unique!`,
-   DB_FOREIGN_KEY_VIOLATION: (entity: string = 'something') => `Cannot delete the resource because it\'s still being referenced by ${entity}.`,
+   DB_UNIQUE_CONSTRAINT_VIOLATION: () => `Conflict on trying to add a new resource.`,
+   DB_FOREIGN_KEY_VIOLATION: () => `Cannot delete: related resources exist.`,
+   DB_NOT_NULL_VIOLATION: () => `Missing required field.`,
+   DB_STRING_DATA_TRUNCATION: () => `Value is too long.`,
 
    // general resource messages
    RESOURCE_NOT_FOUND: (resource: string, value: string, valueIdentity: string = 'slug') => `Could not find ${resource} with ${valueIdentity} "${value}".`,
@@ -21,7 +23,6 @@ export const ERROR_MESSAGES = {
    // authentication messages
    AUTH_PASSWORDS_DONT_MATCH: () => `Coniform password and password do not match`,
    AUTH_INVALID_CREDENTIALS: () => `Invalid credentials`,
-   AUTH_NO_USER: () => `No user provided in request`,
    AUTH_FORBIDDEN: () => `Forbidden`,
 
    UNEXPECTED: (action: string) => {console.error(`Unexpected error occured while ${action}.`); return `Unexpected internal server error`}

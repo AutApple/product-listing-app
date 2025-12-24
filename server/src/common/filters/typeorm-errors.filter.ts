@@ -9,36 +9,59 @@ import { ERROR_MESSAGES } from '../../config/error-messages.config.js';
 
 @Catch(QueryFailedError)
 export class TypeORMErrorFilter implements ExceptionFilter {
-    catch(exception: QueryFailedError, host: ArgumentsHost){
-
-        
+    catch(exception: QueryFailedError, host: ArgumentsHost) {
         const response: Response = host.switchToHttp().getResponse<Response>();
-        
-        
+
         const driverError = exception.driverError as DatabaseError | undefined;
-        
+
         const fallback = () =>
             response.status(500).json({
                 message: ERROR_MESSAGES.DB_ERROR_GENERAL,
                 detail: driverError?.detail
             });
-        
-        
-        if(!driverError) // Fallback for driverError undefined or not a PG-style error
+
+
+        if (!driverError) // Fallback for driverError undefined or not a PG-style error
             return fallback();
 
-        switch(driverError.code) {
+        switch (driverError.code) {
             case PostgresErrorCodes.UniqueViolation:
+                // HTTP 409 Conflict: resource already exists
                 return response.status(409).json({
-                    message: ERROR_MESSAGES.DB_UNIQUE_CONSTRAINT_VIOLATION(driverError.where),
-                    detail: driverError.detail
+                    message: ERROR_MESSAGES.DB_UNIQUE_CONSTRAINT_VIOLATION(), // no internal value
                 });
-            case PostgresErrorCodes.ForeignKeyViolation: 
-                return response.status(409).json({
-                    message: ERROR_MESSAGES.DB_FOREIGN_KEY_VIOLATION(driverError.table),
-                })
+
+            case PostgresErrorCodes.ForeignKeyViolation:
+                // HTTP 400 Bad Request: invalid reference
+                return response.status(400).json({
+                    message: ERROR_MESSAGES.DB_FOREIGN_KEY_VIOLATION(),
+                });
+
+            case PostgresErrorCodes.NotNullViolation:
+                // HTTP 400 Bad Request: missing required field
+                return response.status(400).json({
+                    message: ERROR_MESSAGES.DB_NOT_NULL_VIOLATION(),
+                });
+
+            case PostgresErrorCodes.CheckViolation:
+                // HTTP 400 Bad Request: invalid value
+                return response.status(400).json({
+                    message: ERROR_MESSAGES.DB_ERROR_GENERAL(),
+                });
+
+            case PostgresErrorCodes.StringDataRightTruncation:
+                // HTTP 400 Bad Request: value too long
+                return response.status(400).json({
+                    message: ERROR_MESSAGES.DB_STRING_DATA_TRUNCATION(),
+                });
+
+            default:
+                // HTTP 500 Internal Server Error: generic fallback
+                return response.status(500).json({
+                    message: ERROR_MESSAGES.UNEXPECTED(`sql problem ${driverError.detail}`), // detail is only exposed in the console (logging from ERROR_MESSAGES.UNEXPECTED)
+                });
         }
-        
+
         return fallback();
     }
 }
