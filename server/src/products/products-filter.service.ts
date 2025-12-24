@@ -66,7 +66,7 @@ export class ProductsFilterService {
 
             const filters = filterCollection[slug];
 
-            // For each filter slug, value and operator construct SELECT p.id WHERE EXISTS (attribute value filtered with specified conditions) AND WHERE EXISTS(...) ...
+            // For each filter slug, value and operator construct SELECT p.id WHERE EXISTS (1st attribute value matching corresponding filter conditions) AND WHERE EXISTS(2nd attr val..) ...
             qb.andWhere(qb2 => {
                 // It's going to check whether each individual attribute with specified filter exist on the product using EXISTS.
                 const subQuery = qb2
