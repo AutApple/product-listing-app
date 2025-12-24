@@ -6,7 +6,7 @@ import { QueryParserConfiguration } from '../types/query-parser-config.type.js';
 
 
 // This decorator gets raw query and then parses it into the format that is feasable for services (various TypeORM options)
-export const ParsedQuery = createParamDecorator((data: {config: QueryParserConfiguration, dto: Type<any>}, ctx: ExecutionContext) => {
+export const ParsedQuery = createParamDecorator((data: { config: QueryParserConfiguration, dto: Type<any>; }, ctx: ExecutionContext) => {
     const { config, dto } = data;
     const request = ctx.switchToHttp().getRequest();
     const rawQuery = request.query;
@@ -17,14 +17,14 @@ export const ParsedQuery = createParamDecorator((data: {config: QueryParserConfi
         exposeUnsetFields: false
     });
     //2. validate - TODO
-    
+
     //3. parsing logic
     const parsedQuery = new QueryParser(transformedQuery, config).parseInclude()
-                                                                 .parsePagination()
-                                                                 .parseSort()
-                                                                 .parseFilters()
-                                                                 .parseSearchString()
-                                                                 .build();
+        .parsePagination()
+        .parseSort()
+        .parseFilters()
+        .parseSearchString()
+        .build();
+    console.log(parsedQuery);
     return parsedQuery;
-
 });

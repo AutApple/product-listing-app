@@ -18,6 +18,7 @@ export class FilterConditionBuilder {
                     return res[vL];
                 return undefined;
             }
+        
             const conversion = {
                 string: (v: string) => v,
                 number: (v: string) => convertToNumber(v),
@@ -27,6 +28,9 @@ export class FilterConditionBuilder {
             return result;
     }
     
+    /**
+     * @description Builds TypeORM find operator (e.g. Equal, LessThan, MoreThan ...) for a value that is being held within query FilterEntry.
+     */
      public buildFindOperator(obj: FilterEntry, type: FieldType): FindOperator<unknown>{
             type OperatorFunction = (value: any) => FindOperator<unknown>;
             const ops: Record<string, OperatorFunction>  = {
