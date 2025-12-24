@@ -3,10 +3,9 @@ import { FilterEntry, attributeTypeToFieldType, FilterConditionBuilder  } from '
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 import { And, FindOperator, FindOptionsWhere, In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AttributeEntity } from '../attributes/entities/attribute.entity.js';
 import { ProductEntity, ProductView } from './';
 import { FieldType } from '../query-parser/';
-import { AttributeTypes }  from '../attributes/';
+import { AttributeTypes, AttributeEntity }  from '../attributes/';
 import { CategoriesService } from '../categories/categories.service.js';
 
 

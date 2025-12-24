@@ -1,16 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
-import { ReviewEntity } from './entities/review.entity.js';
-import { IdResourceService } from '../common/id-resource.service.js';
+import { CreateReviewDto, UpdateReviewDto, ReviewEntity, ReviewImageEntity, ReviewView } from './';
+import { IdResourceService, deepMergeObjects } from '../common/';
 import { FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductsService } from '../products/products.service.js';
 import { UsersService } from '../users/users.service.js';
-import { ReviewImageEntity } from './entities/review-image.entity.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { ReviewView } from './views/review.view.js';
-import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 
 @Injectable()
 export class ReviewsService extends IdResourceService<ReviewView>{

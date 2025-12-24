@@ -1,9 +1,10 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-import { RegisterDto, AccessTokenGuard, RefreshTokenGuard, AuthCredentialsDto, AuthService } from './';
+import { RegisterDto, AccessTokenGuard, RefreshTokenGuard, AuthCredentialsDto } from './';
 import { User } from './decorators/user.decorator.js';
 import { OutputUserDto } from '../users/dto/output/output-user.dto.js';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiAuthHeader } from '../swagger/decorators/auth-header.decorator.js';
+import { AuthService } from './auth.service.js';
 
 @Controller('auth')
 export class AuthController {

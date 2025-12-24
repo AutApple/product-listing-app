@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WishlistEntity } from './entities/wishlist.entity.js';
 import { Repository } from 'typeorm';
-import { UsersService } from '../users/users.service.js';
-import { ModifyWishlistDto } from './dto/modify-wishlist.dto.js';
+import { ModifyWishlistDto, WishlistItemEntity, WishlistEntity } from './';
 import { ProductsService } from '../products/products.service.js';
 import { ProductEntity } from '../products/entities/product.entity.js';
-import { WishlistItemEntity } from './entities/wishlist-item.entity.js';
 
 @Injectable()
 export class CommonWishlistService {

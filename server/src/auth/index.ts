@@ -1,5 +1,3 @@
-export * from './auth.service.js'
-
 export * from './guards/access-token.guard.js'
 export * from './guards/admin.guard.js'
 export * from './guards/optional.guard.js'

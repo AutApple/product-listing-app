@@ -1,13 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WishlistEntity } from './entities/wishlist.entity.js';
 import { Repository } from 'typeorm';
-import { ModifyWishlistDto } from './dto/modify-wishlist.dto.js';
+import { ModifyWishlistDto, WishlistEntity } from './';
 import { CommonWishlistService } from './common-wishlist.service.js';
 import { v7 as uuidv7 } from 'uuid';
-import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { ERROR_MESSAGES, globalAuthConfiguration } from '../config/';
 import { addDays } from 'date-fns';
-import { globalAuthConfiguration } from '../config/auth.config.js';
 
 @Injectable()
 export class GuestWishlistService {

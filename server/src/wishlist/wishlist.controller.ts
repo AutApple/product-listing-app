@@ -1,12 +1,8 @@
-import { Controller, Get, Post, Body, Session, UseGuards, Patch } from '@nestjs/common';
-import { User } from '../auth/decorators/user.decorator.js';
-import { WishlistEntity } from './entities/wishlist.entity.js';
-import { toOutputDto } from '../common/utils/to-output-dto.js';
-import { OutputWishlistDto } from './dto/output/output-wishlist.dto.js';
-import { ModifyWishlistDto } from './dto/modify-wishlist.dto.js';
+import { Controller, Get, Body, Session, UseGuards, Patch } from '@nestjs/common';
+import { User, JwtPayload, OptionalGuard } from '../auth/';
+import { toOutputDto } from '../common/';
+import { OutputWishlistDto, ModifyWishlistDto, WishlistEntity } from './';
 import { WishlistOrchestratorService } from './wishlist-orchestrator.service.js';
-import { JwtPayload } from '../auth/types/jwt-payload.type.js';
-import { OptionalGuard } from '../auth/guards/optional.guard.js';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('wishlist')

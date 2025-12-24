@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from '../users/users.service.js';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ReviewVoteEntity, VoteType } from './entities/review-vote.entity.js';
+import { ReviewVoteEntity, VoteType, ReviewEntity } from './';
 import { Repository } from 'typeorm';
-import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { ReviewEntity } from './entities/review.entity.js';
+import { ERROR_MESSAGES } from '../config/';
 
 @Injectable()
 export class ReviewsVoteService {

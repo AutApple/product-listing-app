@@ -1,10 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WishlistEntity } from './entities/wishlist.entity.js';
+import { WishlistEntity, ModifyWishlistDto, WishlistItemEntity } from './';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service.js';
-import { ModifyWishlistDto } from './dto/modify-wishlist.dto.js';
-import { WishlistItemEntity } from './entities/wishlist-item.entity.js';
 import { CommonWishlistService } from './common-wishlist.service.js';
 import { addDays } from 'date-fns';
 

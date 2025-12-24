@@ -1,25 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
-import { AccessTokenGuard } from '../auth/guards/access-token.guard.js';
-import { User } from '../auth/decorators/user.decorator.js';
-import { ReviewEntity } from './entities/review.entity.js';
-import { toOutputDto } from '../common/utils/to-output-dto.js';
-import { OutputReviewDto } from './dto/output/output-review.dto.js';
+import { User, AccessTokenGuard } from '../auth/';
+import { toOutputDto, QueryCommonDto } from '../common/';
+import { OutputReviewDto, VoteReviewDto, ReviewView, CreateReviewDto, UpdateReviewDto } from './';
 import { ReviewsVoteService } from './reviews-vote.service.js';
-import { VoteReviewDto } from './dto/vote-review.dto.js';
-import { ReviewView } from './views/review.view.js';
 import { globalQueryParserConfig } from '../config/query-parser.config.js';
-import { ParsedQuery } from '../query-parser/decorators/parsed-query.transformer.js';
-import { QueryCommonDto } from '../common/dto/query.common.dto.js';
-import type { QueryParserResult } from '../query-parser/query-parser.js';
+import { ParsedQuery, type QueryParserResult } from '../query-parser/';
 import { ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/decorators/common-find.decorator.js';
-import { ApiCommonCreateResource } from '../swagger/decorators/common-create.decorator.js';
-import { ApiAuthHeader } from '../swagger/decorators/auth-header.decorator.js';
-import { ApiCommonUpdateResource } from '../swagger/decorators/common-update.decorator.js';
-import { ApiCommonDeleteResource } from '../swagger/decorators/common-delete.decorator.js';
+import { ApiCommonFindManyResources, ApiCommonFindOneResource, ApiAuthHeader, ApiCommonCreateResource, ApiCommonDeleteResource, ApiCommonUpdateResource } from '../swagger/';
 
 @Controller('reviews')
 export class ReviewsController {

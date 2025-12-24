@@ -3,8 +3,7 @@ import { AuthWishlistService } from './auth-wishlist.service.js';
 import { GuestWishlistService } from './guest-wishlist.service.js';
 import { JwtPayload } from '../auth/types/jwt-payload.type.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { WishlistEntity } from './entities/wishlist.entity.js';
-import { ModifyWishlistDto } from './dto/modify-wishlist.dto.js';
+import { WishlistEntity, ModifyWishlistDto } from './';
 
 @Injectable()
 export class WishlistOrchestratorService {
