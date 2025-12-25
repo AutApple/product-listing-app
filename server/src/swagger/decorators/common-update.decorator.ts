@@ -1,12 +1,13 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiExtraModels, ApiForbiddenResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiExtraModels, ApiForbiddenResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { capitalizeString } from '../utils/capitalizeString.js';
 
 export function ApiCommonUpdateResource<BDto, ODto>(
     resourceName: string,
     bodyDto: new (...args: any[]) => BDto,
     outputDto: new (...args: any[]) => ODto,
-    adminOnly: boolean = true
+    adminOnly: boolean = true,
+    canConflict: boolean = true
 ) {
     return applyDecorators(
         ApiTags(`${capitalizeString(resourceName)} / Write`),
@@ -21,6 +22,8 @@ export function ApiCommonUpdateResource<BDto, ODto>(
         ApiCreatedResponse({
             schema: { $ref: getSchemaPath(outputDto), description: `Updated ${resourceName} object`, }
         }),
-        adminOnly? ApiForbiddenResponse({ description: 'Forbidden: Admins only route' }) : () => {}
+        
+        adminOnly? ApiForbiddenResponse({ description: 'Forbidden: Admins only route' }) : () => {},
+        canConflict? ApiConflictResponse({ description: `Conflict: ${capitalizeString(resourceName)} with specified slug already exists` }) : () => {}
     );
 }
