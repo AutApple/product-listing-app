@@ -45,7 +45,9 @@ const globalTitleLength = {
     maxTitleLength: 1000
 }
 
-const defaultValidationConfig: ValidationConfig = {
+
+
+export const defaultValidationConfig: ValidationConfig = {
     product: {
         ...globalTitleLength,
         ...globalSlugLength,
@@ -70,5 +72,3 @@ const defaultValidationConfig: ValidationConfig = {
         ...globalTitleLength
     }
 }
-
-export default defaultValidationConfig; 

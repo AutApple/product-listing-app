@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
-import defaultValidationConfig from '../../config/validation.config.js';
+import { defaultValidationConfig } from '../../config/validation.config.js';
 import { ProductEntity } from '../../products/entities/product.entity.js';
 @Entity({
     name: 'categories'

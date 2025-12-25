@@ -1,4 +1,4 @@
-import defaultValidationConfig from '../../config/validation.config.js';
+import { defaultValidationConfig } from '../../config/validation.config.js';
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { ProductEntity } from '../../products/entities/product.entity.js';

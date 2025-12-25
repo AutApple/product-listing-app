@@ -1,5 +1,5 @@
 import { IsArray, IsEnum, IsNotEmpty, IsString, Length, ValidateIf } from 'class-validator';
-import defaultValidationConfig from '../../config/validation.config.js';
+import { defaultValidationConfig } from '../../config/validation.config.js';
 import { AttributeTypes } from '../types/attribute.types.enum.js';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 

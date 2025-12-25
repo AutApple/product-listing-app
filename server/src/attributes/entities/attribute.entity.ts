@@ -1,5 +1,5 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
-import defaultValidationConfig from '../../config/validation.config.js';
+import { defaultValidationConfig } from '../../config/validation.config.js';
 import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
 import { AttributeTypes } from '../types/attribute.types.enum.js';
 import { AttributeEnumValueEntity } from './attribute-enum-value.entity.js';

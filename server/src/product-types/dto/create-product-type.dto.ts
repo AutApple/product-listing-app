@@ -1,5 +1,5 @@
 import { ArrayNotEmpty, IsArray, IsNotEmpty, IsString, Length } from 'class-validator';
-import defaultValidationConfig from '../../config/validation.config.js';
+import { defaultValidationConfig } from '../../config/validation.config.js';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductTypeDto {
