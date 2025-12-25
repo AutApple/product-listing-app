@@ -11,7 +11,6 @@ import { CategoriesService } from '../categories/categories.service.js';
 
 
 @Injectable()
-
 export class ProductsFilterService {
     constructor(
         private readonly categoriesService: CategoriesService,
@@ -40,7 +39,6 @@ export class ProductsFilterService {
     public async createAttributeFilters(
         filterCollection: Record<string, FilterEntry[]>
     ): Promise<FindOptionsWhere<ProductView>> {
-        // TODO: MAYBE rework whole filtering (common as well) logic to use qb. at least something to consider
         const qb = this.productRepository.createQueryBuilder('p');
 
         const dict = {
