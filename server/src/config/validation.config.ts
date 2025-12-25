@@ -72,3 +72,16 @@ export const defaultValidationConfig: ValidationConfig = {
         ...globalTitleLength
     }
 }
+
+export const attributeReservedSlugs: string[] = [
+    'title',
+    'type',
+    'attribute',
+    'description',
+    'slug',
+    'price',
+    'created_at',
+    'updated_at',
+    'rating',
+    'productRating'
+];

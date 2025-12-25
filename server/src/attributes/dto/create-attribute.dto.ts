@@ -1,5 +1,5 @@
-import { IsArray, IsEnum, IsNotEmpty, IsString, Length, ValidateIf } from 'class-validator';
-import { defaultValidationConfig } from '../../config/validation.config.js';
+import { IsArray, IsEnum, IsNotEmpty, IsNotIn, IsString, Length, ValidateIf } from 'class-validator';
+import { defaultValidationConfig, attributeReservedSlugs } from '../../config/validation.config.js';
 import { AttributeTypes } from '../types/attribute.types.enum.js';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -12,6 +12,7 @@ export class CreateAttributeDto {
     })
     @IsString()
     @Length(defaultValidationConfig.attribute.minSlugLength, defaultValidationConfig.attribute.maxSlugLength)
+    @IsNotIn(attributeReservedSlugs)
     slug: string;
 
     @ApiProperty({
