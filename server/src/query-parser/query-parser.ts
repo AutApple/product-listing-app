@@ -99,7 +99,6 @@ export class QueryParser {
             const type: FieldType | undefined = this.config?.fields[key]?.type;
 
             if (!pathToField || !type) {
-
                 if (this.config.enableFilterFallbackCollection)
                     this.filterFallbackCollection = deepMergeObjects(this.filterFallbackCollection, { [key]: this.query.filters[key] }) as Record<string, FilterEntry[]>;// fallback filtering logic
                 continue;
@@ -115,7 +114,6 @@ export class QueryParser {
                 value = filterConditionBuilder.buildFindOperator(this.query.filters[key][0], type); //otherwise just convert this single value to findOperator
             this.filterOptions = deepMergeObjects(this.filterOptions, this.makeFieldObject(pathToField, value));
         }
-
         return this;
     }
 
