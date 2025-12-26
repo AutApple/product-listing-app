@@ -10,6 +10,7 @@ import { globalAuthConfiguration } from '../../config/auth.config.js';
 export class WishlistEntity extends AbstractEntity {
     @OneToOne(() => UserEntity, (u: UserEntity) => u.wishlist, {nullable: true})
     @JoinColumn()
+    @Index({ unique: true })
     user: UserEntity;
 
     @Column({
