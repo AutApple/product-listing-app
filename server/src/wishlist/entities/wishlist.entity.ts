@@ -1,8 +1,7 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
-import { BeforeInsert, Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity.js';
 import { WishlistItemEntity } from './wishlist-item.entity.js';
-import { globalAuthConfiguration } from '../../config/auth.config.js';
 
 @Entity({
     name: 'wishlists'

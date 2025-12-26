@@ -1,5 +1,5 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-import { RegisterDto, AccessTokenGuard, RefreshTokenGuard, AuthCredentialsDto, OutputAuthDto } from './';
+import { Controller, Post, Body, UseGuards, Patch } from '@nestjs/common';
+import { RegisterDto, AccessTokenGuard, RefreshTokenGuard, AuthCredentialsDto, OutputAuthDto, ChangePasswordDto } from './';
 import { User } from './decorators/user.decorator.js';
 import { OutputUserDto } from '../users/dto/output/output-user.dto.js';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
@@ -50,13 +50,26 @@ export class AuthController {
   @ApiOperation({
     summary: 'Delete refresh token from user associated with access token'
   })
-  @ApiOkResponse({type: 'boolean', description: 'Always returns true on successfull logout'})
+  @ApiOkResponse({type: Boolean, example: true, description: 'Always returns true on successfull logout'})
   @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
   @ApiAuthHeader()
   @UseGuards(AccessTokenGuard)
   @Post('logout') 
   async logout(@User('email') userEmail: string) {
     return await this.authService.logout(userEmail);
+  }
+
+  @ApiTags('Auth')
+  @ApiOperation({
+    summary: 'Change password'
+  })
+  @ApiOkResponse({type: Boolean, example: true, description: 'Always returns true on successfull password change'})
+  @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
+  @ApiBadRequestResponse({ description: 'Password and confirm password don\'t match' })
+  @ApiAuthHeader()
+  @Post('change-password')
+  async changePassword(@User ('email') userEmail: string, @Body() changePasswordDto: ChangePasswordDto) {
+    return await this.authService.changePassword(userEmail, changePasswordDto);
   }
 
   @ApiTags('Auth')
