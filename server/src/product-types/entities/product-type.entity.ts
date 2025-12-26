@@ -1,6 +1,6 @@
 import { defaultValidationConfig } from '../../config/validation.config.js';
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
+import { Column, Entity, Index, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { ProductEntity } from '../../products/entities/product.entity.js';
 import { AttributeEntity } from '../../attributes/entities/attribute.entity.js';
 
@@ -11,8 +11,8 @@ export class ProductTypeEntity extends AbstractEntity {
     @Column({
         type: 'varchar',
         length: defaultValidationConfig.productType.maxSlugLength,
-        unique: true
     })
+    @Index({ unique: true })
     slug: string; 
 
     @OneToMany(() => ProductEntity, (product) => product.productType)

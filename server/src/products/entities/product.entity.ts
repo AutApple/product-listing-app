@@ -1,6 +1,6 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { defaultValidationConfig } from '../../config/validation.config.js';
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany, } from 'typeorm';
+import { Column, Entity, Index, ManyToMany, ManyToOne, OneToMany, } from 'typeorm';
 import { ProductImageEntity } from './product-image.entity.js';
 import { ProductTypeEntity } from '../../product-types/entities/product-type.entity.js';
 import { ProductAttributeValueEntity } from './product-attribute-value.entity.js';
@@ -14,9 +14,9 @@ import { ReviewEntity } from '../../reviews/entities/review.entity.js';
 export class ProductEntity extends AbstractEntity {
     @Column({
         type: 'varchar',
-        length: defaultValidationConfig.product.maxSlugLength,
-        unique: true
+        length: defaultValidationConfig.product.maxSlugLength
     })
+    @Index({ unique: true })
     slug: string;
 
     @Column({

@@ -1,6 +1,6 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { defaultValidationConfig } from '../../config/validation.config.js';
-import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
+import { Column, Entity, Index, ManyToMany, OneToMany } from 'typeorm';
 import { AttributeTypes } from '../types/attribute.types.enum.js';
 import { AttributeEnumValueEntity } from './attribute-enum-value.entity.js';
 import { ProductTypeEntity } from '../../product-types/entities/product-type.entity.js';
@@ -14,8 +14,8 @@ export class AttributeEntity extends AbstractEntity{
     @Column({
         type: 'varchar',
         length: defaultValidationConfig.attribute.maxSlugLength,
-        unique: true
     })
+    @Index({ unique: true })
     slug: string;
 
     @Column({

@@ -1,5 +1,5 @@
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, Index, OneToMany, OneToOne } from 'typeorm';
 import bcrypt from 'bcrypt';
 import { WishlistEntity } from '../../wishlist/entities/wishlist.entity.js';
 import { ReviewEntity } from '../../reviews/entities/review.entity.js';
@@ -9,9 +9,8 @@ import { ReviewVoteEntity } from '../../reviews/entities/review-vote.entity.js';
     name: 'users'
 })
 export class UserEntity extends AbstractEntity{
-    @Column({
-        unique: true
-    })
+    @Column({})
+    @Index({ unique: true })
     email: string;
     
     @Column()

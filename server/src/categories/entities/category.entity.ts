@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { defaultValidationConfig } from '../../config/validation.config.js';
 import { ProductEntity } from '../../products/entities/product.entity.js';
@@ -9,8 +9,8 @@ export class CategoryEntity extends AbstractEntity {
     @Column({
         type: 'varchar',
         length: defaultValidationConfig.product.maxCategorySlugLength,
-        unique: true
     })
+    @Index({ unique: true })
     slug: string;
     
     @Column({
