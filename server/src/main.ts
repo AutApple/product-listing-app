@@ -1,6 +1,6 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe, VersioningType } from '@nestjs/common';
 import { TypeORMErrorFilter } from './common/filters/typeorm-errors.filter.js';
 import session from 'express-session';
 import { globalAuthConfiguration } from './config/auth.config.js';
@@ -31,7 +31,15 @@ async function bootstrap() {
   // TypeORM errors filter
   app.useGlobalFilters(new TypeORMErrorFilter());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  
+  // API Routes and versioning
+  app.setGlobalPrefix('api');
 
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
+  
   const config = new DocumentBuilder()
     .setTitle(defaultCommonConfig.apiTitle)
     .setDescription(defaultCommonConfig.apiDescription)
