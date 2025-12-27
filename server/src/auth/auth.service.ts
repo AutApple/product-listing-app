@@ -81,6 +81,11 @@ export class AuthService {
       this.usersService.changeCredentials(email, { password: changePasswordDto.newPassword });
     }
 
+    async changeEmail(email: string, changeEmailDto: ChangeEmailDto) {
+      await this.validateUser({ email, password: changeEmailDto.password });
+      this.usersService.changeCredentials(email, { email: changeEmailDto.newEmail });
+    }
+
     async me(email: string) {
       return await this.usersService.findOneByEmail(email);
     }

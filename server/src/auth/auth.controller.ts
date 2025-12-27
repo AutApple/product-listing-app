@@ -1,5 +1,5 @@
 import { Controller, Post, Body, UseGuards, Patch } from '@nestjs/common';
-import { RegisterDto, AccessTokenGuard, RefreshTokenGuard, AuthCredentialsDto, OutputAuthDto, ChangePasswordDto } from './';
+import { RegisterDto, AccessTokenGuard, RefreshTokenGuard, AuthCredentialsDto, OutputAuthDto, ChangePasswordDto, ChangeEmailDto } from './';
 import { User } from './decorators/user.decorator.js';
 import { OutputUserDto } from '../users/dto/output/output-user.dto.js';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
@@ -20,6 +20,7 @@ export class AuthController {
   async login(@Body() loginDto: AuthCredentialsDto) {
     return await this.authService.login(loginDto);
   }
+  
   @ApiCreatedResponse({type: OutputAuthDto, description: 'Access and refresh tokens'})
   @ApiBadRequestResponse({ description: 'Bad Request: required fields missing' })
   @ApiConflictResponse({ description: 'Conflict: User with specified email already exists '})
@@ -70,6 +71,18 @@ export class AuthController {
   @Post('change-password')
   async changePassword(@User ('email') userEmail: string, @Body() changePasswordDto: ChangePasswordDto) {
     return await this.authService.changePassword(userEmail, changePasswordDto);
+  }
+
+  @ApiTags('Auth')
+  @ApiOperation({
+    summary: 'Change email'
+  })
+  @ApiOkResponse({type: Boolean, example: true, description: 'Always returns true on successfull password change'})
+  @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
+  @ApiAuthHeader()
+  @Post('change-email')
+  async changeEmail(@User ('email') userEmail: string, @Body() changeEmailDto: ChangeEmailDto) {
+    return await this.authService.changeEmail(userEmail, changeEmailDto);
   }
 
   @ApiTags('Auth')
