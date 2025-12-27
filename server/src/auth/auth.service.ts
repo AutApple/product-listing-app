@@ -1,7 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ERROR_MESSAGES } from '../config/';
 import { UserEntity } from '../users/';
-import { OutputAuthDto, RegisterDto, AuthCredentialsDto, ChangePasswordDto } from './';
+import { OutputAuthDto, RegisterDto, AuthCredentialsDto, ChangePasswordDto, ChangeEmailDto } from './';
 import { JwtService } from '@nestjs/jwt';
 import { globalAuthConfiguration } from '../config/auth.config.js';
 import { UsersService } from '../users/users.service.js';
@@ -73,11 +73,12 @@ export class AuthService {
       await this.usersService.setRefreshToken(email, tokens.refreshToken);
       return tokens;
     }
+
     async changePassword(email: string, changePasswordDto: ChangePasswordDto) {
-      await this.validateUser({ email, password: changePasswordDto.currentPassword });
+      await this.validateUser({ email, password: changePasswordDto.password });
       if (changePasswordDto.newPassword !== changePasswordDto.confirmPassword)
         throw new BadRequestException(ERROR_MESSAGES.AUTH_PASSWORDS_DONT_MATCH());
-      this.usersService.changePassword(email,changePasswordDto.newPassword);
+      this.usersService.changeCredentials(email, { password: changePasswordDto.newPassword });
     }
 
     async me(email: string) {

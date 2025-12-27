@@ -35,21 +35,15 @@ export class UsersService {
       return await this.userRepository.save(user);
   }
 
-  async changeEmailName(email: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
+  async changeCredentials(email: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
     const user = await this.findOneByEmail(email);
     if (updateUserDto.name !== undefined) user.name = updateUserDto.name;
     if (updateUserDto.email !== undefined) user.email = updateUserDto.email;
+    if (updateUserDto.password !== undefined) user.hashedPassword = await bcrypt.hash(updateUserDto.password, globalAuthConfiguration.saltLevel);
     await this.userRepository.save(user);
     return user;
   }
 
-  async changePassword(email: string, newPassword: string): Promise<UserEntity> {
-    const user = await this.findOneByEmail(email);
-    const hashedPassword = await bcrypt.hash(newPassword, globalAuthConfiguration.saltLevel);
-    user.hashedPassword = hashedPassword;
-    this.userRepository.save(user);
-    return user;
-  } 
 
   
 

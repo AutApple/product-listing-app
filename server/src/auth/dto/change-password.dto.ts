@@ -8,7 +8,7 @@ export class ChangePasswordDto {
         type: 'string',
         description: 'Current password'
     })
-    currentPassword: string; 
+    password: string; 
     
     @ApiProperty({
         name: 'newPassword',
