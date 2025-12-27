@@ -12,12 +12,14 @@ export class UsersController {
     constructor(
         private readonly usersService: UsersService
     ) {}
-    
+
     private dto(entity: UserEntity | UserEntity[]): OutputUserDto | OutputUserDto[] {
         return toOutputDto(entity, OutputUserDto);
     }
     
-    @ApiTags('Auth')
+    //TODO: patch uesrs/me
+    
+    @ApiTags('User')
     @ApiOperation({
         summary: 'Get user object associated with access token in a header'
     })
