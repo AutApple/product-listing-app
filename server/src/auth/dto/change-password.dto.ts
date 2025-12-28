@@ -15,7 +15,7 @@ export class ChangePasswordDto {
         type: 'string',
         description: 'New password'
     })
-    @IsString() 
+    @IsString()
     newPassword: string;
     
     @ApiProperty({

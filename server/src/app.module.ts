@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ReviewsModule } from './reviews/reviews.module';
+import { BootstrapModule } from './bootstrap/bootstrap-module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -22,6 +23,7 @@ import { ReviewsModule } from './reviews/reviews.module';
       inject: [ConfigService]
     }),
     ScheduleModule.forRoot(),
+    BootstrapModule,
     ProductsModule,
     ProductTypesModule,
     AttributesModule,
