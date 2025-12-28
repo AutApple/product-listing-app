@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto, UserEntity  } from './';
+import { CreateUserDto, UpdateUserCredentialsDto, UserEntity  } from './';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ERROR_MESSAGES, globalAuthConfiguration } from '../config/';
 import bcrypt from 'bcrypt';
+import { UpdateUserInfoDto } from './dto/update-user-info.dto.js';
 
 @Injectable()
 export class UsersService {
@@ -35,17 +36,21 @@ export class UsersService {
       return await this.userRepository.save(user);
   }
 
-  async changeCredentials(email: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
+  async changeCredentials(email: string, updateUserCredentialsDto: UpdateUserCredentialsDto): Promise<UserEntity> {
     const user = await this.findOneByEmail(email);
-    if (updateUserDto.name !== undefined) user.name = updateUserDto.name;
-    if (updateUserDto.email !== undefined) user.email = updateUserDto.email;
-    if (updateUserDto.password !== undefined) user.hashedPassword = await bcrypt.hash(updateUserDto.password, globalAuthConfiguration.saltLevel);
+    if (updateUserCredentialsDto.email !== undefined) user.email = updateUserCredentialsDto.email;
+    if (updateUserCredentialsDto.password !== undefined) user.hashedPassword = await bcrypt.hash(updateUserCredentialsDto.password, globalAuthConfiguration.saltLevel);
     await this.userRepository.save(user);
     return user;
   }
 
+  async changeInfo(email: string, updateUserInfoDto: UpdateUserInfoDto): Promise<UserEntity> {
+    const user = await this.findOneByEmail(email);
+    if (updateUserInfoDto.name !== undefined) user.name = updateUserInfoDto.name;
+    await this.userRepository.save(user);
+    return user; 
+  }
 
-  
 
   async remove(email: string): Promise<UserEntity> {
     const user = await this.findOneByEmail(email);
