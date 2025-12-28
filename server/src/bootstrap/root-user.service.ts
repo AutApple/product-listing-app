@@ -2,9 +2,7 @@ import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { UserEntity } from '../users/index.js';
 import bcrypt from 'bcrypt';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { globalAuthConfiguration } from '../config/auth.config.js';
 
 @Injectable()
 export class RootUserService implements OnApplicationBootstrap {
@@ -22,7 +20,7 @@ export class RootUserService implements OnApplicationBootstrap {
 
     if (!existingRoot) {
       const password = rootPassword;
-      const hashed = await bcrypt.hash(password, 10);
+      const hashed = await bcrypt.hash(password, globalAuthConfiguration.saltLevel);
 
       const rootUser = userRepo.create({
         email: rootEmail,
