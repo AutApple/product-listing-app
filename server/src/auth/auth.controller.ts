@@ -77,6 +77,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Change email'
   })
+
   @ApiOkResponse({type: Boolean, example: true, description: 'Always returns true on successfull password change'})
   @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
   @ApiAuthHeader()
@@ -85,16 +86,4 @@ export class AuthController {
     return await this.authService.changeEmail(userEmail, changeEmailDto);
   }
 
-  @ApiTags('Auth')
-  @ApiOperation({
-    summary: 'Get user object associated with access token in a header'
-  })
-  @ApiOkResponse({type: OutputUserDto, description: 'User object associated with provided credentials'})
-  @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
-  @ApiAuthHeader()
-  @UseGuards(AccessTokenGuard)
-  @Post('me') 
-  async me(@User('email') email: string) {
-    return new OutputUserDto(await this.authService.me(email));
-  }
 }

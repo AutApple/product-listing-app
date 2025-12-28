@@ -52,6 +52,7 @@ export class AuthService {
       const user = await this.validateUser(loginDto);
       return await this.makeAndUpdateRefreshToken(user.id, user.email);
     }
+
     async register(registerDto: RegisterDto): Promise<OutputAuthDto> {
       if(registerDto.password !== registerDto.confirmPassword)
         throw new BadRequestException(ERROR_MESSAGES.AUTH_PASSWORDS_DONT_MATCH());
@@ -84,9 +85,5 @@ export class AuthService {
     async changeEmail(email: string, changeEmailDto: ChangeEmailDto) {
       await this.validateUser({ email, password: changeEmailDto.password });
       this.usersService.changeCredentials(email, { email: changeEmailDto.newEmail });
-    }
-
-    async me(email: string) {
-      return await this.usersService.findOneByEmail(email);
     }
   }
