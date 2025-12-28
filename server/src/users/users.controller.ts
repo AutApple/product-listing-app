@@ -45,4 +45,7 @@ export class UsersController {
         const data = await this.usersService.findOneByEmail(email)
         return this.dto(data);
     }
+
+    // TODO: admin-only endpoints (make/remove admin, maybe get user info)
+    
 }
