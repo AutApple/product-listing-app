@@ -14,6 +14,12 @@ dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
+  // Redirect to docs on trying to access root
+  app.getHttpAdapter().get('/', (req, res: Response) => {
+    res.redirect(301, '/api');
+  });
+
+
   // Validation pipe
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
