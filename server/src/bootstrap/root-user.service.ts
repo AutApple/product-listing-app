@@ -10,10 +10,13 @@ export class RootUserService implements OnApplicationBootstrap {
   constructor(private dataSource: DataSource, private readonly configService: ConfigService) {}
 
   async onApplicationBootstrap() {
+    if(this.configService.get<boolean>('BOOTSTRAP_CREATE_ROOT') === false)
+      return;
+
     const userRepo = this.dataSource.getRepository(UserEntity);
 
-    const rootEmail = this.configService.get<'string'>('DEFAULT_ROOT_EMAIL') || 'root@example.com';
-    const rootPassword =this.configService.get<'string'>('DEFAULT_ROOT_PASSWORD') || 'root';
+    const rootEmail = this.configService.get<string>('DEFAULT_ROOT_EMAIL') || 'root@example.com';
+    const rootPassword =this.configService.get<string>('DEFAULT_ROOT_PASSWORD') || 'root';
 
     const existingRoot = await userRepo.findOne({
       where: { email: rootEmail },
