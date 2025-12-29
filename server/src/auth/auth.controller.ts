@@ -68,6 +68,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
   @ApiBadRequestResponse({ description: 'Password and confirm password don\'t match' })
   @ApiAuthHeader()
+  @UseGuards(AccessTokenGuard)
   @Post('change-password')
   async changePassword(@User ('email') userEmail: string, @Body() changePasswordDto: ChangePasswordDto) {
     return await this.authService.changePassword(userEmail, changePasswordDto);
@@ -80,6 +81,7 @@ export class AuthController {
   @ApiOkResponse({type: Boolean, example: true, description: 'Always returns true on successfull email change'})
   @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
   @ApiAuthHeader()
+  @UseGuards(AccessTokenGuard)
   @Post('change-email')
   async changeEmail(@User ('email') userEmail: string, @Body() changeEmailDto: ChangeEmailDto) {
     return await this.authService.changeEmail(userEmail, changeEmailDto);
