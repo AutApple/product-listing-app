@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ERROR_MESSAGES } from '../../config/error-messages.config.js';
 import { UsersService } from '../../users/users.service.js';
 import { JwtPayload } from '../types/jwt-payload.type.js';
@@ -11,7 +11,7 @@ export class AdminGuard implements CanActivate {
     const payload = context.switchToHttp().getRequest<{ user?: JwtPayload }>().user;
 
     if (!payload)
-      throw new ForbiddenException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS());
+      throw new UnauthorizedException(ERROR_MESSAGES.AUTH_INVALID_CREDENTIALS());
     
 
     const user = await this.usersService.findOneByEmail(payload.email);
