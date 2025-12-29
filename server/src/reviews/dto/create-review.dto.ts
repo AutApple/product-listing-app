@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNumber, IsString, Max, Min } from 'class-validator';
+import { IsArray, IsNumber, IsString, Length, Max, Min } from 'class-validator';
+import { defaultValidationConfig } from '../../config/validation.config.js';
 
 export class CreateReviewDto {
     @ApiProperty({
@@ -27,6 +28,7 @@ export class CreateReviewDto {
         type: 'string'
     })
     @IsString()
+    @Length(defaultValidationConfig.review.minTextLength, defaultValidationConfig.review.maxTextLength)
     text: string; 
 
     @ApiProperty({

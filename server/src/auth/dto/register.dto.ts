@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString, IsStrongPassword, Length } from 'class-validator';
+import { defaultValidationConfig } from '../../config/validation.config.js';
 
 export class RegisterDto {
     @ApiProperty({
@@ -9,6 +10,7 @@ export class RegisterDto {
     })
     @IsString()
     @IsEmail()
+    @Length(defaultValidationConfig.auth.minEmailLength, defaultValidationConfig.auth.maxEmailLength)
     email: string; 
 
     @ApiProperty({
@@ -17,6 +19,7 @@ export class RegisterDto {
         description: 'Display name for a new user'
     })
     @IsString()
+    @Length(defaultValidationConfig.auth.minNameLength, defaultValidationConfig.auth.maxNameLength)
     name: string;
 
     @ApiProperty({
@@ -24,7 +27,8 @@ export class RegisterDto {
         type: 'string',
         description: 'Password for a new user'
     })
-    @IsString() 
+    @IsString()
+    @IsStrongPassword(defaultValidationConfig.auth.isStrongPasswordOptions)
     password: string;
     
     @ApiProperty({

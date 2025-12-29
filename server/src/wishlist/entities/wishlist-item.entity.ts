@@ -1,13 +1,13 @@
-import { Column, Entity, ManyToMany, ManyToOne } from 'typeorm';
-import { WishlistEntity } from './wishlist.entity.js';
+import { Column, Entity, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { ProductEntity } from '../../products/entities/product.entity.js';
+import { WishlistEntity } from './wishlist.entity.js';
 
 @Entity({
     name: 'wishlist_items'
 })
 export class WishlistItemEntity extends AbstractEntity {
-    @ManyToOne(() => WishlistEntity, w => w.items) 
+    @ManyToOne(() => WishlistEntity, w => w.items)
     wishlist: WishlistEntity;
 
     @ManyToOne(() => ProductEntity, p => p.wishlistItems)
@@ -17,5 +17,5 @@ export class WishlistItemEntity extends AbstractEntity {
         type: 'numeric',
         default: 1
     })
-    amount: number; 
+    amount: number;
 }

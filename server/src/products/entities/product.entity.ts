@@ -1,12 +1,11 @@
-import { AbstractEntity } from '../../common/entities/abstract.entity.js';
-import { defaultValidationConfig } from '../../config/validation.config.js';
-import { Column, Entity, Index, ManyToMany, ManyToOne, OneToMany, } from 'typeorm';
-import { ProductImageEntity } from './product-image.entity.js';
-import { ProductTypeEntity } from '../../product-types/entities/product-type.entity.js';
-import { ProductAttributeValueEntity } from './product-attribute-value.entity.js';
+import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 import { CategoryEntity } from '../../categories/entities/category.entity.js';
-import { WishlistItemEntity } from '../../wishlist/entities/wishlist-item.entity.js';
+import { AbstractEntity } from '../../common/entities/abstract.entity.js';
+import { ProductTypeEntity } from '../../product-types/entities/product-type.entity.js';
 import { ReviewEntity } from '../../reviews/entities/review.entity.js';
+import { WishlistItemEntity } from '../../wishlist/entities/wishlist-item.entity.js';
+import { ProductAttributeValueEntity } from './product-attribute-value.entity.js';
+import { ProductImageEntity } from './product-image.entity.js';
 
 @Entity({
     name: 'products'
@@ -14,29 +13,27 @@ import { ReviewEntity } from '../../reviews/entities/review.entity.js';
 export class ProductEntity extends AbstractEntity {
     @Column({
         type: 'varchar',
-        length: defaultValidationConfig.product.maxSlugLength
+        length: 255
     })
     @Index({ unique: true })
     slug: string;
 
     @Column({
         type: 'varchar',
-        length: defaultValidationConfig.product.maxTitleLength
+        length: 255
     })
     title: string;
 
     @Column({
         name: 'short_description',
         default: 'No description specified.',
-        type: 'varchar',
-        length: defaultValidationConfig.product.maxShortDescriptionLength
+        type: 'text'
     })
     shortDescription: string;
 
     @Column({
         default: 'No description specified.',
-        type: 'varchar',
-        length: defaultValidationConfig.product.maxDescriptionLength
+        type: 'text'
     })
     description: string;
 
@@ -57,7 +54,6 @@ export class ProductEntity extends AbstractEntity {
     @ManyToOne(() => ProductTypeEntity, (productType: ProductTypeEntity) => productType.products)
     productType: ProductTypeEntity;
 
-
     @OneToMany(() => WishlistItemEntity, w => w.product)
     wishlistItems: WishlistItemEntity[];
 
@@ -68,8 +64,6 @@ export class ProductEntity extends AbstractEntity {
     )
     attributeValues: ProductAttributeValueEntity[];
 
-
     @OneToMany(() => ReviewEntity, e => e.product, { cascade: ['insert', 'update', 'remove'] })
     reviews: ReviewEntity[];
-
 }

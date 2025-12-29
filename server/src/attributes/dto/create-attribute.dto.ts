@@ -21,6 +21,7 @@ export class CreateAttributeDto {
         description: 'Display title of an attribute'
     })
     @IsString()
+    @Length(defaultValidationConfig.attribute.minTitleLength, defaultValidationConfig.attribute.maxTitleLength)
     title: string;
 
     @ApiProperty({
@@ -38,6 +39,7 @@ export class CreateAttributeDto {
     })
     @ValidateIf((o: CreateAttributeDto) => o.type === AttributeTypes.ENUM, {message: 'Provide enum values with enumValues field'})
     @IsArray()
+    @Length(defaultValidationConfig.attribute.minEnumValueLength, defaultValidationConfig.attribute.maxEnumValueLength, { each: true })
     @IsString({ each: true })
     @IsNotEmpty({ each: true })
     enumValues?: string[];

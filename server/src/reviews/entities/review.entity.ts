@@ -35,7 +35,7 @@ export class ReviewEntity extends AbstractEntity {
     rating: number; // from 1.0 to 5.0
 
     @Column({
-        type: 'varchar'
+        type: 'text'
     })
     text: string; 
 

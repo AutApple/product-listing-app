@@ -1,5 +1,5 @@
-import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { UserEntity } from '../../users/entities/user.entity.js';
 import { WishlistItemEntity } from './wishlist-item.entity.js';
 
@@ -7,7 +7,7 @@ import { WishlistItemEntity } from './wishlist-item.entity.js';
     name: 'wishlists'
 })
 export class WishlistEntity extends AbstractEntity {
-    @OneToOne(() => UserEntity, (u: UserEntity) => u.wishlist, {nullable: true})
+    @OneToOne(() => UserEntity, (u: UserEntity) => u.wishlist, { nullable: true })
     @JoinColumn()
     @Index({ unique: true })
     user: UserEntity;
@@ -15,17 +15,18 @@ export class WishlistEntity extends AbstractEntity {
     @Column({
         nullable: true,
         type: 'varchar',
+        length: 255,
         unique: true
     })
-    anonymousId: string | null; 
+    anonymousId: string | null;
 
     @OneToMany(() => WishlistItemEntity, w => w.wishlist, {
         cascade: ['insert', 'remove', 'update'],
         nullable: true
-    }) 
+    })
     items: WishlistItemEntity[];
 
     @Index(['expires_at'])
-    @Column({ type: 'timestamptz', nullable: true, name: 'expires_at' }) 
+    @Column({ type: 'timestamptz', nullable: true, name: 'expires_at' })
     expiresAt: Date; // this column is used for cleaning up userless wishlists 
 }

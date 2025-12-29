@@ -10,7 +10,7 @@ export class AuthCredentialsDto {
     @IsString()
     @IsEmail()
     email: string;
-    
+
     @ApiProperty({
         name: 'password',
         type: 'string',
