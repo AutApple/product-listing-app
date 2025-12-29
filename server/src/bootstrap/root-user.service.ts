@@ -3,16 +3,17 @@ import { DataSource } from 'typeorm';
 import { UserEntity } from '../users/index.js';
 import bcrypt from 'bcrypt';
 import { globalAuthConfiguration } from '../config/auth.config.js';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RootUserService implements OnApplicationBootstrap {
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource, private readonly configService: ConfigService) {}
 
   async onApplicationBootstrap() {
     const userRepo = this.dataSource.getRepository(UserEntity);
 
-    const rootEmail = process.env.DEFAULT_ROOT_EMAIL || 'root@example.com';
-    const rootPassword = process.env.DEFAULT_ROOT_PASSWORD || 'root';
+    const rootEmail = this.configService.get<'string'>('DEFAULT_ROOT_EMAIL') || 'root@example.com';
+    const rootPassword =this.configService.get<'string'>('DEFAULT_ROOT_PASSWORD') || 'root';
 
     const existingRoot = await userRepo.findOne({
       where: { email: rootEmail },
