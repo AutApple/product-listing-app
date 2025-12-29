@@ -80,10 +80,12 @@ export class AuthService {
       if (changePasswordDto.newPassword !== changePasswordDto.confirmPassword)
         throw new BadRequestException(ERROR_MESSAGES.AUTH_PASSWORDS_DONT_MATCH());
       this.usersService.changeCredentials(email, { password: changePasswordDto.newPassword });
+      return true;
     }
 
     async changeEmail(email: string, changeEmailDto: ChangeEmailDto) {
       await this.validateUser({ email, password: changeEmailDto.password });
       this.usersService.changeCredentials(email, { email: changeEmailDto.newEmail });
+      return true;
     }
   }
