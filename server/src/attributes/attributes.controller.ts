@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AttributeEntity, CreateAttributeDto, UpdateAttributeDto, OutputAttributeDto } from './';
 import { toOutputDto, QueryCommonDto, BulkOrSingleValidationPipe } from '../common/';
 import { ParsedQuery, type QueryParserResult } from '../query-parser/';
@@ -6,7 +6,9 @@ import { globalQueryParserConfig } from '../config/';
 import { AdminGuard } from '../auth/guards/admin.guard.js';
 import { ApiCommonCreateResource, ApiCommonUpdateResource, ApiCommonDeleteResource, ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/';
 import { AttributesService } from './attributes.service.js';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
+@UseInterceptors(CacheInterceptor)
 @Controller('admin/attributes')
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
