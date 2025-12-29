@@ -10,7 +10,7 @@ export class OutputUserDto {
     email: string;
 
     @ApiProperty({
-        name: 'email',
+        name: 'name',
         description: 'Display name of a user',
         type: 'string'
     })
