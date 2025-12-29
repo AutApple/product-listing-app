@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getTypeOrmConfig } from './config/typeorm.config.js';
@@ -14,6 +12,9 @@ import { WishlistModule } from './wishlist/wishlist.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ReviewsModule } from './reviews/reviews.module';
 import { BootstrapModule } from './bootstrap/bootstrap-module.js';
+import { CacheModule } from '@nestjs/cache-manager'
+import { redisStore } from 'cache-manager-ioredis-yet';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -21,6 +22,17 @@ import { BootstrapModule } from './bootstrap/bootstrap-module.js';
       imports: [ConfigModule],
       useFactory: getTypeOrmConfig,
       inject: [ConfigService]
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true, 
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        host: configService.get<string>('REDIS_HOST') || 'localhost',
+        port: configService.get<number>('REDIS_PORT') || 6379,
+        ttl: configService.get<number>('REDIS_TTL_TIME') || 350
+      }),  
+      inject: [ConfigService] 
     }),
     ScheduleModule.forRoot(),
     BootstrapModule,
@@ -31,8 +43,9 @@ import { BootstrapModule } from './bootstrap/bootstrap-module.js';
     UsersModule,
     AuthModule,
     WishlistModule,
-    ReviewsModule],
-  controllers: [AppController],
-  providers: [AppService],
+    ReviewsModule
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
