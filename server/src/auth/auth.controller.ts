@@ -77,8 +77,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Change email'
   })
-
-  @ApiOkResponse({type: Boolean, example: true, description: 'Always returns true on successfull password change'})
+  @ApiOkResponse({type: Boolean, example: true, description: 'Always returns true on successfull email change'})
   @ApiUnauthorizedResponse({ description: 'Unauthorized: invalid auth credentials' })
   @ApiAuthHeader()
   @Post('change-email')
