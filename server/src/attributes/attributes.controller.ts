@@ -7,6 +7,7 @@ import { AdminGuard } from '../auth/guards/admin.guard.js';
 import { ApiCommonCreateResource, ApiCommonUpdateResource, ApiCommonDeleteResource, ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/';
 import { AttributesService } from './attributes.service.js';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { AccessTokenGuard } from '../auth/index.js';
 
 @UseInterceptors(CacheInterceptor)
 @Controller('admin/attributes')
@@ -40,7 +41,7 @@ export class AttributesController {
   }
 
   @ApiCommonCreateResource('attribute', CreateAttributeDto, OutputAttributeDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Post()
   async create(@Body(new BulkOrSingleValidationPipe(CreateAttributeDto)) createAttributeDto: CreateAttributeDto | CreateAttributeDto[]) {
     const data = await this.attributesService.create(createAttributeDto);
@@ -48,7 +49,7 @@ export class AttributesController {
   }
 
   @ApiCommonUpdateResource('attribute', CreateAttributeDto, OutputAttributeDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateAttributeDto: UpdateAttributeDto) {
     const data = await this.attributesService.update(slug, updateAttributeDto);
@@ -56,7 +57,7 @@ export class AttributesController {
   }
 
   @ApiCommonDeleteResource('attribute', OutputAttributeDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
     const data = await this.attributesService.remove(slug);

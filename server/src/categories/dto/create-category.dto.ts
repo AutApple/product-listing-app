@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {  IsNotEmpty, IsOptional, IsString, ValidateIf } from 'class-validator';
+import {  IsNotEmpty, IsOptional, IsString, Length, ValidateIf } from 'class-validator';
+import { defaultValidationConfig } from '../../config/validation.config.js';
 
 export class CreateCategoryDto {
     @ApiProperty({
@@ -7,6 +8,7 @@ export class CreateCategoryDto {
         description: 'Slug of a category'
     })
     @IsString()
+    @Length(defaultValidationConfig.category.minSlugLength, defaultValidationConfig.category.maxSlugLength)
     slug: string;
 
     @ApiProperty({
@@ -14,6 +16,7 @@ export class CreateCategoryDto {
         description: 'Title of a category'
     })
     @IsString() 
+    @Length(defaultValidationConfig.category.minTitleLength, defaultValidationConfig.category.maxTitleLength)
     title: string; 
 
     @ApiPropertyOptional({

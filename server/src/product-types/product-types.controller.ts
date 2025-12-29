@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ParsedQuery, type QueryParserResult } from '../query-parser/';
 import { globalQueryParserConfig } from '../config/';
 import { BulkOrSingleValidationPipe, toOutputDto, QueryCommonDto } from '../common/';
 import { ProductTypeEntity, OutputProductTypeDto, CreateProductTypeDto, UpdateProductTypeDto } from './';
-import { AdminGuard } from '../auth/';
+import { AccessTokenGuard, AdminGuard } from '../auth/';
 import { ApiCommonFindManyResources, ApiCommonFindOneResource, ApiCommonCreateResource,  ApiCommonUpdateResource, ApiCommonDeleteResource } from '../swagger/';
 import { ProductTypesService } from './product-types.service.js';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
+@UseInterceptors(CacheInterceptor)
 @Controller('admin/product-types')
 export class ProductTypesController {
   constructor(private readonly productTypesService: ProductTypesService) { }
@@ -40,6 +42,7 @@ export class ProductTypesController {
   }
 
   @ApiCommonCreateResource('product type', CreateProductTypeDto, OutputProductTypeDto)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Post()
   async create(@Body(new BulkOrSingleValidationPipe(CreateProductTypeDto)) createProductTypeDto: CreateProductTypeDto | CreateProductTypeDto[]) {
     const data = await this.productTypesService.create(createProductTypeDto);
@@ -47,7 +50,7 @@ export class ProductTypesController {
   }
 
   @ApiCommonUpdateResource('product type', CreateProductTypeDto, OutputProductTypeDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateProductTypeDto: UpdateProductTypeDto) {
     const data = await this.productTypesService.update(slug, updateProductTypeDto);
@@ -55,7 +58,7 @@ export class ProductTypesController {
   }
 
   @ApiCommonDeleteResource('product type', OutputProductTypeDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
     const data = await this.productTypesService.remove(slug);

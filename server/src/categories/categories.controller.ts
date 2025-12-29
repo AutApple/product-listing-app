@@ -3,10 +3,9 @@ import {  CreateCategoryDto, UpdateCategoryDto, OutputCategoryDto, CategoryEntit
 import { ParsedQuery, type QueryParserResult } from '../query-parser/';
 import { globalQueryParserConfig } from '../config/';
 import { QueryCommonDto, toOutputDto, BulkOrSingleValidationPipe } from '../common/';
-import { AdminGuard } from '../auth/';
+import { AccessTokenGuard, AdminGuard } from '../auth/';
 import { ApiCommonFindManyResources, ApiCommonFindOneResource, ApiCommonCreateResource, ApiCommonUpdateResource, ApiCommonDeleteResource } from '../swagger/';
 import { CategoriesService } from './categories.service.js';
-
 @Controller('admin/categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
@@ -36,7 +35,7 @@ export class CategoriesController {
   }
 
   @ApiCommonCreateResource('category', CreateCategoryDto, OutputCategoryDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Post()
   async create(@Body(new BulkOrSingleValidationPipe(CreateCategoryDto)) createCategoryDto: CreateCategoryDto | CreateCategoryDto[]) {
     const data = await this.categoriesService.create(createCategoryDto);
@@ -44,7 +43,7 @@ export class CategoriesController {
   }
 
   @ApiCommonUpdateResource('category', CreateCategoryDto, OutputCategoryDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     const data = await this.categoriesService.update(slug, updateCategoryDto);
@@ -52,7 +51,7 @@ export class CategoriesController {
   }
 
   @ApiCommonDeleteResource('category', OutputCategoryDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
     const data = await this.categoriesService.remove(slug);

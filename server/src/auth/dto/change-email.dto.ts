@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString, Length } from 'class-validator';
+import { defaultValidationConfig } from '../../config/validation.config.js';
 
 export class ChangeEmailDto {
     @IsString()    
@@ -17,6 +18,7 @@ export class ChangeEmailDto {
     })
     @IsString()
     @IsEmail()
+    @Length(defaultValidationConfig.auth.minEmailLength, defaultValidationConfig.auth.maxEmailLength)
     newEmail: string;
      
 }

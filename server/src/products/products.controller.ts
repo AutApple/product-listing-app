@@ -7,6 +7,7 @@ import { toOutputDto, BulkOrSingleValidationPipe, QueryCommonDto } from '../comm
 import { AdminGuard } from '../auth/guards/admin.guard.js';
 import { ApiCommonCreateResource, ApiCommonDeleteResource, ApiCommonUpdateResource, ApiCommonFindManyResources, ApiCommonFindOneResource } from '../swagger/';
 import { CacheInterceptor } from '@nestjs/cache-manager';
+import { AccessTokenGuard } from '../auth/index.js';
 
 @UseInterceptors(CacheInterceptor)
 @Controller('products')
@@ -40,7 +41,7 @@ export class ProductsController {
   }
 
   @ApiCommonCreateResource('product', CreateProductDto, OutputProductDto, true)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Post()
   async create(@Body(new BulkOrSingleValidationPipe(CreateProductDto)) createProductDto: CreateProductDto | CreateProductDto[]) {
     const data = await this.productsService.create(createProductDto);
@@ -48,7 +49,7 @@ export class ProductsController {
   }
 
   @ApiCommonUpdateResource('product', CreateProductDto, OutputProductDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Patch(':slug')
   async update(@Param('slug') slug: string, @Body() updateProductDto: UpdateProductDto) {
     const data = await this.productsService.update(slug, updateProductDto);
@@ -56,7 +57,7 @@ export class ProductsController {
   }
 
   @ApiCommonDeleteResource('product', OutputProductDto)
-  @UseGuards(AdminGuard)
+  @UseGuards(AccessTokenGuard, AdminGuard)
   @Delete(':slug')
   async remove(@Param('slug') slug: string) {
     const data = await this.productsService.remove(slug);

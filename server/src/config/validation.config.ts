@@ -85,8 +85,8 @@ export const defaultValidationConfig: ValidationConfig = {
         maxSlugLength: 50,
         minTitleLength: 4,
         maxTitleLength: 50,
-        minEnumValueLength: 3,
-        maxEnumValueLength: 30
+        minEnumValueLength: 1,
+        maxEnumValueLength: 50
     },
     review: {
         minTextLength: 10,
