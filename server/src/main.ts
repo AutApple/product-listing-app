@@ -1,12 +1,16 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ClassSerializerInterceptor, ValidationPipe, VersioningType } from '@nestjs/common';
+import { ClassSerializerInterceptor, RequestMethod, ValidationPipe, VersioningType } from '@nestjs/common';
 import { TypeORMErrorFilter } from './common/filters/typeorm-errors.filter.js';
 import session from 'express-session';
 import { globalAuthConfiguration } from './config/auth.config.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import defaultCommonConfig from './config/common.config.js';
 import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
+import dotenv from 'dotenv'
+import type { Response } from 'express';
+dotenv.config();
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
@@ -33,7 +37,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   
   // API Routes and versioning
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {exclude: ['']});
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -59,6 +63,6 @@ async function bootstrap() {
     customCss: theme.getBuffer(SwaggerThemeNameEnum.DARK)
   });
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.APP_PORT ?? 3000);
 }
 bootstrap();

@@ -1,7 +1,3 @@
-// Secret codes are specified in environment variables
-import dotenv from 'dotenv';
-dotenv.config(); // configure env variables
-
 interface AuthConfiguration {
     saltLevel: number;
     
