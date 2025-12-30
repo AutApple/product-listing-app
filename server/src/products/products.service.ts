@@ -1,21 +1,22 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateProductDto, UpdateProductDto, ProductEntity, ProductImageEntity, ProductAttributeValueEntity, ProductView } from './';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
+import { AttributeEntity, AttributeTypes } from '../attributes/';
+import { CategoryEntity } from '../categories/';
+import { CategoriesService } from '../categories/categories.service.js';
+import { deepMergeObjects, FilterEntry, SlugResourceService } from '../common/';
+import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { ImagesService } from '../images/images.service.js';
 import { ProductTypeEntity } from '../product-types/';
 import { ProductTypesService } from '../product-types/product-types.service.js';
-import { AttributeTypes, AttributeEntity } from '../attributes/';
-import { ERROR_MESSAGES } from '../config/error-messages.config.js';
-import { CategoryEntity } from '../categories/';
+import { CreateProductDto, ProductAttributeValueEntity, ProductEntity, ProductView, UpdateProductDto } from './';
 import { ProductsFilterService } from './products-filter.service.js';
-import { SlugResourceService, deepMergeObjects, FilterEntry } from '../common/';
-import { CategoriesService } from '../categories/categories.service.js';
 
 @Injectable()
 export class ProductsService extends SlugResourceService<ProductView> {
   constructor(
     @InjectRepository(ProductEntity) private readonly productRepository: Repository<ProductEntity>,
-    @InjectRepository(ProductImageEntity) private readonly productImageRepository: Repository<ProductImageEntity>,
+    private readonly imagesService: ImagesService,
     @InjectRepository(ProductView) private readonly productViewRepository: Repository<ProductView>,
     private readonly productTypesService: ProductTypesService,
     private readonly categoriesService: CategoriesService,
@@ -107,15 +108,6 @@ export class ProductsService extends SlugResourceService<ProductView> {
     return result;
   }
 
-  private upsertImageUrls(product: ProductEntity, imageUrls: string[], mergeImageUrls?: ProductImageEntity[]): ProductImageEntity[] {
-    const result: ProductImageEntity[] = mergeImageUrls ?? [];
-    for (const url of imageUrls) {
-      if (result.findIndex(v => v.url === url) !== -1)
-        continue;
-      result.push(this.productImageRepository.create({ url, product }));
-    }
-    return result;
-  }
 
   private async validateAndPreloadProductTypes(
     dtos: CreateProductDto[]
@@ -154,7 +146,7 @@ export class ProductsService extends SlugResourceService<ProductView> {
     const products: ProductEntity[] = [];
     await this.productRepository.manager.transaction(async (entityManager: EntityManager) => {
       for (const dto of dtos) {
-        const { attributes, imageUrls, productTypeSlug, categorySlug, ...productData } = dto;
+        const { attributes, imageSlugs, productTypeSlug, categorySlug, ...productData } = dto;
         const productType: ProductTypeEntity | undefined = productTypeMap.get(productTypeSlug);
         if (!productType)
           throw new BadRequestException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('product type', productTypeSlug));
@@ -172,13 +164,15 @@ export class ProductsService extends SlugResourceService<ProductView> {
           attributes as [{ key: string, value: (number | boolean | string); }],
           productType.attributes
         );
-        await entityManager.save(product);
+
         // Assign images
-        if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
-          const images = this.upsertImageUrls(product, imageUrls);
-          await entityManager.save(images);
+        if (imageSlugs && imageSlugs.length) { // if there are any image urls specified, create entities for them
+          const images = await this.imagesService.getBySlugs(imageSlugs); // get images associated with each of the slug
           product.images = images;
         }
+
+        await entityManager.save(product);
+
         products.push(product);
       }
     });
@@ -201,7 +195,7 @@ export class ProductsService extends SlugResourceService<ProductView> {
       ['attributeValues', 'images', 'productType', 'productType.attribute', 'attributeValues.attribute']
     );
 
-    const { attributes, imageUrls, productTypeSlug, categorySlug, ...productData } = updateProductDto;
+    const { attributes, imageSlugs, productTypeSlug, categorySlug, ...productData } = updateProductDto;
 
     Object.assign(product, productData);
 
@@ -223,13 +217,13 @@ export class ProductsService extends SlugResourceService<ProductView> {
       product.attributeValues = newValues;
     }
 
-    await this.productRepository.save(product);
-
-    if (imageUrls && imageUrls.length) { // if there are any image urls specified, create entities for them
-      const images = this.upsertImageUrls(product, imageUrls, product.images);
-      await this.productImageRepository.save(images);
+    if (imageSlugs && imageSlugs.length) { // use specified image slugs
+      const images = await this.imagesService.getBySlugs(imageSlugs);
       product.images = images;
     }
+
+    await this.productRepository.save(product);
+
     const view = await this.findOneBySlug(slug);
     return view;
   }

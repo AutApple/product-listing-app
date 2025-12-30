@@ -60,7 +60,8 @@ export class OutputProductDto {
 
     @ApiProperty({ description: 'Attributes of a product', type: [AttributeValueDto] })
     attributes: AttributeValueDto[];
-    images: string[];
+    @ApiProperty({ description: 'Slugs of an images associated with a product', type: [String] })
+    imageSlugs: string[];
 
 
     constructor(product: ProductView) {
@@ -88,9 +89,9 @@ export class OutputProductDto {
         }
 
         if (product.images) {
-            this.images = [];
+            this.imageSlugs = [];
             for (const img of product.images)
-                this.images.push(img.url);
+                this.imageSlugs.push(img.slug);
         }
     }
 }

@@ -29,10 +29,10 @@ export class OutputReviewDto {
 
     @ApiProperty({
         name: 'images',
-        description: 'Image URLs',
+        description: 'Image slugs',
         type: [String]
     })
-    images: string[];
+    imageSlugs: string[];
 
     @ApiProperty({
         name: 'rating',
@@ -67,9 +67,9 @@ export class OutputReviewDto {
         this.productSlug = review.productSlug;
         this.userName = review.userName;
         this.aggregatedReviewScore = review.reviewVoteScore ?? 0;
-        this.images = [];
+        this.imageSlugs = [];
         if (review.images)
-            this.images = review.images.map(i => i.url);
+            this.imageSlugs = review.images.map(i => i.slug);
         this.rating = review.rating;
         this.createdAt = review.createdAt.toLocaleString();
         this.updatedAt = review.updatedAt.toLocaleString();

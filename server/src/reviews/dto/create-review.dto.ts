@@ -32,11 +32,11 @@ export class CreateReviewDto {
     text: string; 
 
     @ApiProperty({
-        name: 'images',
-        description: 'URLs of a review images',
+        name: 'imageSlugs',
+        description: 'Slugs of an images that were submitted to POST /images',
         type: [String]
     })
     @IsArray()
     @IsString({each: true}) // FIXME: IsUrl in production
-    images: string[];
+    imageSlugs: string[];
 }

@@ -15,5 +15,6 @@ import { ImagesS3Service } from './images-s3.service.js';
   ],
   controllers: [ImagesController],
   providers: [ImagesService, ImagesS3Service],
+  exports: [ImagesService]
 })
 export class ImagesModule {}

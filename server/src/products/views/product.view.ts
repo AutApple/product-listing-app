@@ -61,10 +61,10 @@ interface AttributeValueView {
             ) AS "attributeValues",
                   COALESCE(
             (
-                SELECT json_agg(json_build_object('url', pi.url))
-                FROM product_images pi
+                SELECT json_agg(json_build_object('slug', pi.slug))
+                FROM images pi
                 WHERE pi."productId" = p.id
-                AND pi.url IS NOT NULL
+                AND pi.slug IS NOT NULL
             ),
             '[]'::json
             ) AS images
@@ -125,7 +125,7 @@ export class ProductView {
     attributeValues: AttributeValueView[];
 
     @ViewColumn()
-    images: Array<{ url: string }>; 
+    images: Array<{ slug: string }>; 
 
     public static generateFromEntity (entity: ProductEntity) {
         const pv = new ProductView();

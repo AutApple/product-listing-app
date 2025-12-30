@@ -32,10 +32,10 @@ import { VoteType } from '../entities/review-vote.entity.js';
       
       COALESCE(
         (
-          SELECT json_agg(json_build_object('url', ri.url))
-          FROM review_images ri
+          SELECT json_agg(json_build_object('slug', ri.slug))
+          FROM images ri
           WHERE ri."reviewId" = r.id
-          AND ri.url IS NOT NULL
+          AND ri.slug IS NOT NULL
         ),
         '[]'::json
       ) AS images
@@ -94,7 +94,7 @@ export class ReviewView {
   reviewVoteScore: number;
 
   @ViewColumn()
-  images: Array<{ url: string }>; 
+  images: Array<{ slug: string }>; 
 
   public static generateFromEntity (entity: ReviewEntity) {
     const rv = new ReviewView();

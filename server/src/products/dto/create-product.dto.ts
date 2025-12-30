@@ -79,14 +79,13 @@ export class CreateProductDto {
     
 
     @ApiProperty({
-        description: 'Array of strings resembling image URLs of a given product',
+        description: 'Array of strings resembling slugs of images uploaded via POST /images endpoint',
         required: true,
         type: [String]
     })
     @IsArray()
-    @IsUrl({}, { each: true })
     @IsString({ each: true })
-    imageUrls: string[];
+    imageSlugs: string[];
 
     @ApiProperty({
         description: 'Slug of a product type that the product is related to',

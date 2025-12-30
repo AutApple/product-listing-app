@@ -1,11 +1,11 @@
 import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 import { CategoryEntity } from '../../categories/entities/category.entity.js';
 import { AbstractEntity } from '../../common/entities/abstract.entity.js';
+import { ImageEntity } from '../../images/index.js';
 import { ProductTypeEntity } from '../../product-types/entities/product-type.entity.js';
 import { ReviewEntity } from '../../reviews/entities/review.entity.js';
 import { WishlistItemEntity } from '../../wishlist/entities/wishlist-item.entity.js';
 import { ProductAttributeValueEntity } from './product-attribute-value.entity.js';
-import { ProductImageEntity } from './product-image.entity.js';
 
 @Entity({
     name: 'products'
@@ -46,10 +46,10 @@ export class ProductEntity extends AbstractEntity {
     @ManyToOne(() => CategoryEntity)
     category: CategoryEntity;
 
-    @OneToMany(() => ProductImageEntity, (productImage: ProductImageEntity) => productImage.product, {
-        cascade: ['insert', 'update', 'remove']
+    @OneToMany(() => ImageEntity, (image: ImageEntity) => image.product, {
+        cascade: ['update', 'remove']
     })
-    images: ProductImageEntity[];
+    images: ImageEntity[];
 
     @ManyToOne(() => ProductTypeEntity, (productType: ProductTypeEntity) => productType.products)
     productType: ProductTypeEntity;

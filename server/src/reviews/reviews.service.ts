@@ -1,17 +1,19 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { CreateReviewDto, UpdateReviewDto, ReviewEntity, ReviewImageEntity, ReviewView } from './';
+import { CreateReviewDto, UpdateReviewDto, ReviewEntity, ReviewView } from './';
 import { IdResourceService, deepMergeObjects } from '../common/';
 import { FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductsService } from '../products/products.service.js';
 import { UsersService } from '../users/users.service.js';
 import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { ImagesService } from '../images/images.service.js';
+import { ImageEntity } from '../images/index.js';
 
 @Injectable()
 export class ReviewsService extends IdResourceService<ReviewView>{
   constructor(
     @InjectRepository(ReviewEntity) private readonly reviewRepository: Repository<ReviewEntity>,
-    @InjectRepository(ReviewImageEntity) private readonly reviewImageRepository: Repository<ReviewImageEntity>,
+    private readonly imagesService: ImagesService,
     @InjectRepository(ReviewView) private readonly reviewViewRepository: Repository<ReviewView>,
     private readonly productsService: ProductsService,
     private readonly usersService: UsersService,
@@ -20,19 +22,18 @@ export class ReviewsService extends IdResourceService<ReviewView>{
   }
   
   async create(createReviewDto: CreateReviewDto, email: string): Promise<ReviewView> {
-    const { productSlug, text, rating, images } = createReviewDto;
+    const { productSlug, text, rating, imageSlugs } = createReviewDto;
     
     const product = await this.productsService.findEntityBySlug(productSlug); 
     const user = await this.usersService.findOneByEmail(email);
 
     const review = this.reviewRepository.create({product, author: user, text, rating, images: []});
     
-    if (images.length > 0) {
-        const imageEntities: ReviewImageEntity[] = images.map(url => this.reviewImageRepository.create({url, review}));
+    if (imageSlugs.length > 0) {
+        const imageEntities: ImageEntity[] = await this.imagesService.getBySlugs(imageSlugs);
         review.images = imageEntities;
     }
- 
-    
+     
     const savedReview = await this.reviewRepository.save(review);;
     return ReviewView.generateFromEntity(savedReview); 
   }
@@ -44,10 +45,12 @@ export class ReviewsService extends IdResourceService<ReviewView>{
     const review = await this.findOneById(id);
     if (email !== review.userEmail)
       throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN());
-    const { text, rating } = updateReviewDto;
+    const { text, rating, imageSlugs } = updateReviewDto;
     let updateObject = {};
     if (text) deepMergeObjects(updateObject, {text});
     if (rating) deepMergeObjects(updateObject, {rating}); 
+    if (imageSlugs) deepMergeObjects(updateObject, { images: await this.imagesService.getBySlugs(imageSlugs) });
+    
     await this.reviewRepository.update({id: review.id}, updateObject);
     Object.assign(review, updateObject);
     return review;

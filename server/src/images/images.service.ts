@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { UploadImageDto } from './dto/upload-image.dto.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ImageEntity } from './entities/image.entity.js';
@@ -40,5 +40,22 @@ export class ImagesService {
       throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('image', slug));
     }
     return image;
+  }
+  
+
+
+  async getBySlugs(slugs: string[], fromEmail: string | undefined = undefined): Promise<ImageEntity[]> {
+    const images: ImageEntity[] = [];
+    for (const slug of slugs) {
+      const image = await this.imageRepository.findOne({ where: {slug}, relations: ['author'] }); 
+      
+      if (!image)
+        throw new NotFoundException(ERROR_MESSAGES.RESOURCE_NOT_FOUND('image', slug));
+      if (fromEmail && image.author.email !== fromEmail)
+        throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN());
+
+      images.push(image);
+    }
+    return images;
   }
 }
