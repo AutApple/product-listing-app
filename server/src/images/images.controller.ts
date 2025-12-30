@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { UploadImageDto } from './dto/upload-image.dto';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard, User } from '../auth/index.js';
 import { ApiAuthHeader } from '../swagger/index.js';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Express } from 'express';
+import type { Express, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 @Controller('images')
@@ -28,5 +28,13 @@ export class ImagesController {
     await validateOrReject(uploadImageDto);
     
     return this.imagesService.upload(uploadImageDto, file, uploaderEmail);
+  }
+
+  @ApiTags('Images')
+  @ApiOperation({summary: 'Get specific image from the cloud storage'})
+  @ApiParam({name: 'slug', description: 'Slug of an image'})
+  @Get(':slug')
+  async getImage(@Param('slug') slug: string, @Res() res: Response) {
+    return await this.imagesService.getImage(slug, res);
   }
 }

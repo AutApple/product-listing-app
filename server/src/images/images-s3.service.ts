@@ -47,3 +47,11 @@ export class ImagesS3Service {
         return key;
     }
 
+    async getImage(key: string): Promise<GetObjectCommandOutput> {
+      const command = new GetObjectCommand({
+        Bucket: 'wwhhooami-cloud',
+        Key: key,
+      });
+      return await this.s3Client.send(command);
+    }
+}
