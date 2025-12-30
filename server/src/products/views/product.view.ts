@@ -129,6 +129,7 @@ export class ProductView {
 
     public static generateFromEntity (entity: ProductEntity) {
         const pv = new ProductView();
+        pv.attributeValues = [];
         pv.id = entity.id;
         pv.createdAt = entity.createdAt;
         pv.updatedAt = entity.updatedAt; 
