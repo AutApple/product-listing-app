@@ -23,7 +23,8 @@ export class OutputCategoryDto {
             type: 'string',
             description: 'Full slash separated path to the category'
         }, {
-            $ref: getSchemaPath(Array<String>),
+            type: 'array',
+            items: {type: 'string'},
             description: 'Individual category slugs that make up a path'
         }]
     })

@@ -7,7 +7,4 @@ export class UploadImageDto {
     })
     @IsString()
     slug: string;
-
-    @ApiProperty({ description: 'Attached image file', type: 'string', format: 'binary' })
-    file: any;
 }

@@ -8,6 +8,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import type { Express, Response } from 'express';
 import { validateOrReject } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
+import { SwaggerImageDto } from './dto/swagger-image.dto.js';
 @Controller('images')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
@@ -16,7 +17,7 @@ export class ImagesController {
   @ApiOperation({summary: 'Upload image to the cloud storage'})
   @ApiAuthHeader()
   @ApiConsumes('multipart/form-data')
-  @ApiBody({type: UploadImageDto, description: 'Upload image data'})
+  @ApiBody({type: SwaggerImageDto, description: 'Upload image data'})
   @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('file'))
   @Post()
