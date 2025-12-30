@@ -30,7 +30,7 @@ export class ReviewsService extends IdResourceService<ReviewView>{
     const review = this.reviewRepository.create({product, author: user, text, rating, images: []});
     
     if (imageSlugs.length > 0) {
-        const imageEntities: ImageEntity[] = await this.imagesService.getBySlugs(imageSlugs);
+        const imageEntities: ImageEntity[] = await this.imagesService.getBySlugs(imageSlugs, email);
         review.images = imageEntities;
     }
      
@@ -50,7 +50,7 @@ export class ReviewsService extends IdResourceService<ReviewView>{
     
     if (text) deepMergeObjects(updateObject, {text});
     if (rating) deepMergeObjects(updateObject, {rating}); 
-    if (imageSlugs) deepMergeObjects(updateObject, { images: await this.imagesService.getBySlugs(imageSlugs) });
+    if (imageSlugs) deepMergeObjects(updateObject, { images: await this.imagesService.getBySlugs(imageSlugs, email) });
     
     await this.reviewRepository.update({id: review.id}, updateObject);
     Object.assign(review, updateObject);
