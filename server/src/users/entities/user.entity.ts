@@ -4,6 +4,7 @@ import { AbstractEntity } from '../../common/entities/abstract.entity.js';
 import { ReviewVoteEntity } from '../../reviews/entities/review-vote.entity.js';
 import { ReviewEntity } from '../../reviews/entities/review.entity.js';
 import { WishlistEntity } from '../../wishlist/entities/wishlist.entity.js';
+import { ImageEntity } from '../../images/index.js';
 
 @Entity({
     name: 'users'
@@ -50,6 +51,9 @@ export class UserEntity extends AbstractEntity {
 
     @OneToMany(() => ReviewEntity, e => e.author)
     reviews: ReviewEntity[];
+
+    @OneToMany(() => ImageEntity, e => e.author)
+    images: ImageEntity[];
 
     @OneToMany(() => ReviewVoteEntity, e => e.user)
     reviewVotes: ReviewVoteEntity;

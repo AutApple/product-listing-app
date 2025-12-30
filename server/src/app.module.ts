@@ -14,6 +14,8 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { BootstrapModule } from './bootstrap/bootstrap-module.js';
 import { CacheModule } from '@nestjs/cache-manager'
 import { getReddisConfig } from './config/reddis.config.js';
+import { ImagesModule } from './images/images.module';
+
 
 @Module({
   imports: [
@@ -38,7 +40,8 @@ import { getReddisConfig } from './config/reddis.config.js';
     UsersModule,
     AuthModule,
     WishlistModule,
-    ReviewsModule
+    ReviewsModule,
+    ImagesModule,
   ],
   controllers: [],
   providers: [],

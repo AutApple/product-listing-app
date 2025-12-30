@@ -11,6 +11,8 @@ export const ERROR_MESSAGES = {
    RESOURCE_NOT_FOUND: (resource: string, value: string, valueIdentity: string = 'slug') => `Could not find ${resource} with ${valueIdentity} "${value}".`,
    NO_DATA_PROVIDED: () => `No data provided`,
    RESOURCE_VALIDATION_FAIL: () => `Validation failed.`,
+   NO_FILE_PROVIDED: () => `No file provided`,
+
    // product attributes validation messages
    ATTRIBUTE_BAD_REQUEST: (slug: string, values: string[]) => `Attribute "${slug}" can only have following values: ${values.join(', ')}.`,
    ATTRIBUTE_NOT_FOUND: (key: string) => `Attribute with key ${key} was not found in the attributes of a given product type.`,
