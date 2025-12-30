@@ -40,13 +40,14 @@ export class ReviewsService extends IdResourceService<ReviewView>{
 
 
   async update(id: string, updateReviewDto: UpdateReviewDto, email: string): Promise<ReviewView> {
-    // TODO: maybe some kind of review history logging on update.
-    
+    // TODO: some kind of review history logging on update. 
     const review = await this.findOneById(id);
     if (email !== review.userEmail)
       throw new ForbiddenException(ERROR_MESSAGES.AUTH_FORBIDDEN());
     const { text, rating, imageSlugs } = updateReviewDto;
+    
     let updateObject = {};
+    
     if (text) deepMergeObjects(updateObject, {text});
     if (rating) deepMergeObjects(updateObject, {rating}); 
     if (imageSlugs) deepMergeObjects(updateObject, { images: await this.imagesService.getBySlugs(imageSlugs) });

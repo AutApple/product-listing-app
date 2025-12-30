@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto, UpdateUserCredentialsDto, UserEntity  } from './';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -38,7 +38,11 @@ export class UsersService {
 
   async changeCredentials(email: string, updateUserCredentialsDto: UpdateUserCredentialsDto): Promise<UserEntity> {
     const user = await this.findOneByEmail(email);
-    if (updateUserCredentialsDto.email !== undefined) user.email = updateUserCredentialsDto.email;
+    if (updateUserCredentialsDto.email !== undefined) {
+      if (await this.findOneByEmail(updateUserCredentialsDto.email))
+        throw new ConflictException(ERROR_MESSAGES.DB_UNIQUE_CONSTRAINT_VIOLATION())
+      user.email = updateUserCredentialsDto.email;
+    }
     if (updateUserCredentialsDto.password !== undefined) user.hashedPassword = await bcrypt.hash(updateUserCredentialsDto.password, globalAuthConfiguration.saltLevel);
     await this.userRepository.save(user);
     return user;

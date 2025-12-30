@@ -2,7 +2,7 @@ export const ERROR_MESSAGES = {
    //database messages
    DB_ERROR_GENERAL: () => 'Database query failed.',
    
-   DB_UNIQUE_CONSTRAINT_VIOLATION: () => `Conflict on trying to add a new resource.`,
+   DB_UNIQUE_CONSTRAINT_VIOLATION: () => `Conflict on trying to add a new entity (are all of the unique fields being unique?).`,
    DB_FOREIGN_KEY_VIOLATION: () => `Cannot delete: related resources exist.`,
    DB_NOT_NULL_VIOLATION: () => `Missing required field.`,
    DB_STRING_DATA_TRUNCATION: () => `Value is too long.`,

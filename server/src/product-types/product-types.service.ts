@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateProductTypeDto, UpdateProductTypeDto, ProductTypeEntity } from './';
 import { EntityManager, FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributeEntity } from '../attributes/';
 import { SlugResourceService } from '../common/';
 import { AttributesService } from '../attributes/attributes.service.js';
+import { ERROR_MESSAGES } from '../config/error-messages.config.js';
 
 @Injectable()
 export class ProductTypesService extends SlugResourceService<ProductTypeEntity> {
@@ -58,7 +59,7 @@ export class ProductTypesService extends SlugResourceService<ProductTypeEntity> 
   }
 
   async update(slug: string, updateProductTypeDto: UpdateProductTypeDto): Promise<ProductTypeEntity> {
-    const { attributes, ...productTypeData } = updateProductTypeDto;
+    const { attributes, slug: newSlug } = updateProductTypeDto;
     const productType = await this.findOneBySlug(slug, {
       attributes: {
         id: true,
@@ -68,8 +69,12 @@ export class ProductTypesService extends SlugResourceService<ProductTypeEntity> 
       }
     });
 
-    Object.assign(productType, productTypeData);
-
+    if (newSlug) {
+      if (await this.findOneBySlug(newSlug))
+        throw new ConflictException(ERROR_MESSAGES.DB_UNIQUE_CONSTRAINT_VIOLATION());
+      productType.slug = newSlug;
+    }
+    
     if (attributes && attributes.length > 0)
       productType.attributes = await this.makeAttributes(attributes);
 

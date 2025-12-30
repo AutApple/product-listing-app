@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, FindOptionsOrder, FindOptionsSelect, FindOptionsWhere, Repository } from 'typeorm';
 import { AttributeEntity, AttributeTypes } from '../attributes/';
@@ -195,14 +195,21 @@ export class ProductsService extends SlugResourceService<ProductView> {
       ['attributeValues', 'images', 'productType', 'productType.attribute', 'attributeValues.attribute']
     );
 
-    const { attributes, imageSlugs, productTypeSlug, categorySlug, ...productData } = updateProductDto;
+    const { attributes, imageSlugs, productTypeSlug, categorySlug, slug: newSlug, title, shortDescription, description, price } = updateProductDto;
 
-    Object.assign(product, productData);
+    if (newSlug) {
+      if (await this.findOneBySlug(slug))
+        throw new ConflictException(ERROR_MESSAGES.DB_UNIQUE_CONSTRAINT_VIOLATION());
+      product.slug = newSlug;
+    }
 
-    if (productTypeSlug)
-      product.productType = await this.productTypesService.findOneBySlug(productTypeSlug);
-    if (categorySlug)
-      product.category = await this.categoriesService.findOneBySlug(categorySlug);
+    if (title) product.title = title;
+    if (price) product.price = price;
+    if (shortDescription) product.shortDescription = shortDescription;
+    if (description) product.description = description;
+
+    if (productTypeSlug) product.productType = await this.productTypesService.findOneBySlug(productTypeSlug);
+    if (categorySlug) product.category = await this.categoriesService.findOneBySlug(categorySlug);
 
     if (attributes) {
       this.validateAttributeValues(

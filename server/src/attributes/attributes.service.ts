@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAttributeDto, UpdateAttributeDto } from './dto/';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, FindOptionsOrder, FindOptionsSelect, Repository } from 'typeorm';
-import { AttributeEnumValueEntity, AttributeEntity, AttributeTypes } from './';
 import { SlugResourceService } from '../common/slug-resource.service.js';
+import { ERROR_MESSAGES } from '../config/error-messages.config.js';
+import { AttributeEntity, AttributeEnumValueEntity, AttributeTypes } from './';
+import { CreateAttributeDto, UpdateAttributeDto } from './dto/';
 
 @Injectable()
 export class AttributesService extends SlugResourceService<AttributeEntity> {
@@ -46,13 +47,23 @@ export class AttributesService extends SlugResourceService<AttributeEntity> {
 
   async update(slug: string, updateAttributeDto: UpdateAttributeDto): Promise<AttributeEntity> {
     const attribute = await this.findOneBySlug(slug);
-    const { enumValues, ...attributeData } = updateAttributeDto;
-    Object.assign(attribute, attributeData);
+    const { enumValues, slug: newSlug, title, type } = updateAttributeDto;
+
+    if (newSlug) {
+      if (await this.findOneBySlug(newSlug))
+        throw new ConflictException(ERROR_MESSAGES.DB_UNIQUE_CONSTRAINT_VIOLATION());
+      attribute.slug = newSlug;
+    }
+
+    if (title) attribute.title = title;
+    if (type) attribute.type = type;
+
     if (enumValues && attribute.type === AttributeTypes.ENUM) {
       attribute.enumValues = [];
       for (const value of enumValues)
         attribute.enumValues.push(new AttributeEnumValueEntity(value, attribute));
     }
+
     return await this.attributeEntityRepository.save(attribute);
   }
 
