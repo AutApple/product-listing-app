@@ -2,7 +2,9 @@ import { Column, Entity, Index, ManyToOne } from 'typeorm';
 import { AbstractEntity } from '../../common/index.js';
 import { UserEntity } from '../../users/index.js';
 
-@Entity()
+@Entity({
+    name: 'images'
+})
 export class ImageEntity extends AbstractEntity {
     @Column({
         type: 'varchar',
