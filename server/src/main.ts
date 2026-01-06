@@ -32,9 +32,10 @@ async function bootstrap() {
       resave: false, 
       saveUninitialized: true,
       cookie: {
-        sameSite: 'lax',
+        sameSite: process.env.DEV === 'true' ? 'lax' : 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
-
+        httpOnly: true,
+        secure: process.env.DEV !== 'true'
       }
     })
   );
