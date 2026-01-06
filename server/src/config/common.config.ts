@@ -1,11 +1,7 @@
-export interface CommonConfig {
-    apiTitle: string; 
-    apiDescription: string;
-    apiVersion: string; 
-}
+import { CommonConfig } from './interfaces/common.config.interface.js';
 
 
-const defaultCommonConfig = { 
+const defaultCommonConfig: CommonConfig = { 
     apiTitle: 'Product Listing API',
     apiDescription: `Product Listing API`,
     apiVersion: '1.0'

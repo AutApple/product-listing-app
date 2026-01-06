@@ -2,7 +2,7 @@ import { createParamDecorator, ExecutionContext, Type } from '@nestjs/common';
 import { QueryCommonDto } from '../../common/dto/query.common.dto.js';
 import { plainToInstance } from 'class-transformer';
 import { QueryParser } from '../query-parser.js';
-import { QueryParserConfiguration } from '../types/query-parser-config.type.js';
+import { QueryParserConfiguration } from '../../config/interfaces/query-parser-config.interface.js';
 
 
 // This decorator gets raw query and then parses it into the format that is feasable for services (various TypeORM options)

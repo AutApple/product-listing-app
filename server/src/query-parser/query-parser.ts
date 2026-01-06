@@ -2,7 +2,7 @@ import { And, FindOperator, FindOptionsOrder, Raw } from 'typeorm';
 import { FilterEntry, QueryCommonDto } from '../common/dto/query.common.dto.js';
 import { deepMergeObjects } from '../common/utils/deep-merge-objects.js';
 import { FilterConditionBuilder } from '../common/utils/filter-condition-builder.js';
-import { FieldType, QueryParserConfiguration } from './types/query-parser-config.type.js';
+import { FieldType, QueryParserConfiguration } from '../config/interfaces/query-parser-config.interface.js';
 
 export interface QueryParserResult {
     selectOptions?: object;

@@ -1,5 +1,5 @@
 import { Equal, FindOperator, In, LessThan, LessThanOrEqual, MoreThan, MoreThanOrEqual } from 'typeorm';
-import { FieldType } from '../../query-parser/types/query-parser-config.type.js';
+import { FieldType } from '../../config/interfaces/query-parser-config.interface.js';
 import { FilterEntry } from '../dto/query.common.dto.js';
 import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { ERROR_MESSAGES } from '../../config/error-messages.config.js';

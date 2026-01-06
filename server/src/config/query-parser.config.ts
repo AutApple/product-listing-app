@@ -1,4 +1,4 @@
-import { FieldType, QueryParserConfiguration } from '../query-parser/types/query-parser-config.type.js';
+import { FieldType, QueryParserConfiguration } from './interfaces/query-parser-config.interface.js';
 
 const products: QueryParserConfiguration = {
     fields: {

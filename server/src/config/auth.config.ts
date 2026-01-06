@@ -1,16 +1,4 @@
-interface AuthConfiguration {
-    saltLevel: number;
-    
-    jwtAccessSecret: string;
-    jwtRefreshSecret: string; 
-    
-    sessionSecret: string; 
-    
-    jwtAccessTokenExpiration: number;
-    jwtRefreshTokenExpiration: number;
-
-    anonymousWishlistsExpirationDays: number;
-}
+import { AuthConfiguration } from './interfaces/auth.config.interface.js';
 
 export const globalAuthConfiguration: AuthConfiguration = {
     saltLevel: 10,

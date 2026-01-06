@@ -1,4 +1,4 @@
-import { FieldType } from '../../query-parser/types/query-parser-config.type.js';
+import { FieldType } from '../../config/interfaces/query-parser-config.interface.js';
 import { AttributeTypes }  from '../../attributes/types/attribute.types.enum.js';
 
 const dict = {
