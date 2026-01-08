@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:15
+    env_file: .env.docker
+  redis:
+    image: redis:7
+  app:
+    build: .
+    env_file: .env.docker
+    ports:
+      - "${APP_PORT}:3000"
+    depends_on:
+      - redis
+      - postgres
