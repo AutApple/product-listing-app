@@ -38,7 +38,7 @@ docker compose --env-file .env up --build
 
 ### API Documentation
 
-The API documentation is available in your local development environment at:
+The Swagger UI API documentation is available in your local development environment at:
 
-- **Root endpoint:** `http://localhost:3000/`
-- **Swagger UI:** `http://localhost:3000/api/`
+- **Root endpoint:** `http://localhost:3000/` (redirects to `/api`)
+- **Api endpoint:** `http://localhost:3000/api/`
