@@ -5,6 +5,7 @@ Product listing app - frontend in development (client-dev branch).
 ## Features
 - User authentication and authorization
 - REST API for core domain logic
+- Advanced product filtering by attributes 
 - Redis-backed caching
 - PostgreSQL persistence
 - Image upload and storage via AWS
