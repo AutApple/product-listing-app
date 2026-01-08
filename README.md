@@ -1,6 +1,6 @@
 # Product Listing App
 
-Product listing application. Client is currently in development (client-dev branch).
+Product listing app - frontend in development (client-dev branch).
 
 ## Features
 - User authentication and authorization
@@ -21,6 +21,17 @@ Product listing application. Client is currently in development (client-dev bran
 - Docker
 - Docker Compose
 
-### Run locally
+### Building the project
+
+1. Create a `.env` file based on the example:
+
 ```bash
-docker compose up --build
+cp .env.example .env
+```
+Then edit .env to match your local configuration (ports, database credentials, AWS Settings, etc.).
+
+2. Use Docker Compose with your custom env file:
+
+```bash
+docker compose --env-file .env up --build
+```
